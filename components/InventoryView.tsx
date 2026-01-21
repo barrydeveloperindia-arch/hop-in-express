@@ -639,7 +639,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({
       <div className="bg-surface-elevated rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden no-print">
         {/* Desktop View */}
         <table className="w-full text-left hidden md:table">
-          <thead className="bg-slate-50 text-slate-400 text-[9px] font-black uppercase border-b">
+          <thead className="bg-slate-50 text-slate-600 text-[9px] font-black uppercase border-b">
             <tr>
               <th className="px-10 py-6">Asset Identity</th>
               <th className="px-10 py-6 text-center">Stock Level</th>
