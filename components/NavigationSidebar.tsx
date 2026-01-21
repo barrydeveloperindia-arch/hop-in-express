@@ -83,12 +83,12 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
                 <div className="px-8 pb-8">
                     <h1 className="text-xl font-black text-white px-2 tracking-tighter uppercase">Hop In Express</h1>
-                    <p className="text-[10px] font-bold text-indigo-400 px-2 tracking-[0.3em] uppercase opacity-80">Command OS</p>
+                    <p className="text-[10px] font-bold text-teal-400 px-2 tracking-[0.3em] uppercase opacity-80">Command OS</p>
                 </div>
 
                 {/* Navigation Items */}
                 <nav className="flex-1 overflow-y-auto px-4 space-y-1">
-                    <div className="px-4 py-2 text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                    <div className="px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                         Modules
                     </div>
                     {menuItems.map((item) => {
@@ -106,17 +106,17 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                 className={cn(
                                     "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-sm font-bold",
                                     isActive
-                                        ? "bg-indigo-600 text-white shadow-glow"
+                                        ? "bg-teal-600 text-white shadow-glow"
                                         : "text-slate-400 hover:text-white hover:bg-white/5"
                                 )}
                             >
-                                <Icon className={cn("w-5 h-5", isActive ? "text-white" : "text-slate-500 group-hover:text-indigo-400")} />
+                                <Icon className={cn("w-5 h-5", isActive ? "text-white" : "text-slate-500 group-hover:text-teal-400")} />
                                 {item.label}
                             </button>
                         );
                     })}
 
-                    <div className="mt-8 px-4 py-2 text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                    <div className="mt-8 px-4 py-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                         System
                     </div>
                     {footerItems.map((item) => {
@@ -144,7 +144,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                     <div className="mt-4 px-4 py-2">
                         <div className="bg-slate-900 rounded-lg p-3 border border-white/10">
                             <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Debug Info</p>
-                            <p className="text-[10px] text-indigo-400 font-mono mt-1 break-all">
+                            <p className="text-[10px] text-teal-400 font-mono mt-1 break-all">
                                 ShopID: {import.meta.env.VITE_USER_ID || 'Auth UID'}
                             </p>
                         </div>

@@ -53,20 +53,20 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, inventory, role, at
           </div>
         )}
 
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm h-48 flex flex-col justify-between group">
+        <div className="bg-surface-elevated p-8 rounded-2xl border border-slate-700 shadow-sm h-48 flex flex-col justify-between group">
           <div>
             <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest">Inventory Realization</p>
-            <h3 className="text-4xl font-black mt-2 font-mono text-slate-900 group-hover:text-teal-600 transition-colors">{SHOP_INFO.currency}{stockValuation.toLocaleString()}</h3>
+            <h3 className="text-4xl font-black mt-2 font-mono text-white group-hover:text-teal-400 transition-colors">{SHOP_INFO.currency}{stockValuation.toLocaleString()}</h3>
           </div>
-          <p className="text-[8px] font-bold text-slate-300 uppercase">Live Stock Asset Portfolio</p>
+          <p className="text-[8px] font-bold text-slate-500 uppercase">Live Stock Asset Portfolio</p>
         </div>
 
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm h-48 flex flex-col justify-between">
+        <div className="bg-surface-elevated p-8 rounded-2xl border border-slate-700 shadow-sm h-48 flex flex-col justify-between">
           <div>
             <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest">Unpaid Liabilities</p>
-            <h3 className="text-4xl font-black mt-2 font-mono text-rose-600">{SHOP_INFO.currency}{financialSummary.unpaidBills.toLocaleString()}</h3>
+            <h3 className="text-4xl font-black mt-2 font-mono text-rose-400">{SHOP_INFO.currency}{financialSummary.unpaidBills.toLocaleString()}</h3>
           </div>
-          <p className="text-[8px] font-bold text-slate-300 uppercase">Outstanding Vendor Bills</p>
+          <p className="text-[8px] font-bold text-slate-500 uppercase">Outstanding Vendor Bills</p>
         </div>
 
         <div className="bg-[#0F172A] p-8 rounded-2xl shadow-lg text-white h-48 flex flex-col justify-between">
@@ -78,13 +78,13 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, inventory, role, at
         </div>
       </div>
 
-      <div className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200 h-[300px] md:h-[400px]">
-        <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight mb-8">Integrated Revenue Analytics</h4>
+      <div className="bg-surface-elevated p-6 md:p-10 rounded-3xl shadow-sm border border-slate-700 h-[300px] md:h-[400px]">
+        <h4 className="text-lg font-black text-white uppercase tracking-tight mb-8">Integrated Revenue Analytics</h4>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={trendData}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 800, fill: '#94a3b8' }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 800, fill: '#94a3b8' }} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
+            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 800, fill: '#cbd5e1' }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 800, fill: '#cbd5e1' }} />
             <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
             <Area type="monotone" dataKey="gross" stroke="#0d9488" strokeWidth={4} fill="#0d948810" />
           </AreaChart>
