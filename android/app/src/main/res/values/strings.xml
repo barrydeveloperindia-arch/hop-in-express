@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Hop In Express Command OS</string>
+    <string name="title_activity_main">Hop In Express Command OS</string>
+    <string name="package_name">com.hopinexpress.commandos</string>
+    <string name="custom_url_scheme">com.hopinexpress.commandos</string>
+</resources>

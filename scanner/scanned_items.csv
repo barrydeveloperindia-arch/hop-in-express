@@ -1,0 +1,11 @@
+product_id,product_name,category,price_gbp,currency,vat_percent,barcode,stock
+1,Rice Basmati 5kg,Grains,12.99,GBP,0,5.01235E+12,40
+2,Wheat Flour 2kg,Grains,3.5,GBP,0,5.01235E+12,60
+3,Sugar 1kg,Essentials,1.45,GBP,0,5.01235E+12,80
+4,Sunflower Oil 1L,Cooking Oil,2.99,GBP,0,5.01235E+12,50
+5,Fresh Milk 2L,Dairy,2.3,GBP,0,5.01235E+12,35
+6,Bread Loaf,Bakery,1.2,GBP,0,5.01235E+12,45
+7,Eggs (12 pack),Dairy,3.1,GBP,0,5.01235E+12,30
+8,Tea Bags 80 pcs,Beverages,3.99,GBP,20,5.01235E+12,25
+9,Coffee 200g,Beverages,4.5,GBP,20,5.01235E+12,20
+10,Biscuits Pack,Snacks,1.75,GBP,20,5.01235E+12,55

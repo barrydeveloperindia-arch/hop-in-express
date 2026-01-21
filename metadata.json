@@ -1,0 +1,7 @@
+{
+  "name": "Hop In Express - 1",
+  "description": "Enterprise-grade UK grocery inventory & management system with HMRC compliance, EAN-13 scanning, and expiry tracking.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
