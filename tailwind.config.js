@@ -13,46 +13,34 @@ export default {
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
-        // PROFESSIONAL DARK THEME (Standard Palette)
-        // We do NOT invert Slate/White here to avoid confusion.
-        // Instead we use semantic names.
+        // HIGH VISIBILITY LIGHT THEME PAILLETTE
+        // We use standard colors but define clear semantic aliases for consistency
 
-        slate: colors.slate,
-        gray: colors.gray,
-        zinc: colors.zinc,
-        neutral: colors.neutral,
-        stone: colors.stone,
-        red: colors.red,
-        orange: colors.orange,
-        amber: colors.amber,
-        yellow: colors.yellow,
-        lime: colors.lime,
-        green: colors.green,
-        emerald: colors.emerald,
-        teal: colors.teal,
-        cyan: colors.cyan,
-        sky: colors.sky,
-        blue: colors.blue,
-        indigo: colors.indigo,
-        violet: colors.violet,
-        purple: colors.purple,
-        fuchsia: colors.fuchsia,
-        pink: colors.pink,
-        rose: colors.rose,
-
+        // Surface: Clear separation
         surface: {
-          void: '#0f172a', // Slate 900 (Page Background)
-          elevated: '#1e293b', // Slate 800 (Card Background)
-          highlight: '#334155', // Slate 700 (Hover/Input)
+          void: '#f1f5f9', // Slate 100 (Page Background - Light Grey)
+          elevated: '#ffffff', // White (Cards)
+          highlight: '#e2e8f0', // Slate 200 (Hover/Input)
         },
-        accent: {
-          core: '#14b8a6', // Teal 500
-          hover: '#0d9488', // Teal 600
+
+        // Brand: Strong, Professional Indigo
+        primary: {
+          DEFAULT: '#4f46e5', // Indigo 600
+          hover: '#4338ca', // Indigo 700
+          light: '#e0e7ff', // Indigo 100
         },
+
+        // Text: High Contrast
+        ink: {
+          base: '#0f172a', // Slate 900 (Headings/Data)
+          muted: '#475569', // Slate 600 (Labels - darker than 400)
+          light: '#ffffff', // for buttons/sidebar
+        }
       },
+      // Stronger Shadows for visibility
       boxShadow: {
-        'glow': '0 0 20px rgba(20, 184, 166, 0.5)', // Teal Glow
-        'neon': '0 0 10px rgba(20, 184, 166, 0.3)',
+        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        'floating': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
       },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',

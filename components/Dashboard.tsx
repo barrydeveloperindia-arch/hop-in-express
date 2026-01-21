@@ -14,7 +14,7 @@ interface DashboardProps {
   bills: Bill[];
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ transactions, inventory, role, attendance, bills }) => {
+const Dashboard: React.FC<DashboardProps> = ({ transactions, inventory, role, attendance, bills, staff }) => {
   const isFinancialRole = role === 'Owner' || role === 'Accountant';
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -53,40 +53,43 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, inventory, role, at
           </div>
         )}
 
-        <div className="bg-surface-elevated p-8 rounded-2xl border border-slate-700 shadow-sm h-48 flex flex-col justify-between group">
+        <div className="bg-surface-elevated p-8 rounded-2xl border border-slate-200 shadow-card h-48 flex flex-col justify-between group">
           <div>
-            <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest">Inventory Realization</p>
-            <h3 className="text-4xl font-black mt-2 font-mono text-white group-hover:text-teal-400 transition-colors">{SHOP_INFO.currency}{stockValuation.toLocaleString()}</h3>
+            <p className="text-ink-muted text-[10px] font-black uppercase tracking-widest">Inventory Realization</p>
+            <h3 className="text-4xl font-black mt-2 font-mono text-ink-base group-hover:text-primary transition-colors">{SHOP_INFO.currency}{stockValuation.toLocaleString()}</h3>
           </div>
-          <p className="text-[8px] font-bold text-slate-500 uppercase">Live Stock Asset Portfolio</p>
+          <p className="text-[9px] font-bold text-slate-500 uppercase">Live Stock Asset Portfolio</p>
         </div>
 
-        <div className="bg-surface-elevated p-8 rounded-2xl border border-slate-700 shadow-sm h-48 flex flex-col justify-between">
+        <div className="bg-surface-elevated p-8 rounded-2xl border border-slate-200 shadow-card h-48 flex flex-col justify-between">
           <div>
-            <p className="text-slate-400 text-[9px] font-black uppercase tracking-widest">Unpaid Liabilities</p>
-            <h3 className="text-4xl font-black mt-2 font-mono text-rose-400">{SHOP_INFO.currency}{financialSummary.unpaidBills.toLocaleString()}</h3>
+            <p className="text-ink-muted text-[10px] font-black uppercase tracking-widest">Unpaid Liabilities</p>
+            <h3 className="text-4xl font-black mt-2 font-mono text-rose-600">{SHOP_INFO.currency}{financialSummary.unpaidBills.toLocaleString()}</h3>
           </div>
-          <p className="text-[8px] font-bold text-slate-500 uppercase">Outstanding Vendor Bills</p>
+          <p className="text-[9px] font-bold text-slate-500 uppercase">Outstanding Vendor Bills</p>
         </div>
 
-        <div className="bg-[#0F172A] p-8 rounded-2xl shadow-lg text-white h-48 flex flex-col justify-between">
+        <div className="bg-primary p-8 rounded-2xl shadow-floating text-white h-48 flex flex-col justify-between">
           <div>
-            <p className="text-teal-300 text-[9px] font-black uppercase tracking-widest">Terminal Active Staff</p>
-            <h3 className="text-4xl font-black mt-2 font-mono">{attendance.filter(a => a.date === todayStr && (a.status === 'Present' || a.status === 'Late')).length}</h3>
+            <p className="text-indigo-100 text-[10px] font-black uppercase tracking-widest">Terminal Active & Staff</p>
+            <h3 className="text-4xl font-black mt-2 font-mono text-white">
+              {attendance.filter(a => a.date === todayStr && (a.status === 'Present' || a.status === 'Late')).length}
+              <span className="text-lg opacity-50 ml-2">/ {staff.length}</span>
+            </h3>
           </div>
-          <p className="text-[8px] font-bold text-teal-300/40 uppercase">Verified Personnel on Premises</p>
+          <p className="text-[9px] font-bold text-indigo-100 uppercase">Currently On Shift</p>
         </div>
       </div>
 
-      <div className="bg-surface-elevated p-6 md:p-10 rounded-3xl shadow-sm border border-slate-700 h-[300px] md:h-[400px]">
-        <h4 className="text-lg font-black text-white uppercase tracking-tight mb-8">Integrated Revenue Analytics</h4>
+      <div className="bg-surface-elevated p-6 md:p-10 rounded-3xl shadow-card border border-slate-200 h-[300px] md:h-[400px]">
+        <h4 className="text-lg font-black text-ink-base uppercase tracking-tight mb-8">Integrated Revenue Analytics</h4>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={trendData}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
-            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 800, fill: '#cbd5e1' }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 800, fill: '#cbd5e1' }} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} />
             <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }} />
-            <Area type="monotone" dataKey="gross" stroke="#0d9488" strokeWidth={4} fill="#0d948810" />
+            <Area type="monotone" dataKey="gross" stroke="#4f46e5" strokeWidth={3} fill="#4f46e510" />
           </AreaChart>
         </ResponsiveContainer>
       </div>
