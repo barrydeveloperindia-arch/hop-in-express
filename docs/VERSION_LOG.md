@@ -1,6 +1,17 @@
 # Hop In Express - Version Log
 
-## v2.0.0 (Latest)
+## v2.0.1 (Current Stable)
+**Release Date:** January 22, 2026
+**Summary**: Hotfix for Staff Profile Picture Uploads (Compression Logic).
+
+### Assets
+| Asset Type | Location | Notes |
+| :--- | :--- | :--- |
+| **Android APK** | [Download APK](releases/v2.0.1/artifacts/HopIn_Staff_Update_v2.0.1.apk) | Includes camera/gallery fix. |
+
+---
+
+## v2.0.0 (Major Overhaul)
 **Release Date:** January 22, 2026
 **Commit:** *Use `git log` to find exact commit*
 **Summary**: Major UI Overhaul, Dark/Light Theme support, Fixed Staff Profiles, Updated Documentation.

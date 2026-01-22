@@ -17,8 +17,8 @@ export const compressImage = (file: File): Promise<File> => {
             img.src = event.target?.result as string;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 1024;
-                const MAX_HEIGHT = 1024;
+                const MAX_WIDTH = 512;
+                const MAX_HEIGHT = 512;
                 let width = img.width;
                 let height = img.height;
 
@@ -50,7 +50,7 @@ export const compressImage = (file: File): Promise<File> => {
                     } else {
                         reject(new Error("Canvas to Blob failed"));
                     }
-                }, 'image/jpeg', 0.7);
+                }, 'image/jpeg', 0.5);
             };
             img.onerror = (err) => reject(err);
         };
