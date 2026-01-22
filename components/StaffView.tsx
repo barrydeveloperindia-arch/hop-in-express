@@ -439,8 +439,8 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
         pin: editingStaff.pin,
         niNumber: editingStaff.niNumber,
         status: editingStaff.status,
-        photo: editingStaff.photo,
-        email: editingStaff.email
+        photo: editingStaff.photo || '',
+        email: editingStaff.email || ''
       };
 
       try {
