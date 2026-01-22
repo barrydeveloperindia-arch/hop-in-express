@@ -237,13 +237,13 @@ const App: React.FC = () => {
 
       <main className="flex-1 lg:pl-72 relative flex flex-col h-screen overflow-hidden transition-all duration-300">
         {/* Header */}
-        <header className="h-16 border-b border-white/5 bg-surface-void/50 backdrop-blur-md flex items-center justify-between px-4 lg:px-8 shrink-0 z-30">
+        <header className="h-16 border-b border-surface-highlight bg-surface-void/50 backdrop-blur-md flex items-center justify-between px-4 lg:px-8 shrink-0 z-30">
           <div className="flex items-center gap-2 lg:hidden">
-            <span className="font-black text-white uppercase tracking-tighter text-lg ml-1">Command OS</span>
+            <span className="font-black text-ink-base uppercase tracking-tighter text-lg ml-1">Command OS</span>
           </div>
 
-          <div className="hidden lg:block bg-surface-elevated/50 px-3 py-1.5 rounded-lg border border-white/5">
-            <span className="text-[10px] font-black uppercase text-indigo-400 tracking-widest">
+          <div className="hidden lg:block bg-surface-elevated/50 px-3 py-1.5 rounded-lg border border-surface-highlight">
+            <span className="text-[10px] font-black uppercase text-primary tracking-widest">
               Terminal: {TERMINAL_ID}
               {authChecked && user && (
                 <>
