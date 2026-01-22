@@ -5,7 +5,8 @@ const config: CapacitorConfig = {
   appName: 'Hop In Express Command OS',
   webDir: 'dist',
   server: {
-    androidScheme: 'http',
+    androidScheme: 'https',
+    hostname: 'localhost',
     cleartext: true,
     allowNavigation: ['*']
   }

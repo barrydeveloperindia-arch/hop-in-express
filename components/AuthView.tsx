@@ -24,7 +24,34 @@ const AuthView: React.FC = () => {
         const cred = await signInWithEmailAndPassword(auth, email, password);
         // window.alert(`Auth Success: ${cred.user.uid}`);
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCred.user;
+
+        // AUTO-CREATE STAFF RECORD
+        // This ensures the new user appears in the Staff List immediately
+        const { addStaffMember } = await import('../lib/firestore');
+        const shopId = import.meta.env.VITE_USER_ID || 'hop-in-express'; // Use main Shop ID
+
+        const newStaff = {
+          id: user.uid, // Use Auth UID as Staff ID for direct mapping
+          name: email.split('@')[0].toUpperCase(),
+          role: 'Cashier' as any, // Safe Default
+          pin: '0000', // Default PIN, they should change it
+          photo: '',
+          email: email,
+          loginBarcode: `STAFF-${Math.floor(Math.random() * 10000)}`,
+          status: 'Active' as const,
+          joinedDate: new Date().toISOString().split('T')[0],
+          contractType: 'Full-time' as const,
+          niNumber: 'PENDING',
+          taxCode: '1257L',
+          rightToWork: true,
+          emergencyContact: '',
+          monthlyRate: 0, hourlyRate: 11.44, dailyRate: 0, advance: 0, holidayEntitlement: 28, accruedHoliday: 0
+        };
+
+        await addStaffMember(shopId, newStaff);
+        // window.alert("Operator Registered & Added to Staff List");
       }
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
