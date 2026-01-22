@@ -7,34 +7,31 @@ export default {
     "./lib/**/*.{js,ts,jsx,tsx}",
     "./*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
-        // HOP-IN EXPRESS BRAND PALETTE (Black/Yellow/White)
-
-        // Surface: Dark "Storefront" Aesthetics
+        // Dynamic Theme Palette using CSS Variables
         surface: {
-          void: '#0F172A', // Slate 900 (Main Background - Deep Dark Blue/Black)
-          elevated: '#1E293B', // Slate 800 (Cards)
-          highlight: '#334155', // Slate 700 (Hover)
+          void: 'rgb(var(--color-surface-void) / <alpha-value>)',
+          elevated: 'rgb(var(--color-surface-elevated) / <alpha-value>)',
+          highlight: 'rgb(var(--color-surface-highlight) / <alpha-value>)',
         },
 
-        // Brand: Vibrant Yellow/Gold
         primary: {
-          DEFAULT: '#FBBF24', // Amber 400 (Main Action / Brand Color)
-          hover: '#F59E0B', // Amber 500
-          light: '#FEF3C7', // Amber 100
+          DEFAULT: 'rgb(var(--color-primary-main) / <alpha-value>)',
+          hover: 'rgb(var(--color-primary-main) / 0.8)',
+          light: 'rgb(var(--color-primary-main) / 0.2)',
         },
 
-        // Text: Light on Dark
         ink: {
-          base: '#F8FAFC', // Slate 50 (Headings)
-          muted: '#94A3B8', // Slate 400 (Secondary)
+          base: 'rgb(var(--color-ink-base) / <alpha-value>)',
+          muted: 'rgb(var(--color-ink-muted) / <alpha-value>)',
           light: '#FFFFFF',
-          dark: '#0F172A', // Text on Yellow buttons
+          dark: '#0F172A',
         }
       },
       // Stronger Shadows for visibility

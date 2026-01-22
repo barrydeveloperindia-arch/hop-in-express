@@ -17,6 +17,7 @@ import {
 import { cn } from '../lib/utils';
 import { EngLabsLogo } from '../App';
 import { auth } from '../lib/firebase';
+import { ThemeToggle } from './ui/ThemeToggle';
 
 interface NavigationSidebarProps {
     activeView: ViewType;
@@ -152,7 +153,11 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                 </nav>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-white/5">
+                <div className="p-4 border-t border-surface-highlight flex flex-col gap-2">
+                    <div className="flex items-center justify-between px-4 py-2">
+                        <span className="text-[10px] font-black uppercase text-ink-muted tracking-widest">Theme</span>
+                        <ThemeToggle className="scale-75" />
+                    </div>
                     <button
                         onClick={() => auth.signOut()}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-all text-sm font-bold"

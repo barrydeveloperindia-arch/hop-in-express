@@ -3,12 +3,48 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* LIGHT MODE DEFAULTS */
+    --color-surface-void: 241 245 249;
+    /* Slate 100 */
+    --color-surface-elevated: 255 255 255;
+    /* White */
+    --color-surface-highlight: 203 213 225;
+    /* Slate 300 */
+
+    --color-ink-base: 15 23 42;
+    /* Slate 900 */
+    --color-ink-muted: 71 85 105;
+    /* Slate 600 */
+
+    --color-primary-main: 79 70 229;
+    /* Indigo 600 */
+  }
+
+  .dark {
+    /* DARK MODE OVERRIDES */
+    --color-surface-void: 15 23 42;
+    /* Slate 900 */
+    --color-surface-elevated: 30 41 59;
+    /* Slate 800 */
+    --color-surface-highlight: 51 65 85;
+    /* Slate 700 */
+
+    --color-ink-base: 248 250 252;
+    /* Slate 50 */
+    --color-ink-muted: 148 163 184;
+    /* Slate 400 */
+
+    --color-primary-main: 251 191 36;
+    /* Amber 400 */
+  }
+
   body {
-    @apply bg-surface-void text-ink-base antialiased selection:bg-primary-light selection:text-surface-void;
+    @apply bg-surface-void text-ink-base antialiased transition-colors duration-300 selection:bg-primary selection:text-surface-void;
   }
 }
 
-/* Custom Scrollbar for "Terminal" feel */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -19,5 +55,5 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-800 rounded-full hover:bg-slate-700;
+  @apply bg-slate-400/50 rounded-full hover:bg-slate-500/80;
 }

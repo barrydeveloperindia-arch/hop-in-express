@@ -226,7 +226,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-surface-void font-sans overflow-hidden text-slate-200 selection:bg-indigo-500/30">
+    <div className="flex min-h-screen bg-surface-void font-sans overflow-hidden text-ink-base selection:bg-primary-light">
       <NavigationSidebar
         activeView={activeView}
         setActiveView={setActiveView}

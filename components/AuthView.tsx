@@ -7,6 +7,7 @@ import { FluxButton } from './ui/FluxButton';
 import { NeonInput } from './ui/NeonInput';
 import { GlassCard } from './ui/GlassCard';
 import { AlertCircle } from 'lucide-react';
+import { ThemeToggle } from './ui/ThemeToggle';
 
 const AuthView: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -60,11 +61,17 @@ const AuthView: React.FC = () => {
     }
   };
 
+
+
   return (
-    <div className="min-h-screen bg-surface-void flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-surface-void flex flex-col items-center justify-center p-6 relative overflow-hidden font-sans transition-colors duration-500">
+      <div className="absolute top-6 right-6 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Background Ambience */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-900/20 via-surface-void to-surface-void pointer-events-none"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/5 blur-[128px] rounded-full pointer-events-none animate-pulse-slow"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/10 via-surface-void to-surface-void pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 blur-[128px] rounded-full pointer-events-none animate-pulse-slow"></div>
 
       <div className="w-full max-w-md relative z-10 space-y-8">
         <div className="text-center space-y-6">
