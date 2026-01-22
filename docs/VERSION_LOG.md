@@ -7,7 +7,7 @@
 ### Assets
 | Asset Type | Location | Notes |
 | :--- | :--- | :--- |
-| **Android APK** | [Download APK](releases/v2.0.1/artifacts/HopIn_Staff_Update_v2.0.1.apk) | Includes camera/gallery fix. |
+| **Android APK** | [Download APK](releases/v2.0.1/artifacts/HopIn_Express_v2.0.1.apk) | Signed & AI Enabled. |
 | **PDF Manual (Light)** | [Download PDF](releases/v2.0.1/screenshots/light/UserGuide_Light_v2.0.1.pdf) | Located with Screenshots |
 | **PPTX Manual (Light)** | [Download PPTX](releases/v2.0.1/screenshots/light/UserGuide_Light_v2.0.1.pptx) | Located with Screenshots |
 
