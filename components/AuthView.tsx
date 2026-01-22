@@ -126,7 +126,7 @@ const AuthView: React.FC = () => {
         </GlassCard>
 
         <p className="text-center text-ink-muted text-[10px] font-medium">
-          v2.0.0 &bull; Licensed to Hop In Express &bull; <span className="text-ink-muted">EngLabs Inc.</span>
+          v2.0.0 &bull; Licensed to Hop In Express &bull; <span className="text-ink-muted">Command OS</span>
         </p>
       </div>
     </div>

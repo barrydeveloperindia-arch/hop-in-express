@@ -70,7 +70,7 @@ const HelpSupportView: React.FC = () => {
         <div className="bg-surface-elevated p-12 rounded-[3rem] border border-surface-highlight shadow-xl space-y-8">
           <div className="flex justify-between items-center border-b border-slate-100 pb-8">
             <div>
-              <button 
+              <button
                 onClick={() => setActiveDoc(null)}
                 className="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:text-indigo-800 transition-colors mb-4 block"
               >
@@ -130,7 +130,7 @@ const HelpSupportView: React.FC = () => {
         <div className="bg-surface-elevated p-10 rounded-[2.5rem] border border-surface-highlight shadow-sm space-y-6">
           <h4 className="text-lg font-black text-ink-base uppercase tracking-tight">Technical Assistance</h4>
           <p className="text-sm text-ink-muted leading-relaxed font-medium">
-            For critical system failures, terminal lockouts, or database synchronization issues, please contact the EngLabs technical dispatch team.
+            For critical system failures, terminal lockouts, or database synchronization issues, please contact the Hop-In Support Team.
           </p>
           <div className="pt-4 space-y-4">
             <div className="flex items-center gap-4 bg-surface-elevated p-4 rounded-2xl border border-slate-100">
@@ -147,8 +147,8 @@ const HelpSupportView: React.FC = () => {
           <h4 className="text-lg font-black text-ink-base uppercase tracking-tight">System Documentation</h4>
           <div className="space-y-4">
             {Object.keys(DOCUMENTATION).map((docTitle, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 onClick={() => setActiveDoc(docTitle)}
                 className="flex justify-between items-center p-4 bg-surface-elevated rounded-2xl group cursor-pointer hover:bg-indigo-50 transition-colors border border-transparent hover:border-indigo-100"
               >

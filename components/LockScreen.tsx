@@ -80,20 +80,19 @@ const LockScreen: React.FC<LockScreenProps> = ({ staff, onLogin, shopName }) => 
   }, [staff, onLogin, pin, success]);
 
   return (
-    <div className={`fixed inset-0 transition-colors duration-500 flex flex-col items-center justify-center p-6 text-white z-[9999] overflow-hidden ${
-      success ? 'bg-emerald-600' : error ? 'bg-rose-900' : 'bg-[#0F172A]'
-    }`}>
+    <div className={`fixed inset-0 transition-colors duration-500 flex flex-col items-center justify-center p-6 text-white z-[9999] overflow-hidden ${success ? 'bg-emerald-600' : error ? 'bg-rose-900' : 'bg-[#0F172A]'
+      }`}>
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-10">
         <div className="absolute top-0 left-0 w-full h-[2px] bg-[#6366F1] shadow-[0_0_20px_rgba(99,102,241,0.8)] animate-[scan_3s_infinite]" />
       </div>
 
       <div className="absolute top-12 text-center animate-in fade-in duration-1000 flex flex-col items-center">
         <div className="bg-surface-elevated/10 p-8 rounded-[3rem] backdrop-blur-xl border border-white/10 shadow-2xl mb-6">
-           <EngLabsLogo light size="lg" />
+          <EngLabsLogo light size="lg" />
         </div>
         <div className="space-y-1">
           <p className="text-[12px] font-black uppercase tracking-[0.4em] text-indigo-400">Retail Operations OS</p>
-          <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{shopName} • {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+          <p className="text-[10px] text-white/40 font-bold uppercase tracking-widest">{shopName} • {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
         </div>
       </div>
 
@@ -101,21 +100,19 @@ const LockScreen: React.FC<LockScreenProps> = ({ staff, onLogin, shopName }) => 
         <div className="text-center space-y-8">
           <div className="flex justify-center gap-6">
             {[...Array(4)].map((_, i) => (
-              <div 
-                key={i} 
-                className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${
-                  success ? 'bg-surface-elevated border-white scale-125' :
-                  error ? 'bg-rose-400 border-rose-400 animate-pulse' :
-                  pin.length > i ? 'bg-indigo-400 border-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.8)]' : 
-                  'bg-transparent border-white/20'
-                }`}
+              <div
+                key={i}
+                className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${success ? 'bg-surface-elevated border-white scale-125' :
+                    error ? 'bg-rose-400 border-rose-400 animate-pulse' :
+                      pin.length > i ? 'bg-indigo-400 border-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.8)]' :
+                        'bg-transparent border-white/20'
+                  }`}
               />
             ))}
           </div>
           <div className="space-y-2">
-            <p className={`text-[10px] font-black uppercase tracking-widest transition-colors ${
-              success ? 'text-white' : error ? 'text-rose-400' : 'text-white/60'
-            }`}>
+            <p className={`text-[10px] font-black uppercase tracking-widest transition-colors ${success ? 'text-white' : error ? 'text-rose-400' : 'text-white/60'
+              }`}>
               {success ? "SESSION INITIATED" : error ? "AUTH FAILED" : "Secure PIN or Badge Scan Required"}
             </p>
           </div>
@@ -149,9 +146,9 @@ const LockScreen: React.FC<LockScreenProps> = ({ staff, onLogin, shopName }) => 
 
       <div className="absolute bottom-12 flex flex-col items-center gap-3">
         <div className="flex gap-4">
-           <div className="w-10 h-[2px] bg-surface-elevated/10"></div>
-           <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">ENGLABS COMPLIANCE SECURED</span>
-           <div className="w-10 h-[2px] bg-surface-elevated/10"></div>
+          <div className="w-10 h-[2px] bg-surface-elevated/10"></div>
+          <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">SYSTEM COMPLIANCE SECURED</span>
+          <div className="w-10 h-[2px] bg-surface-elevated/10"></div>
         </div>
       </div>
     </div>
