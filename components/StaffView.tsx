@@ -54,17 +54,26 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     if (!file) return;
 
     try {
-      const { uploadFile } = await import('../lib/storage_utils');
-      const shopId = import.meta.env.VITE_USER_ID || auth.currentUser?.uid || 'unknown';
-      const path = `shops/${shopId}/staff/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+      // 1. Compress the image first (Client-side optimization)
+      const { compressImage } = await import('../lib/storage_utils');
+      const compressedFile = await compressImage(file);
 
-      const url = await uploadFile(file, path);
+      // 2. Convert to Base64 String
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
 
-      if (isEdit && editingStaff) setEditingStaff(prev => prev ? ({ ...prev, photo: url }) : null);
-      else setNewStaffForm(prev => ({ ...prev, photo: url }));
+        // 3. Update State
+        if (isEdit && editingStaff) {
+          setEditingStaff(prev => prev ? ({ ...prev, photo: base64String }) : null);
+        } else {
+          setNewStaffForm(prev => ({ ...prev, photo: base64String }));
+        }
+      };
+      reader.readAsDataURL(compressedFile);
     } catch (err) {
-      console.error("Upload failed", err);
-      alert("Photo Upload Failed. Check console.");
+      console.error("Photo processing failed", err);
+      alert("Photo processing failed. Please try a smaller image.");
     }
   };
 
