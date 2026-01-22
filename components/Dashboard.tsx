@@ -53,20 +53,20 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, inventory, role, at
           </div>
         )}
 
-        <div className="bg-surface-elevated p-8 rounded-2xl border border-slate-200 shadow-card h-48 flex flex-col justify-between group">
+        <div className="bg-surface-elevated p-8 rounded-2xl border border-surface-highlight shadow-card h-48 flex flex-col justify-between group">
           <div>
             <p className="text-ink-muted text-[10px] font-black uppercase tracking-widest">Inventory Realization</p>
             <h3 className="text-4xl font-black mt-2 font-mono text-ink-base group-hover:text-primary transition-colors">{SHOP_INFO.currency}{stockValuation.toLocaleString()}</h3>
           </div>
-          <p className="text-[9px] font-bold text-slate-500 uppercase">Live Stock Asset Portfolio</p>
+          <p className="text-[9px] font-bold text-ink-muted uppercase">Live Stock Asset Portfolio</p>
         </div>
 
-        <div className="bg-surface-elevated p-8 rounded-2xl border border-slate-200 shadow-card h-48 flex flex-col justify-between">
+        <div className="bg-surface-elevated p-8 rounded-2xl border border-surface-highlight shadow-card h-48 flex flex-col justify-between">
           <div>
             <p className="text-ink-muted text-[10px] font-black uppercase tracking-widest">Unpaid Liabilities</p>
             <h3 className="text-4xl font-black mt-2 font-mono text-rose-600">{SHOP_INFO.currency}{financialSummary.unpaidBills.toLocaleString()}</h3>
           </div>
-          <p className="text-[9px] font-bold text-slate-500 uppercase">Outstanding Vendor Bills</p>
+          <p className="text-[9px] font-bold text-ink-muted uppercase">Outstanding Vendor Bills</p>
         </div>
 
         <div className="bg-primary p-8 rounded-2xl shadow-floating text-white h-48 flex flex-col justify-between">
@@ -81,7 +81,7 @@ const Dashboard: React.FC<DashboardProps> = ({ transactions, inventory, role, at
         </div>
       </div>
 
-      <div className="bg-surface-elevated p-6 md:p-10 rounded-3xl shadow-card border border-slate-200 h-[300px] md:h-[400px]">
+      <div className="bg-surface-elevated p-6 md:p-10 rounded-3xl shadow-card border border-surface-highlight h-[300px] md:h-[400px]">
         <h4 className="text-lg font-black text-ink-base uppercase tracking-tight mb-8">Integrated Revenue Analytics</h4>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={trendData}>

@@ -26,18 +26,18 @@ const TERMINAL_ID = "50LG-UK-01";
 export const EngLabsLogo: React.FC<{ light?: boolean; size?: 'sm' | 'md' | 'lg' }> = ({ light = false, size = 'md' }) => {
   const isSm = size === 'sm';
   const isLg = size === 'lg';
-  const teal = '#4FD1C5';
-  const primary = light ? '#FFFFFF' : '#4F46E5';
+
+  // Size mapping
+  // Increased sizes: sm (w-8 -> w-10), md (w-12 -> w-20), lg (w-16 -> w-32)
+  const dim = isSm ? "w-10 h-10" : isLg ? "w-32 h-32" : "w-20 h-20";
+
   return (
-    <div className={`flex flex-col items-center justify-center ${isLg ? 'gap-2' : 'gap-1'} leading-none select-none`}>
-      <svg width={isSm ? "32" : isLg ? "64" : "48"} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M40 50C40 35 55 25 65 35C75 45 60 60 50 60C40 60 30 55 25 45" stroke={teal} strokeWidth="6" strokeLinecap="round" />
-        <path d="M45 45C45 35 55 30 60 35C65 40 55 50 50 50C45 50 40 45 38 40" stroke={teal} strokeWidth="3" strokeLinecap="round" opacity="0.6" />
-      </svg>
-      <div className="flex items-baseline">
-        <span style={{ color: primary }} className={`font-black tracking-tighter ${isSm ? 'text-sm' : isLg ? 'text-3xl' : 'text-xl'}`}>Eng</span>
-        <span style={{ color: teal }} className={`font-medium ${isSm ? 'text-sm' : isLg ? 'text-3xl' : 'text-xl'} italic ml-[1px]`}>labs</span>
-      </div>
+    <div className={`flex flex-col items-center justify-center gap-2 leading-none select-none`}>
+      <img
+        src="/app-icon.png"
+        alt="Hop-In Express"
+        className={`${dim} object-contain rounded-xl shadow-sm`}
+      />
     </div>
   );
 };

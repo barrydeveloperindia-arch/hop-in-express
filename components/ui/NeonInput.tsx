@@ -15,7 +15,7 @@ export const NeonInput: React.FC<NeonInputProps> = ({ className, label, ...props
             )}
             <input
                 className={cn(
-                    "w-full bg-slate-950/50 border border-slate-800 text-slate-100 placeholder:text-slate-600 rounded-xl px-4 py-3 text-sm font-medium outline-none transition-all focus:border-indigo-500 focus:shadow-neon disabled:opacity-50",
+                    "w-full bg-slate-950/50 border border-slate-800 text-slate-100 placeholder:text-ink-muted rounded-xl px-4 py-3 text-sm font-medium outline-none transition-all focus:border-indigo-500 focus:shadow-neon disabled:opacity-50",
                     className
                 )}
                 {...props}

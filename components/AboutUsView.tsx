@@ -23,25 +23,25 @@ const AboutUsView: React.FC = () => {
       {/* Identity Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Contact Info */}
-        <div className="bg-white p-12 rounded-[3rem] border border-slate-200 shadow-sm space-y-8 flex flex-col justify-between">
+        <div className="bg-surface-elevated p-12 rounded-[3rem] border border-surface-highlight shadow-sm space-y-8 flex flex-col justify-between">
           <div className="space-y-4">
-            <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight">Direct Access</h4>
-            <p className="text-slate-500 text-sm font-medium">Digital concierge for wholesale orders and customer inquiries.</p>
+            <h4 className="text-xl font-black text-ink-base uppercase tracking-tight">Direct Access</h4>
+            <p className="text-ink-muted text-sm font-medium">Digital concierge for wholesale orders and customer inquiries.</p>
           </div>
-          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 flex items-center gap-6 group hover:border-indigo-200 transition-colors">
+          <div className="bg-surface-elevated p-6 rounded-2xl border border-slate-100 flex items-center gap-6 group hover:border-indigo-200 transition-colors">
             <span className="text-4xl">📱</span>
             <div>
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">WhatsApp Business</p>
-              <p className="text-lg font-black text-slate-900">{SHOP_INFO.whatsapp}</p>
+              <p className="text-lg font-black text-ink-base">{SHOP_INFO.whatsapp}</p>
             </div>
           </div>
         </div>
 
         {/* Address & Location */}
-        <div className="lg:col-span-2 bg-white p-12 rounded-[3rem] border border-slate-200 shadow-sm space-y-8">
+        <div className="lg:col-span-2 bg-surface-elevated p-12 rounded-[3rem] border border-surface-highlight shadow-sm space-y-8">
           <div className="flex justify-between items-center">
             <div className="space-y-2">
-              <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight">Store Location</h4>
+              <h4 className="text-xl font-black text-ink-base uppercase tracking-tight">Store Location</h4>
               <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">37 High Street, Eastleigh, UK</p>
             </div>
             <a 
@@ -54,7 +54,7 @@ const AboutUsView: React.FC = () => {
             </a>
           </div>
           
-          <div className="aspect-video w-full rounded-[2rem] overflow-hidden border border-slate-100 bg-slate-50 shadow-inner">
+          <div className="aspect-video w-full rounded-[2rem] overflow-hidden border border-slate-100 bg-surface-elevated shadow-inner">
             <iframe 
               title="Hop In Express Eastleigh Location"
               width="100%" 

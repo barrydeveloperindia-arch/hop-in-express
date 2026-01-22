@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-surface-void text-slate-900 antialiased selection:bg-indigo-100 selection:text-indigo-900;
+    @apply bg-surface-void text-ink-base antialiased selection:bg-primary-light selection:text-surface-void;
   }
 }
 
@@ -13,9 +13,11 @@
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   @apply bg-slate-800 rounded-full hover:bg-slate-700;
 }

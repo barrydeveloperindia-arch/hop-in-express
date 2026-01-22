@@ -67,7 +67,7 @@ const HelpSupportView: React.FC = () => {
     const doc = DOCUMENTATION[activeDoc];
     return (
       <div className="space-y-8 animate-in slide-in-from-right-10 duration-500 pb-20">
-        <div className="bg-white p-12 rounded-[3rem] border border-slate-200 shadow-xl space-y-8">
+        <div className="bg-surface-elevated p-12 rounded-[3rem] border border-surface-highlight shadow-xl space-y-8">
           <div className="flex justify-between items-center border-b border-slate-100 pb-8">
             <div>
               <button 
@@ -76,7 +76,7 @@ const HelpSupportView: React.FC = () => {
               >
                 ← Back to Support Index
               </button>
-              <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tight">{doc.title}</h3>
+              <h3 className="text-3xl font-black text-ink-base uppercase tracking-tight">{doc.title}</h3>
             </div>
             <div className="bg-slate-900 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest">
               Standard Protocol
@@ -85,20 +85,20 @@ const HelpSupportView: React.FC = () => {
 
           <div className="space-y-10">
             <section className="space-y-4">
-              <p className="text-lg text-slate-600 font-medium leading-relaxed italic border-l-4 border-indigo-500 pl-6">
+              <p className="text-lg text-ink-muted font-medium leading-relaxed italic border-l-4 border-indigo-500 pl-6">
                 "{doc.description}"
               </p>
             </section>
 
             <section className="space-y-6">
-              <h4 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em]">Operational Steps</h4>
+              <h4 className="text-[11px] font-black text-ink-base uppercase tracking-[0.3em]">Operational Steps</h4>
               <div className="space-y-4">
                 {doc.steps.map((step, i) => (
-                  <div key={i} className="flex gap-6 items-start p-6 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-indigo-200 transition-colors">
+                  <div key={i} className="flex gap-6 items-start p-6 bg-surface-elevated rounded-2xl border border-slate-100 group hover:border-indigo-200 transition-colors">
                     <span className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-lg">
                       {i + 1}
                     </span>
-                    <p className="text-sm font-bold text-slate-700 uppercase leading-relaxed pt-1">{step}</p>
+                    <p className="text-sm font-bold text-ink-base uppercase leading-relaxed pt-1">{step}</p>
                   </div>
                 ))}
               </div>
@@ -127,32 +127,32 @@ const HelpSupportView: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
-          <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight">Technical Assistance</h4>
-          <p className="text-sm text-slate-500 leading-relaxed font-medium">
+        <div className="bg-surface-elevated p-10 rounded-[2.5rem] border border-surface-highlight shadow-sm space-y-6">
+          <h4 className="text-lg font-black text-ink-base uppercase tracking-tight">Technical Assistance</h4>
+          <p className="text-sm text-ink-muted leading-relaxed font-medium">
             For critical system failures, terminal lockouts, or database synchronization issues, please contact the EngLabs technical dispatch team.
           </p>
           <div className="pt-4 space-y-4">
-            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+            <div className="flex items-center gap-4 bg-surface-elevated p-4 rounded-2xl border border-slate-100">
               <span className="text-2xl">📱</span>
               <div>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Support Line</p>
-                <p className="text-sm font-black text-slate-900">{SHOP_INFO.whatsapp}</p>
+                <p className="text-sm font-black text-ink-base">{SHOP_INFO.whatsapp}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-6">
-          <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight">System Documentation</h4>
+        <div className="bg-surface-elevated p-10 rounded-[2.5rem] border border-surface-highlight shadow-sm space-y-6">
+          <h4 className="text-lg font-black text-ink-base uppercase tracking-tight">System Documentation</h4>
           <div className="space-y-4">
             {Object.keys(DOCUMENTATION).map((docTitle, i) => (
               <div 
                 key={i} 
                 onClick={() => setActiveDoc(docTitle)}
-                className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl group cursor-pointer hover:bg-indigo-50 transition-colors border border-transparent hover:border-indigo-100"
+                className="flex justify-between items-center p-4 bg-surface-elevated rounded-2xl group cursor-pointer hover:bg-indigo-50 transition-colors border border-transparent hover:border-indigo-100"
               >
-                <span className="text-[11px] font-black text-slate-700 uppercase group-hover:text-indigo-600">{docTitle}</span>
+                <span className="text-[11px] font-black text-ink-base uppercase group-hover:text-indigo-600">{docTitle}</span>
                 <span className="text-slate-300 group-hover:text-indigo-400">→</span>
               </div>
             ))}

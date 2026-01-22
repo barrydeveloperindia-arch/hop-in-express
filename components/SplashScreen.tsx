@@ -70,7 +70,7 @@ const SplashScreen: React.FC = () => {
       {/* Main Branding */}
       <div className="relative z-10 text-center space-y-8">
         <div className="flex flex-col items-center">
-          <div className="mb-10 p-8 bg-white/10 rounded-[2.5rem] border border-white/20 backdrop-blur-xl animate-in zoom-in duration-1000 shadow-[0_0_50px_rgba(79,70,229,0.3)]">
+          <div className="mb-10 p-8 bg-surface-elevated/10 rounded-[2.5rem] border border-white/20 backdrop-blur-xl animate-in zoom-in duration-1000 shadow-[0_0_50px_rgba(79,70,229,0.3)]">
             <span className="text-8xl animate-bounce inline-block">🏪</span>
           </div>
           <h1 className="text-white text-7xl md:text-9xl font-black uppercase tracking-tighter animate-text-reveal drop-shadow-2xl">
@@ -90,7 +90,7 @@ const SplashScreen: React.FC = () => {
           <div className="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></div>
           <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">Initialising Secure Terminal 50LG-UK-01</p>
         </div>
-        <div className="w-64 h-1 bg-white/5 rounded-full overflow-hidden">
+        <div className="w-64 h-1 bg-surface-elevated/5 rounded-full overflow-hidden">
           <div className="h-full bg-indigo-500 w-full animate-[scan_2s_ease-in-out_infinite] origin-left"></div>
         </div>
       </div>

@@ -13,28 +13,28 @@ export default {
         sans: ['Inter', 'sans-serif'],
       },
       colors: {
-        // HIGH VISIBILITY LIGHT THEME PAILLETTE
-        // We use standard colors but define clear semantic aliases for consistency
+        // HOP-IN EXPRESS BRAND PALETTE (Black/Yellow/White)
 
-        // Surface: Clear separation
+        // Surface: Dark "Storefront" Aesthetics
         surface: {
-          void: '#f1f5f9', // Slate 100 (Page Background - Light Grey)
-          elevated: '#ffffff', // White (Cards)
-          highlight: '#e2e8f0', // Slate 200 (Hover/Input)
+          void: '#0F172A', // Slate 900 (Main Background - Deep Dark Blue/Black)
+          elevated: '#1E293B', // Slate 800 (Cards)
+          highlight: '#334155', // Slate 700 (Hover)
         },
 
-        // Brand: Strong, Professional Indigo
+        // Brand: Vibrant Yellow/Gold
         primary: {
-          DEFAULT: '#4f46e5', // Indigo 600
-          hover: '#4338ca', // Indigo 700
-          light: '#e0e7ff', // Indigo 100
+          DEFAULT: '#FBBF24', // Amber 400 (Main Action / Brand Color)
+          hover: '#F59E0B', // Amber 500
+          light: '#FEF3C7', // Amber 100
         },
 
-        // Text: High Contrast
+        // Text: Light on Dark
         ink: {
-          base: '#0f172a', // Slate 900 (Headings/Data)
-          muted: '#475569', // Slate 600 (Labels - darker than 400)
-          light: '#ffffff', // for buttons/sidebar
+          base: '#F8FAFC', // Slate 50 (Headings)
+          muted: '#94A3B8', // Slate 400 (Secondary)
+          light: '#FFFFFF',
+          dark: '#0F172A', // Text on Yellow buttons
         }
       },
       // Stronger Shadows for visibility

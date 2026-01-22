@@ -198,7 +198,7 @@ const MarcoAssistant: React.FC<MarcoAssistantProps> = ({ inventory, transactions
                 href="https://gemini.google.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-2"
+                className="bg-surface-elevated/10 hover:bg-surface-elevated/20 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-2"
               >
                 Neural Bypass ↗
               </a>
@@ -225,14 +225,14 @@ const MarcoAssistant: React.FC<MarcoAssistantProps> = ({ inventory, transactions
             )}
             {chat.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-4 rounded-2xl text-xs font-bold leading-relaxed ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-white/5 text-slate-300 border border-white/10 rounded-bl-none'}`}>
+                <div className={`max-w-[85%] p-4 rounded-2xl text-xs font-bold leading-relaxed ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-none' : 'bg-surface-elevated/5 text-slate-300 border border-white/10 rounded-bl-none'}`}>
                   {msg.text}
                 </div>
               </div>
             ))}
             {isThinking && (
               <div className="flex justify-start">
-                <div className="bg-white/5 text-indigo-400 p-4 rounded-2xl rounded-bl-none flex gap-1">
+                <div className="bg-surface-elevated/5 text-indigo-400 p-4 rounded-2xl rounded-bl-none flex gap-1">
                   <div className="w-1.5 h-1.5 bg-current rounded-full animate-bounce"></div>
                   <div className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                   <div className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
@@ -241,14 +241,14 @@ const MarcoAssistant: React.FC<MarcoAssistantProps> = ({ inventory, transactions
             )}
           </div>
 
-          <form onSubmit={askMarco} className="p-6 bg-white/5 border-t border-white/10 shrink-0">
+          <form onSubmit={askMarco} className="p-6 bg-surface-elevated/5 border-t border-white/10 shrink-0">
             <div className="relative">
               <input
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Where to, BOSS?"
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-4 pr-12 text-white text-xs font-bold outline-none focus:border-indigo-500 transition-all"
+                className="w-full bg-surface-elevated/5 border border-white/10 rounded-xl py-4 pl-4 pr-12 text-white text-xs font-bold outline-none focus:border-indigo-500 transition-all"
               />
               <button
                 type="submit"

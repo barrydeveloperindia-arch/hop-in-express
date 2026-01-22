@@ -199,7 +199,7 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({
 
       {isCameraActive && (
         <div className="fixed inset-0 z-[1000] bg-black/95 flex flex-col items-center justify-center p-6 backdrop-blur-md">
-          <div className="w-full max-w-md bg-white rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/20">
+          <div className="w-full max-w-md bg-surface-elevated rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/20">
             <video ref={videoRef} autoPlay playsInline className="w-full aspect-square object-cover" />
             <div className="p-8 flex flex-col gap-4">
               <button onClick={captureFace} className="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black uppercase text-sm shadow-xl">Identify Personnel</button>
@@ -211,9 +211,9 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <div className="bg-white p-12 rounded-[3.5rem] border border-slate-200 shadow-sm flex flex-col h-[600px]">
+        <div className="bg-surface-elevated p-12 rounded-[3.5rem] border border-surface-highlight shadow-sm flex flex-col h-[600px]">
           <div className="flex justify-between items-center mb-10">
-            <h4 className="text-2xl font-black text-slate-900 uppercase">Input Terminal</h4>
+            <h4 className="text-2xl font-black text-ink-base uppercase">Input Terminal</h4>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Vision Engine Ready</span>
@@ -223,18 +223,18 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({
           <div className="flex-1 flex flex-col gap-8">
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className={`flex-1 border-4 border-dashed rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer transition-all ${isProcessing ? 'bg-indigo-50 border-indigo-300' : 'bg-slate-50 border-slate-200 hover:border-indigo-400'}`}
+              className={`flex-1 border-4 border-dashed rounded-[2.5rem] flex flex-col items-center justify-center cursor-pointer transition-all ${isProcessing ? 'bg-indigo-50 border-indigo-300' : 'bg-surface-elevated border-surface-highlight hover:border-indigo-400'}`}
             >
               {isProcessing ? (
                 <div className="flex flex-col items-center gap-6">
-                  <div className="w-20 h-20 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                  <div className="w-20 h-20 border-4 border-surface-highlight border-t-indigo-600 rounded-full animate-spin"></div>
                   <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] animate-pulse">Analyzing Neural Geometry...</p>
                 </div>
               ) : (
                 <div className="text-center space-y-6">
                   <div className="text-7xl">📤</div>
                   <div>
-                    <p className="text-xl font-black text-slate-900 uppercase">Intake Assets</p>
+                    <p className="text-xl font-black text-ink-base uppercase">Intake Assets</p>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">WhatsApp Screens / Invoices / Photos</p>
                   </div>
                 </div>
@@ -251,7 +251,7 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({
             
             <textarea 
               placeholder="Paste chat logs or stock commands..."
-              className="w-full h-32 bg-slate-50 border border-slate-200 rounded-3xl p-8 text-sm font-bold outline-none focus:border-indigo-600 no-scrollbar transition-all"
+              className="w-full h-32 bg-surface-elevated border border-surface-highlight rounded-3xl p-8 text-sm font-bold outline-none focus:border-indigo-600 no-scrollbar transition-all"
               onKeyDown={e => {
                 if (e.key === 'Enter' && e.ctrlKey) processAIRequest(undefined, (e.target as HTMLTextAreaElement).value);
               }}
@@ -259,8 +259,8 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({
           </div>
         </div>
 
-        <div className="bg-white p-12 rounded-[3.5rem] border border-slate-200 shadow-sm flex flex-col h-[600px]">
-          <h4 className="text-2xl font-black text-slate-900 uppercase mb-10 tracking-tight">Intelligence Staging</h4>
+        <div className="bg-surface-elevated p-12 rounded-[3.5rem] border border-surface-highlight shadow-sm flex flex-col h-[600px]">
+          <h4 className="text-2xl font-black text-ink-base uppercase mb-10 tracking-tight">Intelligence Staging</h4>
           
           <div className="flex-1 overflow-y-auto no-scrollbar space-y-8">
             {stagedResult ? (
@@ -271,11 +271,11 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({
                 </div>
                 
                 {stagedResult.modality === 'INVENTORY' && stagedResult.items && (
-                  <div className="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm">
+                  <div className="bg-surface-elevated border border-slate-100 rounded-3xl overflow-hidden shadow-sm">
                     {stagedResult.items.map((it: any, i: number) => (
-                      <div key={i} className="p-6 flex justify-between items-center border-b last:border-0 border-slate-50 hover:bg-slate-50 transition-colors">
+                      <div key={i} className="p-6 flex justify-between items-center border-b last:border-0 border-slate-50 hover:bg-surface-elevated transition-colors">
                         <div className="space-y-1">
-                          <p className="text-sm font-black text-slate-900 uppercase">{it.brand} {it.name}</p>
+                          <p className="text-sm font-black text-ink-base uppercase">{it.brand} {it.name}</p>
                           <p className="text-[9px] font-bold text-slate-400 uppercase">Map: {it.shelfLocation || 'Auto'}</p>
                         </div>
                         <div className="text-right">
@@ -300,7 +300,7 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({
             ) : (
               <div className="h-full flex flex-col items-center justify-center opacity-25">
                 <span className="text-8xl mb-6">👁️‍🗨️</span>
-                <p className="font-black uppercase tracking-[0.6em] text-slate-900 text-xs">Waiting for Data Stream</p>
+                <p className="font-black uppercase tracking-[0.6em] text-ink-base text-xs">Waiting for Data Stream</p>
               </div>
             )}
           </div>

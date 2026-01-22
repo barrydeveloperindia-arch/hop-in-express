@@ -120,7 +120,7 @@ export const IDCard: React.FC<IDCardProps> = ({ staff, onClose }) => {
                     {/* Photo Container */}
                     <div className="mt-8 z-10 relative">
                         <div className="absolute inset-0 bg-indigo-500 blur-xl opacity-20 rounded-full"></div>
-                        <div className="w-36 h-36 rounded-3xl border-4 border-white/10 p-1 bg-white/5 shadow-2xl backdrop-blur-sm relative">
+                        <div className="w-36 h-36 rounded-3xl border-4 border-white/10 p-1 bg-surface-elevated/5 shadow-2xl backdrop-blur-sm relative">
                             <div className="w-full h-full rounded-2xl overflow-hidden bg-slate-800 flex items-center justify-center">
                                 {staff.photo ? (
                                     <img src={staff.photo} className="w-full h-full object-cover" crossOrigin="anonymous" alt="Staff" />
@@ -149,7 +149,7 @@ export const IDCard: React.FC<IDCardProps> = ({ staff, onClose }) => {
                     </div>
 
                     {/* Footer Section (White) */}
-                    <div className="w-full bg-white h-32 mt-auto z-10 flex items-center justify-between px-8 relative">
+                    <div className="w-full bg-surface-elevated h-32 mt-auto z-10 flex items-center justify-between px-8 relative">
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-[#0F172A] rotate-45 transform border-b border-r border-[#0F172A]"></div>
                         <div className="text-left">
                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">AUTH SCAN</p>
@@ -157,15 +157,15 @@ export const IDCard: React.FC<IDCardProps> = ({ staff, onClose }) => {
                         </div>
                         <div className="text-right flex flex-col items-end">
                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">SIGNATURE</p>
-                            <div className="w-24 h-8 border-b-2 border-slate-200 flex items-end justify-end pb-1 opacity-50">
-                                <span className="font-script text-slate-600 text-lg">Authorized</span>
+                            <div className="w-24 h-8 border-b-2 border-surface-highlight flex items-end justify-end pb-1 opacity-50">
+                                <span className="font-script text-ink-muted text-lg">Authorized</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Action Bar */}
-                <div className="flex gap-4 p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
+                <div className="flex gap-4 p-4 bg-surface-elevated/10 backdrop-blur-md rounded-2xl border border-white/10">
                     <button onClick={onClose} className="px-6 py-3 bg-slate-800 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-slate-700 transition-colors">
                         Close
                     </button>

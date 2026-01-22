@@ -633,7 +633,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
 
   return (
     <div className="space-y-10 pb-24 animate-in fade-in duration-700">
-      <div className="flex bg-white p-2 rounded-2xl border border-slate-200 w-full md:w-auto shadow-lg no-print overflow-x-auto">
+      <div className="flex bg-surface-elevated p-2 rounded-2xl border border-surface-highlight w-full md:w-auto shadow-lg no-print overflow-x-auto">
         {[
           { id: 'attendance', label: 'Shift Logs', icon: '⏱️' },
           { id: 'calendar', label: 'Time Matrix', icon: '🗓️' },
@@ -642,7 +642,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`px-6 md:px-10 py-4 release whitespace-nowrap rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-3 ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100' : 'text-slate-400 hover:text-slate-700'}`}
+            className={`px-6 md:px-10 py-4 release whitespace-nowrap rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-3 ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100' : 'text-slate-400 hover:text-ink-base'}`}
           >
             <span className="text-lg">{tab.icon}</span> {tab.label}
           </button>
@@ -654,14 +654,14 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           {/* Attendance Console */}
           <div className="bg-[#0F172A] p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] text-white shadow-2xl flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8 no-print">
             <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center text-3xl border border-white/10 shrink-0">🛂</div>
+              <div className="w-16 h-16 bg-surface-elevated/10 rounded-3xl flex items-center justify-center text-3xl border border-white/10 shrink-0">🛂</div>
               <div>
                 <h4 className="text-xl font-black uppercase tracking-tight">Attendance Console</h4>
                 <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mt-1">Manual Terminal Control</p>
               </div>
             </div>
 
-            <div className="w-full xl:w-auto flex flex-col md:flex-row flex-wrap items-center gap-4 bg-white/5 p-4 rounded-[2rem] border border-white/10">
+            <div className="w-full xl:w-auto flex flex-col md:flex-row flex-wrap items-center gap-4 bg-surface-elevated/5 p-4 rounded-[2rem] border border-white/10">
               <div className="flex flex-col gap-1 w-full md:w-auto">
                 <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-1">Personnel Focus</label>
                 <select
@@ -756,10 +756,10 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
             </div>
           </div>
 
-          <div className="bg-white rounded-[2.5rem] md:rounded-[3.5rem] border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-surface-elevated rounded-[2.5rem] md:rounded-[3.5rem] border border-surface-highlight shadow-sm overflow-hidden">
             {/* Desktop Table */}
             <table className="w-full text-left hidden md:table">
-              <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
+              <thead className="bg-surface-elevated text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
                 <tr>
                   <th className="px-12 py-8">Employee</th>
                   <th className="px-12 py-8">Value Date</th>
@@ -776,13 +776,13 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                   sortedAttendance.map(rec => {
                     const s = staff.find(st => st.id === rec.staffId);
                     return (
-                      <tr key={rec.id} className="hover:bg-slate-50 transition-all text-sm group">
+                      <tr key={rec.id} className="hover:bg-surface-elevated transition-all text-sm group">
                         <td className="px-12 py-8">
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-slate-100 rounded-2xl border flex items-center justify-center overflow-hidden relative shadow-sm">
+                            <div className="w-10 h-10 bg-surface-highlight rounded-2xl border flex items-center justify-center overflow-hidden relative shadow-sm">
                               {s?.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : <div className="text-[10px] font-black">{s?.name.slice(0, 2)}</div>}
                             </div>
-                            <span className="uppercase text-slate-900">{s?.name || 'Unknown'}</span>
+                            <span className="uppercase text-ink-base">{s?.name || 'Unknown'}</span>
                           </div>
                         </td>
                         <td className="px-12 py-8 text-slate-400 font-mono text-xs">{rec.date}</td>
@@ -791,7 +791,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                             {rec.status}
                           </span>
                         </td>
-                        <td className="px-12 py-8 text-center font-mono text-slate-900">
+                        <td className="px-12 py-8 text-center font-mono text-ink-base">
                           {rec.clockIn || '--'} <span className="text-slate-300 mx-2">→</span> {rec.clockOut || '--'}
                         </td>
                         <td className="px-12 py-8 text-right text-[10px] text-indigo-400 uppercase font-black tracking-widest">
@@ -804,7 +804,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                                 setIsAddMode(false);
                                 setEditingRecord({ ...rec });
                               }}
-                              className="p-3 bg-slate-100 rounded-xl text-slate-400 hover:bg-indigo-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                              className="p-3 bg-surface-highlight rounded-xl text-slate-400 hover:bg-indigo-600 hover:text-white transition-all opacity-0 group-hover:opacity-100"
                             >
                               ✎
                             </button>
@@ -818,21 +818,21 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
             </table>
 
             {/* Mobile Cards */}
-            <div className="md:hidden p-4 space-y-4 bg-slate-50">
+            <div className="md:hidden p-4 space-y-4 bg-surface-elevated">
               {sortedAttendance.length === 0 ? (
                 <div className="py-10 text-center text-slate-300 font-black uppercase tracking-widest italic opacity-40">No shift records</div>
               ) : (
                 sortedAttendance.slice(0, 20).map(rec => { // Limit to 20 on mobile to avoid lag
                   const s = staff.find(st => st.id === rec.staffId);
                   return (
-                    <div key={rec.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+                    <div key={rec.id} className="bg-surface-elevated p-5 rounded-2xl border border-surface-highlight shadow-sm flex flex-col gap-3">
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-slate-100 rounded-2xl border flex items-center justify-center overflow-hidden relative shadow-sm">
+                          <div className="w-10 h-10 bg-surface-highlight rounded-2xl border flex items-center justify-center overflow-hidden relative shadow-sm">
                             {s?.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : <div className="text-[10px] font-black">{s?.name.slice(0, 2)}</div>}
                           </div>
                           <div>
-                            <p className="font-bold text-slate-900 uppercase text-xs">{s?.name || 'Unknown'}</p>
+                            <p className="font-bold text-ink-base uppercase text-xs">{s?.name || 'Unknown'}</p>
                             <p className="text-[10px] text-slate-400 font-mono">{rec.date}</p>
                           </div>
                         </div>
@@ -841,7 +841,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                         </span>
                       </div>
                       <div className="flex items-center justify-between pl-14">
-                        <div className="text-xs font-mono font-bold text-slate-700">
+                        <div className="text-xs font-mono font-bold text-ink-base">
                           {rec.clockIn || '-- : --'} <span className="text-slate-300 mx-1">→</span> {rec.clockOut || '-- : --'}
                         </div>
                         <div className="flex items-center gap-3">
@@ -868,28 +868,28 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       {
         activeTab === 'calendar' && (
           <div className="space-y-10">
-            <div className="bg-white p-6 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] border border-slate-200 flex flex-col md:flex-row gap-6 md:gap-10 items-start md:items-center justify-between shadow-sm">
-              <div className="flex gap-4 bg-slate-100 p-2 rounded-xl">
-                <button onClick={() => setCalendarMode('individual')} className={`px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${calendarMode === 'individual' ? 'bg-white shadow-md text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}>Individual Focus</button>
-                <button onClick={() => setCalendarMode('roster')} className={`px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${calendarMode === 'roster' ? 'bg-white shadow-md text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}>Team Roster</button>
+            <div className="bg-surface-elevated p-6 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] border border-surface-highlight flex flex-col md:flex-row gap-6 md:gap-10 items-start md:items-center justify-between shadow-sm">
+              <div className="flex gap-4 bg-surface-highlight p-2 rounded-xl">
+                <button onClick={() => setCalendarMode('individual')} className={`px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${calendarMode === 'individual' ? 'bg-surface-elevated shadow-md text-indigo-600' : 'text-slate-400 hover:text-ink-muted'}`}>Individual Focus</button>
+                <button onClick={() => setCalendarMode('roster')} className={`px-6 py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${calendarMode === 'roster' ? 'bg-surface-elevated shadow-md text-indigo-600' : 'text-slate-400 hover:text-ink-muted'}`}>Team Roster</button>
               </div>
 
               <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start md:items-center w-full md:w-auto">
                 {calendarMode === 'individual' ? (
                   <>
                     <div className="flex flex-col md:flex-row gap-4 md:gap-6 items-start md:items-center w-full md:w-auto">
-                      <p className="text-sm font-bold uppercase text-slate-700 tracking-wider">Focus Personnel:</p>
-                      <select value={selectedStaffId} onChange={e => setSelectedStaffId(e.target.value)} className="w-full md:w-auto bg-slate-50 border-2 border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold uppercase outline-none focus:border-indigo-600 transition-all text-slate-900">
+                      <p className="text-sm font-bold uppercase text-ink-base tracking-wider">Focus Personnel:</p>
+                      <select value={selectedStaffId} onChange={e => setSelectedStaffId(e.target.value)} className="w-full md:w-auto bg-surface-elevated border-2 border-surface-highlight rounded-2xl px-6 py-4 text-sm font-bold uppercase outline-none focus:border-indigo-600 transition-all text-ink-base">
                         {staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                       </select>
                     </div>
-                    <input type="month" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} className="w-full md:w-auto bg-slate-50 border-2 border-slate-200 rounded-2xl px-6 py-4 text-sm font-bold uppercase outline-none text-slate-900" />
+                    <input type="month" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} className="w-full md:w-auto bg-surface-elevated border-2 border-surface-highlight rounded-2xl px-6 py-4 text-sm font-bold uppercase outline-none text-ink-base" />
                   </>
                 ) : (
                   // Week Navigator for Roster
-                  <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
-                    <button onClick={() => setWeekOffset(prev => prev - 1)} className="w-12 h-12 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-slate-600 hover:text-indigo-600 text-lg">◀</button>
-                    <span className="text-xs font-black uppercase tracking-widest text-slate-700 w-32 text-center">
+                  <div className="flex items-center gap-4 bg-surface-elevated p-2 rounded-xl">
+                    <button onClick={() => setWeekOffset(prev => prev - 1)} className="w-12 h-12 flex items-center justify-center bg-surface-elevated rounded-xl shadow-sm font-black text-ink-muted hover:text-indigo-600 text-lg">◀</button>
+                    <span className="text-xs font-black uppercase tracking-widest text-ink-base w-32 text-center">
                       {(() => {
                         const start = new Date();
                         const day = start.getDay();
@@ -898,7 +898,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                         return `Week of ${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
                       })()}
                     </span>
-                    <button onClick={() => setWeekOffset(prev => prev + 1)} className="w-12 h-12 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-slate-600 hover:text-indigo-600 text-lg">▶</button>
+                    <button onClick={() => setWeekOffset(prev => prev + 1)} className="w-12 h-12 flex items-center justify-center bg-surface-elevated rounded-xl shadow-sm font-black text-ink-muted hover:text-indigo-600 text-lg">▶</button>
                   </div>
                 )}
               </div>
@@ -918,9 +918,9 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                     <div
                       key={day}
                       onClick={() => isPresent && setDayDetails({ date: dateStr, records: dayRecords })}
-                      className={`aspect-square p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 flex flex-col justify-between transition-all hover:scale-105 active:scale-95 ${isPresent ? 'bg-emerald-50 border-emerald-100 shadow-lg shadow-emerald-50 cursor-pointer' : 'bg-white border-slate-200'}`}
+                      className={`aspect-square p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 flex flex-col justify-between transition-all hover:scale-105 active:scale-95 ${isPresent ? 'bg-emerald-50 border-emerald-100 shadow-lg shadow-emerald-50 cursor-pointer' : 'bg-surface-elevated border-surface-highlight'}`}
                     >
-                      <span className="text-lg font-black text-slate-600">{day}</span>
+                      <span className="text-lg font-black text-ink-muted">{day}</span>
                       <div className="text-center">
                         {isPresent ? (
                           <div className="space-y-1">
@@ -938,12 +938,12 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
               </div>
             ) : (
               // ROSTER VIEW (WEEKLY)
-              <div className="bg-white rounded-[2.5rem] md:rounded-[3.5rem] border border-slate-200 shadow-sm overflow-hidden p-6 md:p-10">
+              <div className="bg-surface-elevated rounded-[2.5rem] md:rounded-[3.5rem] border border-surface-highlight shadow-sm overflow-hidden p-6 md:p-10">
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse min-w-[600px] md:min-w-full">
                     <thead>
                       <tr>
-                        <th className="sticky left-0 bg-white z-20 p-4 min-w-[120px] text-left text-[10px] font-black uppercase text-slate-400 tracking-widest border-b border-slate-100 border-r shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Staff</th>
+                        <th className="sticky left-0 bg-surface-elevated z-20 p-4 min-w-[120px] text-left text-[10px] font-black uppercase text-slate-400 tracking-widest border-b border-slate-100 border-r shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Staff</th>
                         {Array.from({ length: 7 }).map((_, i) => {
                           const start = new Date();
                           const day = start.getDay();
@@ -955,7 +955,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                             <th key={i} className={`min-w-[80px] p-4 text-center border-b border-slate-100 ${isToday ? 'bg-indigo-50/50' : ''}`}>
                               <div className="flex flex-col items-center">
                                 <span className="text-[10px] font-black uppercase text-slate-300">{d.toLocaleString('default', { weekday: 'short' })}</span>
-                                <span className={`text-sm font-black ${isToday ? 'text-indigo-600' : 'text-slate-700'}`}>{d.getDate()}</span>
+                                <span className={`text-sm font-black ${isToday ? 'text-indigo-600' : 'text-ink-base'}`}>{d.getDate()}</span>
                               </div>
                             </th>
                           );
@@ -964,10 +964,10 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                       {staff.map(s => (
-                        <tr key={s.id} className="hover:bg-slate-50/50 transition-colors">
-                          <td className="sticky left-0 bg-white z-10 p-4 text-xs font-bold text-slate-700 uppercase border-r border-slate-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                        <tr key={s.id} className="hover:bg-surface-elevated/50 transition-colors">
+                          <td className="sticky left-0 bg-surface-elevated z-10 p-4 text-xs font-bold text-ink-base uppercase border-r border-slate-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-slate-100 rounded-xl border flex items-center justify-center overflow-hidden shrink-0">
+                              <div className="w-8 h-8 bg-surface-highlight rounded-xl border flex items-center justify-center overflow-hidden shrink-0">
                                 {s.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : <div className="text-[8px] font-black">{s.name.slice(0, 2)}</div>}
                               </div>
                               {s.name}
@@ -1011,7 +1011,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
 
       {
         activeTab === 'registry' && (
-          <div className="bg-white rounded-[2.5rem] md:rounded-[3.5rem] border border-slate-200 shadow-sm overflow-hidden">
+          <div className="bg-surface-elevated rounded-[2.5rem] md:rounded-[3.5rem] border border-surface-highlight shadow-sm overflow-hidden">
             <div className="p-6 md:p-8 flex justify-end">
               {isAdmin && (
                 <button
@@ -1027,7 +1027,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
             </div>
             {/* Desktop Table */}
             <table className="w-full text-left hidden md:table">
-              <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
+              <thead className="bg-surface-elevated text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
                 <tr>
                   <th className="px-12 py-8">ID Photo</th>
                   <th className="px-12 py-8">Official Name</th>
@@ -1039,14 +1039,14 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
               </thead>
               <tbody className="divide-y divide-slate-100 font-bold">
                 {staff.map(s => (
-                  <tr key={s.id} className="hover:bg-slate-50 transition-all text-sm uppercase group">
+                  <tr key={s.id} className="hover:bg-surface-elevated transition-all text-sm uppercase group">
                     <td className="px-12 py-8">
-                      <div className="w-12 h-12 bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center">
+                      <div className="w-12 h-12 bg-surface-highlight rounded-2xl border border-surface-highlight overflow-hidden flex items-center justify-center">
                         {s.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : <span className="text-xl">👤</span>}
                       </div>
                     </td>
                     <td className="px-12 py-8">
-                      <p className="text-slate-900 group-hover:text-indigo-600 transition-colors">{s.name}</p>
+                      <p className="text-ink-base group-hover:text-indigo-600 transition-colors">{s.name}</p>
                       <p className="text-[9px] text-slate-300 font-mono mt-2">#{s.id.slice(0, 8)}</p>
                     </td>
                     <td className="px-12 py-8 text-indigo-600 font-black tracking-widest text-[10px]">{s.role}</td>
@@ -1057,13 +1057,13 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                         <>
                           <button
                             onClick={() => setEditingStaff({ ...s })}
-                            className="bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-indigo-600 p-3 rounded-xl transition-all"
+                            className="bg-surface-highlight hover:bg-slate-200 text-slate-400 hover:text-indigo-600 p-3 rounded-xl transition-all"
                           >
                             ✎
                           </button>
                           <button
                             onClick={() => setIdCardStaff(s)}
-                            className="bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-indigo-600 p-3 rounded-xl transition-all ml-2"
+                            className="bg-surface-highlight hover:bg-slate-200 text-slate-400 hover:text-indigo-600 p-3 rounded-xl transition-all ml-2"
                             title="Generate ID Card"
                           >
                             🪪
@@ -1077,16 +1077,16 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
             </table>
 
             {/* Mobile Cards */}
-            <div className="md:hidden p-4 space-y-4 bg-slate-50">
+            <div className="md:hidden p-4 space-y-4 bg-surface-elevated">
               {staff.map(s => (
-                <div key={s.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                <div key={s.id} className="bg-surface-elevated p-5 rounded-2xl border border-surface-highlight shadow-sm flex flex-col gap-4">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-slate-100 rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
+                      <div className="w-12 h-12 bg-surface-highlight rounded-2xl border border-surface-highlight overflow-hidden flex items-center justify-center shrink-0">
                         {s.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : <span className="text-xl">👤</span>}
                       </div>
                       <div>
-                        <p className="text-sm font-black text-slate-900 uppercase">{s.name}</p>
+                        <p className="text-sm font-black text-ink-base uppercase">{s.name}</p>
                         <p className="text-[10px] text-slate-400 font-mono">#{s.id.slice(0, 8)}</p>
                       </div>
                     </div>
@@ -1096,7 +1096,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                   </div>
 
                   <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-                    <span className="text-[10px] font-mono text-slate-500">{s.joinedDate}</span>
+                    <span className="text-[10px] font-mono text-ink-muted">{s.joinedDate}</span>
                     <div className="flex gap-2">
                       {isAdmin && (
                         <>
@@ -1129,7 +1129,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       {
         addStaffModalOpen && (
           <div className="fixed inset-0 z-[1000] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
+            <div className="bg-surface-elevated w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
               <div className="bg-emerald-600 p-10 text-white flex justify-between items-center">
                 <div>
                   <h3 className="text-2xl font-black uppercase tracking-tight">New Recruit</h3>
@@ -1140,11 +1140,11 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
               <div className="p-10 space-y-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                  <input className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.name} onChange={e => setNewStaffForm({ ...newStaffForm, name: e.target.value })} placeholder="e.g. JOHN DOE" />
+                  <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.name} onChange={e => setNewStaffForm({ ...newStaffForm, name: e.target.value })} placeholder="e.g. JOHN DOE" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Role Designation</label>
-                  <select className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.role} onChange={e => setNewStaffForm({ ...newStaffForm, role: e.target.value as any })}>
+                  <select className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.role} onChange={e => setNewStaffForm({ ...newStaffForm, role: e.target.value as any })}>
                     <option value="Cashier">Cashier</option>
                     <option value="Manager">Manager</option>
                     <option value="Stock Clerk">Stock Clerk</option>
@@ -1155,29 +1155,29 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Profile Photo</label>
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-slate-100 rounded-2xl border flex items-center justify-center overflow-hidden relative">
+                    <div className="w-16 h-16 bg-surface-highlight rounded-2xl border flex items-center justify-center overflow-hidden relative">
                       {newStaffForm.photo ? (
                         <img src={newStaffForm.photo} className="w-full h-full object-cover" />
                       ) : <span className="text-2xl">📷</span>}
                     </div>
-                    <label className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg text-[10px] font-bold uppercase cursor-pointer transition-colors">
+                    <label className="bg-slate-200 hover:bg-slate-300 text-ink-base px-3 py-2 rounded-lg text-[10px] font-bold uppercase cursor-pointer transition-colors">
                       Upload
                       <input type="file" onChange={(e) => handlePhotoUpload(e, false)} className="hidden" accept="image/*" />
                     </label>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address (Role Access)</label>
-                    <input className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.email} onChange={e => setNewStaffForm({ ...newStaffForm, email: e.target.value })} placeholder="staff@example.com" />
+                    <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.email} onChange={e => setNewStaffForm({ ...newStaffForm, email: e.target.value })} placeholder="staff@example.com" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Secure PIN</label>
-                    <input className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.pin} onChange={e => setNewStaffForm({ ...newStaffForm, pin: e.target.value })} placeholder="0000" />
+                    <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.pin} onChange={e => setNewStaffForm({ ...newStaffForm, pin: e.target.value })} placeholder="0000" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">NI Number</label>
-                    <input className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.niNumber} onChange={e => setNewStaffForm({ ...newStaffForm, niNumber: e.target.value })} placeholder="QQ123456A" />
+                    <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.niNumber} onChange={e => setNewStaffForm({ ...newStaffForm, niNumber: e.target.value })} placeholder="QQ123456A" />
                   </div>
                 </div>
                 <button onClick={handleAddNewStaff} className="w-full bg-[#0F172A] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.5em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all mt-4">
@@ -1193,7 +1193,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       {
         editingStaff && (
           <div className="fixed inset-0 z-[1000] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
+            <div className="bg-surface-elevated w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
               <div className="bg-[#0F172A] p-10 text-white flex justify-between items-center">
                 <div>
                   <h3 className="text-2xl font-black uppercase tracking-tight">Personnel File</h3>
@@ -1204,13 +1204,13 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
               <div className="p-10 space-y-6">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                  <input className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.name} onChange={e => setEditingStaff({ ...editingStaff, name: e.target.value })} />
+                  <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.name} onChange={e => setEditingStaff({ ...editingStaff, name: e.target.value })} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Role</label>
-                    <select className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.role} onChange={e => setEditingStaff({ ...editingStaff, role: e.target.value as any })}>
+                    <select className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.role} onChange={e => setEditingStaff({ ...editingStaff, role: e.target.value as any })}>
                       <option value="Cashier">Cashier</option>
                       <option value="Manager">Manager</option>
                       <option value="Stock Clerk">Stock Clerk</option>
@@ -1221,12 +1221,12 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Profile Photo</label>
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-slate-100 rounded-2xl border flex items-center justify-center overflow-hidden relative">
+                      <div className="w-16 h-16 bg-surface-highlight rounded-2xl border flex items-center justify-center overflow-hidden relative">
                         {editingStaff.photo ? (
                           <img src={editingStaff.photo} className="w-full h-full object-cover" />
                         ) : <span className="text-2xl">📷</span>}
                       </div>
-                      <label className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg text-[10px] font-bold uppercase cursor-pointer transition-colors">
+                      <label className="bg-slate-200 hover:bg-slate-300 text-ink-base px-3 py-2 rounded-lg text-[10px] font-bold uppercase cursor-pointer transition-colors">
                         Upload
                         <input type="file" onChange={(e) => handlePhotoUpload(e, true)} className="hidden" accept="image/*" />
                       </label>
@@ -1240,7 +1240,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Status</label>
-                    <select className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.status} onChange={e => setEditingStaff({ ...editingStaff, status: e.target.value as any })}>
+                    <select className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.status} onChange={e => setEditingStaff({ ...editingStaff, status: e.target.value as any })}>
                       <option value="Active">Active</option>
                       <option value="Inactive">Inactive</option>
                       <option value="Pending Approval">Pending</option>
@@ -1251,15 +1251,15 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">PIN</label>
-                    <input className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.pin} onChange={e => setEditingStaff({ ...editingStaff, pin: e.target.value })} />
+                    <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.pin} onChange={e => setEditingStaff({ ...editingStaff, pin: e.target.value })} />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">NI Number</label>
-                    <input className="w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.niNumber} onChange={e => setEditingStaff({ ...editingStaff, niNumber: e.target.value })} />
+                    <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.niNumber} onChange={e => setEditingStaff({ ...editingStaff, niNumber: e.target.value })} />
                   </div>
                 </div>
 
-                <div className="bg-slate-50 p-4 rounded-xl text-[10px] text-slate-400 text-center font-mono">
+                <div className="bg-surface-elevated p-4 rounded-xl text-[10px] text-slate-400 text-center font-mono">
                   ID: {editingStaff.id}
                 </div>
 
@@ -1295,7 +1295,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       {
         editingRecord && (
           <div className="fixed inset-0 z-[1000] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
+            <div className="bg-surface-elevated w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
               <div className="bg-indigo-600 p-10 text-white flex justify-between items-center">
                 <div>
                   <h3 className="text-2xl font-black uppercase tracking-tight">Shift Modification</h3>
@@ -1310,7 +1310,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                     <select
                       value={editingRecord.staffId}
                       onChange={e => setEditingRecord({ ...editingRecord, staffId: e.target.value })}
-                      className="w-full bg-slate-50 border rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600"
+                      className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600"
                     >
                       {staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
@@ -1321,7 +1321,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                       type="date"
                       value={editingRecord.date}
                       onChange={e => setEditingRecord({ ...editingRecord, date: e.target.value })}
-                      className="w-full bg-slate-50 border rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600"
+                      className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600"
                     />
                   </div>
                 </div>
@@ -1333,7 +1333,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                       type="time"
                       value={editingRecord.clockIn || ''}
                       onChange={e => setEditingRecord({ ...editingRecord, clockIn: e.target.value })}
-                      className="w-full bg-slate-50 border rounded-xl px-4 py-4 text-xl font-black font-mono outline-none focus:border-indigo-600"
+                      className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xl font-black font-mono outline-none focus:border-indigo-600"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1342,7 +1342,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                       type="time"
                       value={editingRecord.clockOut || ''}
                       onChange={e => setEditingRecord({ ...editingRecord, clockOut: e.target.value })}
-                      className="w-full bg-slate-50 border rounded-xl px-4 py-4 text-xl font-black font-mono outline-none focus:border-indigo-600"
+                      className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xl font-black font-mono outline-none focus:border-indigo-600"
                     />
                   </div>
                 </div>
@@ -1353,11 +1353,11 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                     value={editingRecord.notes || ''}
                     onChange={e => setEditingRecord({ ...editingRecord, notes: e.target.value })}
                     placeholder="Reason for manual adjustment..."
-                    className="w-full bg-slate-50 border rounded-xl px-4 py-4 text-xs font-bold outline-none focus:border-indigo-600 h-24"
+                    className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xs font-bold outline-none focus:border-indigo-600 h-24"
                   />
                 </div>
 
-                <div className="bg-slate-50 p-6 rounded-2xl flex justify-between items-center">
+                <div className="bg-surface-elevated p-6 rounded-2xl flex justify-between items-center">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Recalculated Engagement</span>
                   <span className="text-2xl font-black font-mono text-indigo-600">{calculateHours(editingRecord.clockIn || '', editingRecord.clockOut || '')} Hours</span>
                 </div>
@@ -1377,24 +1377,24 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       {/* Day Details Modal (Individual Focus) */}
       {dayDetails && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setDayDetails(null)}>
-          <div className="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl scale-100 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+          <div className="bg-surface-elevated rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl scale-100 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-start mb-8">
               <div>
-                <h3 className="text-xl font-black uppercase text-slate-900 leading-none">
+                <h3 className="text-xl font-black uppercase text-ink-base leading-none">
                   {new Date(dayDetails.date).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric' })}
                 </h3>
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
                   {new Date(dayDetails.date).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
                 </p>
               </div>
-              <button onClick={() => setDayDetails(null)} className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-lg">✕</button>
+              <button onClick={() => setDayDetails(null)} className="w-10 h-10 rounded-full bg-surface-highlight hover:bg-slate-200 flex items-center justify-center text-ink-muted font-bold text-lg">✕</button>
             </div>
 
             <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
               {dayDetails.records.map((rec, idx) => (
-                <div key={rec.id} className="bg-slate-50 p-5 rounded-2xl border border-slate-100 flex justify-between items-center group hover:border-indigo-200 transition-colors">
+                <div key={rec.id} className="bg-surface-elevated p-5 rounded-2xl border border-slate-100 flex justify-between items-center group hover:border-indigo-200 transition-colors">
                   <div className="flex items-center gap-4">
-                    <span className="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-400 flex items-center justify-center text-[10px] font-black shadow-sm group-hover:text-indigo-600 group-hover:border-indigo-200">{idx + 1}</span>
+                    <span className="w-8 h-8 rounded-xl bg-surface-elevated border border-surface-highlight text-slate-400 flex items-center justify-center text-[10px] font-black shadow-sm group-hover:text-indigo-600 group-hover:border-indigo-200">{idx + 1}</span>
                     <div>
                       <p className="text-sm font-black text-slate-800 uppercase tabular-nums tracking-tight">
                         {rec.clockIn} <span className="text-slate-300 px-1">→</span> {rec.clockOut || 'ACTIVE'}
@@ -1414,9 +1414,9 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
             <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-end">
               <div>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Duration</p>
-                <p className="text-sm font-bold text-slate-500">{staff.find(s => s.id === selectedStaffId)?.name}</p>
+                <p className="text-sm font-bold text-ink-muted">{staff.find(s => s.id === selectedStaffId)?.name}</p>
               </div>
-              <span className="text-4xl font-black text-slate-900 tabular-nums tracking-tight">
+              <span className="text-4xl font-black text-ink-base tabular-nums tracking-tight">
                 {dayDetails.records.reduce((acc, curr) => acc + (curr.hoursWorked || 0), 0).toFixed(2)}<span className="text-lg text-slate-400 ml-1">h</span>
               </span>
             </div>

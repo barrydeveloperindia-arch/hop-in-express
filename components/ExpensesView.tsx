@@ -48,8 +48,8 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
       <div className="lg:col-span-1">
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 sticky top-10">
-          <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-8 flex items-center gap-2">
+        <div className="bg-surface-elevated p-8 rounded-2xl shadow-sm border border-surface-highlight sticky top-10">
+          <h4 className="text-sm font-black text-ink-base uppercase tracking-widest mb-8 flex items-center gap-2">
             <span className="w-2 h-6 bg-indigo-600"></span> Outgoing Remittance
           </h4>
           <div className="space-y-6">
@@ -59,7 +59,7 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
                 type="date"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold focus:border-indigo-600 outline-none"
+                className="w-full bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-3.5 text-sm font-bold focus:border-indigo-600 outline-none"
               />
             </div>
             <div className="space-y-1">
@@ -69,7 +69,7 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
                 placeholder="e.g. British Gas, Council Tax"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold focus:border-indigo-600 outline-none"
+                className="w-full bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-3.5 text-sm font-bold focus:border-indigo-600 outline-none"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -80,7 +80,7 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
                   placeholder="0.00"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-lg font-black font-mono focus:border-indigo-600 outline-none"
+                  className="w-full bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-3.5 text-lg font-black font-mono focus:border-indigo-600 outline-none"
                 />
               </div>
               <div className="space-y-1">
@@ -88,7 +88,7 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-[10px] font-black uppercase tracking-widest focus:border-indigo-600 outline-none"
+                  className="w-full bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-4 text-[10px] font-black uppercase tracking-widest focus:border-indigo-600 outline-none"
                 >
                   <option>Utilities</option>
                   <option>Business Rates</option>
@@ -111,9 +111,9 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
       </div>
 
       <div className="lg:col-span-2">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex flex-wrap justify-between items-center gap-4">
-            <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Expense Audit Trail</h4>
+        <div className="bg-surface-elevated rounded-2xl shadow-sm border border-surface-highlight overflow-hidden">
+          <div className="p-8 border-b border-slate-100 bg-surface-elevated/50 flex flex-wrap justify-between items-center gap-4">
+            <h4 className="text-sm font-black text-ink-base uppercase tracking-widest">Expense Audit Trail</h4>
 
             <div className="flex items-center gap-6">
               <div className="flex flex-col gap-1">
@@ -121,7 +121,7 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
                 <select
                   value={selectedFilterCategory}
                   onChange={e => setSelectedFilterCategory(e.target.value)}
-                  className="bg-white border border-slate-200 rounded-lg px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:border-indigo-600 appearance-none cursor-pointer h-[34px] min-w-[140px]"
+                  className="bg-surface-elevated border border-surface-highlight rounded-lg px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:border-indigo-600 appearance-none cursor-pointer h-[34px] min-w-[140px]"
                 >
                   {uniqueCategories.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -137,7 +137,7 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap hidden md:table">
-              <thead className="bg-white text-slate-400 uppercase text-[9px] font-black tracking-[0.3em] border-b border-slate-100">
+              <thead className="bg-surface-elevated text-slate-400 uppercase text-[9px] font-black tracking-[0.3em] border-b border-slate-100">
                 <tr>
                   <th className="px-8 py-5">Value Date</th>
                   <th className="px-8 py-5">Payee / Category</th>
@@ -152,12 +152,12 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
                   </tr>
                 ) : (
                   filteredExpenses.map((exp) => (
-                    <tr key={exp.id} className="hover:bg-slate-50/50 transition-all group">
+                    <tr key={exp.id} className="hover:bg-surface-elevated/50 transition-all group">
                       <td className="px-8 py-6">
-                        <span className="text-sm font-black text-slate-900">{new Date(exp.date).toLocaleDateString('en-GB')}</span>
+                        <span className="text-sm font-black text-ink-base">{new Date(exp.date).toLocaleDateString('en-GB')}</span>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="font-black text-slate-900 text-sm">{exp.description}</p>
+                        <p className="font-black text-ink-base text-sm">{exp.description}</p>
                         <p className="text-[10px] font-black uppercase text-indigo-600 tracking-widest mt-1">{exp.category}</p>
                       </td>
                       <td className="px-8 py-6">
@@ -183,15 +183,15 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({ expenses, setExpenses, logA
             </table>
 
             {/* Mobile Expense Cards */}
-            <div className="md:hidden p-4 space-y-4 bg-slate-50">
+            <div className="md:hidden p-4 space-y-4 bg-surface-elevated">
               {filteredExpenses.length === 0 ? (
                 <div className="text-center py-10 text-slate-400 font-bold uppercase tracking-widest text-xs">No expenses found</div>
               ) : (
                 filteredExpenses.map(exp => (
-                  <div key={exp.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+                  <div key={exp.id} className="bg-surface-elevated p-5 rounded-2xl border border-surface-highlight shadow-sm flex flex-col gap-3">
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-black text-slate-900 uppercase text-sm">{exp.description}</p>
+                        <p className="font-black text-ink-base uppercase text-sm">{exp.description}</p>
                         <p className="text-[10px] text-slate-400 font-mono mt-1">{new Date(exp.date).toLocaleDateString('en-GB')}</p>
                       </div>
                       <span className="text-xl font-black font-mono text-indigo-600">£{exp.amount.toFixed(2)}</span>

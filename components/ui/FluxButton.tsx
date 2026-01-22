@@ -34,7 +34,7 @@ export const FluxButton: React.FC<FluxButtonProps> = ({
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             <span className="relative z-10">{children}</span>
             {variant === 'primary' && (
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                <div className="absolute inset-0 bg-surface-elevated/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
             )}
         </button>
     );

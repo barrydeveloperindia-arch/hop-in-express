@@ -194,13 +194,13 @@ const SalesView: React.FC<SalesViewProps> = ({
   return (
     <div className="space-y-8">
       {/* Sales Performance Analytics */}
-      <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-8 no-print">
+      <div className="bg-surface-elevated p-8 rounded-[2.5rem] border border-surface-highlight shadow-sm space-y-8 no-print">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
-            <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight">Sales Revenue Trend</h4>
+            <h4 className="text-xl font-black text-ink-base uppercase tracking-tight">Sales Revenue Trend</h4>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Daily Performance Matrix</p>
           </div>
-          <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+          <div className="flex items-center gap-4 bg-surface-elevated p-2 rounded-2xl border border-slate-100">
             <input
               type="date"
               value={startDate}
@@ -259,7 +259,7 @@ const SalesView: React.FC<SalesViewProps> = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20 lg:pb-0">
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-8">
+          <div className="bg-surface-elevated p-6 md:p-10 rounded-[2.5rem] border border-surface-highlight shadow-sm space-y-8">
             <div className="relative group">
               <span className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-300 text-xl">🔍</span>
               <input
@@ -268,19 +268,19 @@ const SalesView: React.FC<SalesViewProps> = ({
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
 
-                className="w-full bg-slate-50 border border-slate-200 rounded-[1.5rem] pl-20 pr-10 py-6 md:py-8 text-base md:text-lg font-black outline-none focus:border-indigo-600 focus:bg-white transition-all shadow-inner uppercase"
+                className="w-full bg-surface-elevated border border-surface-highlight rounded-[1.5rem] pl-20 pr-10 py-6 md:py-8 text-base md:text-lg font-black outline-none focus:border-indigo-600 focus:bg-surface-elevated transition-all shadow-inner uppercase"
               />
               {searchQuery && (
-                <div className="absolute top-full left-0 right-0 mt-4 bg-white border border-slate-200 rounded-[2rem] shadow-2xl z-50 overflow-hidden divide-y divide-slate-50 max-h-[60vh] overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-4 bg-surface-elevated border border-surface-highlight rounded-[2rem] shadow-2xl z-50 overflow-hidden divide-y divide-slate-50 max-h-[60vh] overflow-y-auto">
                   {filteredItems.map(item => (
                     <button
                       key={item.id}
                       onClick={() => addToBasket(item)}
                       disabled={item.stock <= 0}
-                      className="w-full p-6 flex justify-between items-center text-left hover:bg-slate-50 transition-colors group/item"
+                      className="w-full p-6 flex justify-between items-center text-left hover:bg-surface-elevated transition-colors group/item"
                     >
                       <div className="space-y-1">
-                        <p className="font-black text-slate-900 uppercase text-sm leading-tight">
+                        <p className="font-black text-ink-base uppercase text-sm leading-tight">
                           <span className="text-indigo-600 mr-2">{item.brand}</span>
                           {item.name}
                         </p>
@@ -289,7 +289,7 @@ const SalesView: React.FC<SalesViewProps> = ({
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-black text-xl text-slate-900 group-hover/item:text-indigo-600 transition-colors">{SHOP_INFO.currency}{item.price.toFixed(2)}</p>
+                        <p className="font-black text-xl text-ink-base group-hover/item:text-indigo-600 transition-colors">{SHOP_INFO.currency}{item.price.toFixed(2)}</p>
                       </div>
                     </button>
                   ))}
@@ -299,21 +299,21 @@ const SalesView: React.FC<SalesViewProps> = ({
 
             <div className="min-h-[400px] flex flex-col gap-4">
               {basket.map(item => (
-                <div key={item.id} className="p-6 bg-white border border-slate-100 rounded-3xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+                <div key={item.id} className="p-6 bg-surface-elevated border border-slate-100 rounded-3xl shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
                   <div className="flex-1 w-full md:w-auto text-center md:text-left">
-                    <h6 className="font-black text-slate-900 text-sm uppercase leading-tight">{item.brand} {item.name}</h6>
+                    <h6 className="font-black text-ink-base text-sm uppercase leading-tight">{item.brand} {item.name}</h6>
                     <p className="text-[10px] text-slate-400 font-bold uppercase mt-2 tracking-widest">
                       {SHOP_INFO.currency}{item.price.toFixed(2)} • VAT {item.vatRate}%
                     </p>
                   </div>
                   <div className="flex items-center gap-4 md:gap-8 justify-between w-full md:w-auto">
-                    <div className="flex items-center bg-slate-50 p-1.5 rounded-2xl gap-4 border border-slate-100">
-                      <button onClick={() => setBasket(b => b.map(i => i.id === item.id ? { ...i, qty: Math.max(1, i.qty - 1) } : i))} className="w-10 h-10 bg-white border border-slate-200 rounded-xl shadow-sm font-black text-slate-400 hover:text-rose-600 transition-colors">-</button>
-                      <span className="text-xl font-black font-mono w-8 text-center text-slate-900">{item.qty}</span>
-                      <button onClick={() => setBasket(b => b.map(i => i.id === item.id ? { ...i, qty: i.qty + 1 } : i))} className="w-10 h-10 bg-white border border-slate-200 rounded-xl shadow-sm font-black text-slate-400 hover:text-indigo-600 transition-colors">+</button>
+                    <div className="flex items-center bg-surface-elevated p-1.5 rounded-2xl gap-4 border border-slate-100">
+                      <button onClick={() => setBasket(b => b.map(i => i.id === item.id ? { ...i, qty: Math.max(1, i.qty - 1) } : i))} className="w-10 h-10 bg-surface-elevated border border-surface-highlight rounded-xl shadow-sm font-black text-slate-400 hover:text-rose-600 transition-colors">-</button>
+                      <span className="text-xl font-black font-mono w-8 text-center text-ink-base">{item.qty}</span>
+                      <button onClick={() => setBasket(b => b.map(i => i.id === item.id ? { ...i, qty: i.qty + 1 } : i))} className="w-10 h-10 bg-surface-elevated border border-surface-highlight rounded-xl shadow-sm font-black text-slate-400 hover:text-indigo-600 transition-colors">+</button>
                     </div>
                     <div className="w-24 md:w-32 text-right">
-                      <p className="text-xl md:text-2xl font-black font-mono text-slate-900 tracking-tighter">{SHOP_INFO.currency}{(item.price * item.qty).toFixed(2)}</p>
+                      <p className="text-xl md:text-2xl font-black font-mono text-ink-base tracking-tighter">{SHOP_INFO.currency}{(item.price * item.qty).toFixed(2)}</p>
                     </div>
                   </div>
                 </div>
@@ -321,7 +321,7 @@ const SalesView: React.FC<SalesViewProps> = ({
               {basket.length === 0 && (
                 <div className="flex-1 flex flex-col items-center justify-center opacity-20 py-20">
                   <span className="text-8xl mb-8 text-indigo-200">🛒</span>
-                  <p className="font-black uppercase tracking-[0.4em] text-slate-900 text-center px-4">Basket Empty</p>
+                  <p className="font-black uppercase tracking-[0.4em] text-ink-base text-center px-4">Basket Empty</p>
                 </div>
               )}
             </div>

@@ -269,7 +269,7 @@ export const AccessTerminal: React.FC<AccessTerminalProps> = ({ isOpen, onClose,
                 <div className="w-1/3 bg-slate-950 border-r border-slate-800 p-8 flex flex-col justify-between relative overflow-hidden">
                     <div className="z-10">
                         <h2 className="text-2xl font-black text-white uppercase tracking-widest">Access<br /><span className="text-indigo-500">Terminal</span></h2>
-                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Secure Entry Point</p>
+                        <p className="text-ink-muted text-[10px] font-bold uppercase tracking-[0.2em] mt-2">Secure Entry Point</p>
                     </div>
 
                     <div className="z-10">
@@ -319,7 +319,7 @@ export const AccessTerminal: React.FC<AccessTerminalProps> = ({ isOpen, onClose,
                                 }} className="w-16 h-16 rounded-2xl bg-slate-800 text-white font-black text-xl hover:bg-slate-700 transition-colors">0</button>
                                 <button onClick={handleAdminUnlock} className="w-16 h-16 rounded-2xl bg-rose-600 text-white font-black text-lg hover:bg-rose-500 transition-colors">OK</button>
                             </div>
-                            <button onClick={() => { setShowAdminLock(false); setAdminPinInput(''); }} className="mt-8 text-slate-500 hover:text-white text-xs font-bold uppercase">Cancel</button>
+                            <button onClick={() => { setShowAdminLock(false); setAdminPinInput(''); }} className="mt-8 text-ink-muted hover:text-white text-xs font-bold uppercase">Cancel</button>
                         </div>
                     ) : (
                         // Normal Terminal Content
@@ -354,7 +354,7 @@ export const AccessTerminal: React.FC<AccessTerminalProps> = ({ isOpen, onClose,
                                         {/* Library handles rendering */}
                                     </div>
                                     <p className="mt-8 text-slate-400 text-xs font-mono uppercase tracking-widest animate-pulse">Scanning Camera Feed...</p>
-                                    <button onClick={() => setMode('SELECT')} className="mt-8 text-slate-500 hover:text-white text-xs font-bold uppercase">Cancel</button>
+                                    <button onClick={() => setMode('SELECT')} className="mt-8 text-ink-muted hover:text-white text-xs font-bold uppercase">Cancel</button>
                                 </div>
                             )}
 
@@ -370,14 +370,14 @@ export const AccessTerminal: React.FC<AccessTerminalProps> = ({ isOpen, onClose,
                                                     </div>
                                                     <div className="text-left">
                                                         <div className="text-white font-bold text-sm">{s.name}</div>
-                                                        <div className="text-slate-500 text-[10px] uppercase font-bold">{s.role}</div>
+                                                        <div className="text-ink-muted text-[10px] uppercase font-bold">{s.role}</div>
                                                     </div>
                                                 </div>
-                                                <div className="text-slate-600">➜</div>
+                                                <div className="text-ink-muted">➜</div>
                                             </button>
                                         ))}
                                     </div>
-                                    <button onClick={() => setMode('SELECT')} className="mt-8 text-slate-500 hover:text-white text-xs font-bold uppercase">Back</button>
+                                    <button onClick={() => setMode('SELECT')} className="mt-8 text-ink-muted hover:text-white text-xs font-bold uppercase">Back</button>
                                 </div>
                             ) : null}
 
@@ -402,7 +402,7 @@ export const AccessTerminal: React.FC<AccessTerminalProps> = ({ isOpen, onClose,
                                         }} className="w-16 h-16 rounded-2xl bg-slate-800 text-white font-black text-xl hover:bg-slate-700 transition-colors">0</button>
                                         <button onClick={handlePinSubmit} className="w-16 h-16 rounded-2xl bg-emerald-600 text-white font-black text-lg hover:bg-emerald-500 transition-colors">OK</button>
                                     </div>
-                                    <button onClick={() => { setSelectedStaffId(''); setPinInput(''); }} className="mt-8 text-slate-500 hover:text-white text-xs font-bold uppercase">Change User</button>
+                                    <button onClick={() => { setSelectedStaffId(''); setPinInput(''); }} className="mt-8 text-ink-muted hover:text-white text-xs font-bold uppercase">Change User</button>
                                 </div>
                             )}
 
@@ -419,7 +419,7 @@ export const AccessTerminal: React.FC<AccessTerminalProps> = ({ isOpen, onClose,
                                     <div className="mt-8 space-y-3">
                                         {status === 'PROCESSING' && <p className="text-emerald-400 text-xs font-bold uppercase animate-pulse">Verifying Identity...</p>}
                                         {status === 'IDLE' && <button onClick={triggerBiometric} className="px-8 py-3 bg-emerald-600 rounded-xl text-white font-bold uppercase text-xs tracking-widest shadow-lg hover:bg-emerald-500 transition-all">Activate Sensor</button>}
-                                        <button onClick={() => setSelectedStaffId('')} className="block mx-auto mt-4 text-slate-500 hover:text-white text-xs font-bold uppercase">Cancel</button>
+                                        <button onClick={() => setSelectedStaffId('')} className="block mx-auto mt-4 text-ink-muted hover:text-white text-xs font-bold uppercase">Cancel</button>
                                     </div>
                                 </div>
                             )}
@@ -444,7 +444,7 @@ export const AccessTerminal: React.FC<AccessTerminalProps> = ({ isOpen, onClose,
                                                 <Camera size={16} /> Verify Identity
                                             </button>
                                         )}
-                                        <button onClick={() => setSelectedStaffId('')} className="block mx-auto mt-4 text-slate-500 hover:text-white text-xs font-bold uppercase">Cancel</button>
+                                        <button onClick={() => setSelectedStaffId('')} className="block mx-auto mt-4 text-ink-muted hover:text-white text-xs font-bold uppercase">Cancel</button>
                                     </div>
                                 </div>
                             )}

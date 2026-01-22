@@ -88,7 +88,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ staff, onLogin, shopName }) => 
       </div>
 
       <div className="absolute top-12 text-center animate-in fade-in duration-1000 flex flex-col items-center">
-        <div className="bg-white/10 p-8 rounded-[3rem] backdrop-blur-xl border border-white/10 shadow-2xl mb-6">
+        <div className="bg-surface-elevated/10 p-8 rounded-[3rem] backdrop-blur-xl border border-white/10 shadow-2xl mb-6">
            <EngLabsLogo light size="lg" />
         </div>
         <div className="space-y-1">
@@ -104,7 +104,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ staff, onLogin, shopName }) => 
               <div 
                 key={i} 
                 className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${
-                  success ? 'bg-white border-white scale-125' :
+                  success ? 'bg-surface-elevated border-white scale-125' :
                   error ? 'bg-rose-400 border-rose-400 animate-pulse' :
                   pin.length > i ? 'bg-indigo-400 border-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.8)]' : 
                   'bg-transparent border-white/20'
@@ -126,7 +126,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ staff, onLogin, shopName }) => 
             <button
               key={num}
               onClick={() => handleKeypadClick(num.toString())}
-              className="h-20 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-2xl font-black hover:bg-white/10 active:scale-90 transition-all backdrop-blur-sm"
+              className="h-20 bg-surface-elevated/5 border border-white/10 rounded-2xl flex items-center justify-center text-2xl font-black hover:bg-surface-elevated/10 active:scale-90 transition-all backdrop-blur-sm"
             >
               {num}
             </button>
@@ -134,7 +134,7 @@ const LockScreen: React.FC<LockScreenProps> = ({ staff, onLogin, shopName }) => 
           <div />
           <button
             onClick={() => handleKeypadClick('0')}
-            className="h-20 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-2xl font-black hover:bg-white/10 active:scale-90 transition-all backdrop-blur-sm"
+            className="h-20 bg-surface-elevated/5 border border-white/10 rounded-2xl flex items-center justify-center text-2xl font-black hover:bg-surface-elevated/10 active:scale-90 transition-all backdrop-blur-sm"
           >
             0
           </button>
@@ -149,9 +149,9 @@ const LockScreen: React.FC<LockScreenProps> = ({ staff, onLogin, shopName }) => 
 
       <div className="absolute bottom-12 flex flex-col items-center gap-3">
         <div className="flex gap-4">
-           <div className="w-10 h-[2px] bg-white/10"></div>
+           <div className="w-10 h-[2px] bg-surface-elevated/10"></div>
            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/20">ENGLABS COMPLIANCE SECURED</span>
-           <div className="w-10 h-[2px] bg-white/10"></div>
+           <div className="w-10 h-[2px] bg-surface-elevated/10"></div>
         </div>
       </div>
     </div>

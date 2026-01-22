@@ -230,53 +230,53 @@ const PurchasesView: React.FC<PurchasesViewProps> = ({
 
   return (
     <div className="space-y-8">
-      <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+      <div className="bg-surface-elevated p-8 rounded-3xl border border-surface-highlight shadow-sm relative overflow-hidden">
         {isScanning && (
-          <div className="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center">
-            <div className="w-16 h-16 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-            <p className="font-black uppercase text-[10px] tracking-widest text-slate-900">AI Vision Analyzing Receipt...</p>
+          <div className="absolute inset-0 z-50 bg-surface-elevated/80 backdrop-blur-sm flex flex-col items-center justify-center">
+            <div className="w-16 h-16 border-4 border-surface-highlight border-t-indigo-600 rounded-full animate-spin mb-4"></div>
+            <p className="font-black uppercase text-[10px] tracking-widest text-ink-base">AI Vision Analyzing Receipt...</p>
           </div>
         )}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
-          <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Stock Acquisition Interface</h4>
+          <h4 className="text-sm font-black text-ink-base uppercase tracking-widest">Stock Acquisition Interface</h4>
           <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
             <button onClick={() => addReceiptRef.current?.click()} className="text-[10px] w-full md:w-auto font-black uppercase text-white bg-indigo-600 px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg whitespace-nowrap">Scan Receipt with AI</button>
-            <button onClick={() => setShowManageRegistry(true)} className="text-[10px] w-full md:w-auto font-black uppercase text-indigo-900 bg-slate-100 px-6 py-3 rounded-xl hover:bg-slate-200 transition-colors whitespace-nowrap">Manage Registry</button>
+            <button onClick={() => setShowManageRegistry(true)} className="text-[10px] w-full md:w-auto font-black uppercase text-indigo-900 bg-surface-highlight px-6 py-3 rounded-xl hover:bg-slate-200 transition-colors whitespace-nowrap">Manage Registry</button>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Arrival Date</label>
-            <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600" />
+            <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} className="w-full bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600" />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Linked Vendor</label>
-            <select value={formData.supplierId} onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-[1.125rem] text-[10px] font-black uppercase outline-none focus:border-indigo-600 appearance-none">
+            <select value={formData.supplierId} onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })} className="w-full bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-[1.125rem] text-[10px] font-black uppercase outline-none focus:border-indigo-600 appearance-none">
               <option value="">Select Registry Vendor</option>
               {suppliers.map(s => <option key={s.id} value={s.id}>{s.name} (Bal: £{s.outstandingBalance.toFixed(2)})</option>)}
             </select>
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Asset To Update</label>
-            <select value={formData.itemId} onChange={(e) => setFormData({ ...formData, itemId: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-[1.125rem] text-[10px] font-black uppercase outline-none focus:border-indigo-600">
+            <select value={formData.itemId} onChange={(e) => setFormData({ ...formData, itemId: e.target.value })} className="w-full bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-[1.125rem] text-[10px] font-black uppercase outline-none focus:border-indigo-600">
               <option value="">Select Inventory SKU</option>
               {inventory.map(i => <option key={i.id} value={i.id}>{i.brand} {i.name} (Now: {i.stock})</option>)}
             </select>
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Units Received</label>
-            <input type="number" value={formData.qty} onChange={(e) => setFormData({ ...formData, qty: parseInt(e.target.value) || 0 })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600" />
+            <input type="number" value={formData.qty} onChange={(e) => setFormData({ ...formData, qty: parseInt(e.target.value) || 0 })} className="w-full bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600" />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Total Invoice Cost (£)</label>
-            <input type="number" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-lg font-black font-mono outline-none focus:border-indigo-600" />
+            <input type="number" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) || 0 })} className="w-full bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-4 text-lg font-black font-mono outline-none focus:border-indigo-600" />
           </div>
           <div className="space-y-2">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Settlement Protocol</label>
             <select
               value={formData.paymentMethod}
               onChange={e => setFormData({ ...formData, paymentMethod: e.target.value })}
-              className="w-full bg-slate-100 border border-slate-300 rounded-xl px-4 py-4 text-[10px] font-black uppercase outline-none focus:border-indigo-600 appearance-none"
+              className="w-full bg-surface-highlight border border-slate-300 rounded-xl px-4 py-4 text-[10px] font-black uppercase outline-none focus:border-indigo-600 appearance-none"
             >
               <option value="ON CREDIT">ON CREDIT (UNPAID)</option>
               <option value="UPI">1. UPI</option>
@@ -291,7 +291,7 @@ const PurchasesView: React.FC<PurchasesViewProps> = ({
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Attach Payment Receipt</label>
             <div
               onClick={() => addReceiptRef.current?.click()}
-              className={`w-full h-14 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition-all ${formData.receiptData ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-indigo-400'}`}
+              className={`w-full h-14 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition-all ${formData.receiptData ? 'border-emerald-500 bg-emerald-50' : 'border-surface-highlight hover:border-indigo-400'}`}
             >
               <span className={`text-[10px] font-black uppercase tracking-widest ${formData.receiptData ? 'text-emerald-700' : 'text-slate-400'}`}>
                 {formData.receiptData ? '✓ Document Captured' : '+ Attach Proof of Payment'}
@@ -305,13 +305,13 @@ const PurchasesView: React.FC<PurchasesViewProps> = ({
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-8 py-6 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-          <h4 className="text-sm font-black text-slate-900 uppercase">Procurement Master Ledger</h4>
+      <div className="bg-surface-elevated rounded-[2.5rem] border border-surface-highlight shadow-sm overflow-hidden">
+        <div className="px-8 py-6 bg-surface-elevated border-b border-slate-100 flex justify-between items-center">
+          <h4 className="text-sm font-black text-ink-base uppercase">Procurement Master Ledger</h4>
           <p className="text-[10px] font-bold text-slate-400 uppercase">Audit Records: {purchases.length}</p>
         </div>
         <table className="w-full text-left hidden md:table">
-          <thead className="bg-white text-slate-400 uppercase text-[9px] font-black tracking-[0.3em] border-b">
+          <thead className="bg-surface-elevated text-slate-400 uppercase text-[9px] font-black tracking-[0.3em] border-b">
             <tr>
               <th className="px-8 py-5">Date</th>
               <th className="px-8 py-5">Vendor</th>
@@ -323,13 +323,13 @@ const PurchasesView: React.FC<PurchasesViewProps> = ({
           </thead>
           <tbody className="divide-y divide-slate-100">
             {purchases.sort((a, b) => b.date.localeCompare(a.date)).map((p) => (
-              <tr key={p.id} className="hover:bg-slate-50 transition-all group">
-                <td className="px-8 py-7 text-sm font-black text-slate-900">{p.date}</td>
+              <tr key={p.id} className="hover:bg-surface-elevated transition-all group">
+                <td className="px-8 py-7 text-sm font-black text-ink-base">{p.date}</td>
                 <td className="px-8 py-7 font-black text-indigo-600 uppercase">
                   {suppliers.find(s => s.id === p.supplierId)?.name || 'Deleted Vendor'}
                 </td>
                 <td className="px-8 py-7 font-black text-slate-400 uppercase text-[10px]">{p.items}</td>
-                <td className="px-8 py-7 font-black font-mono text-slate-900 text-lg">£{p.amount.toFixed(2)}</td>
+                <td className="px-8 py-7 font-black font-mono text-ink-base text-lg">£{p.amount.toFixed(2)}</td>
                 <td className="px-8 py-7 text-center">
                   {p.receiptData ? (
                     <button onClick={() => handleDownloadReceipt(p)} className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all shadow-sm" title="Download Proof">
@@ -356,20 +356,20 @@ const PurchasesView: React.FC<PurchasesViewProps> = ({
         </table>
 
         {/* Mobile Purchases Cards */}
-        <div className="md:hidden p-4 space-y-4 bg-slate-50">
+        <div className="md:hidden p-4 space-y-4 bg-surface-elevated">
           {purchases.length === 0 ? (
             <div className="text-center py-10 text-slate-400 font-black uppercase text-xs tracking-widest">No procurement entries</div>
           ) : (
             purchases.sort((a, b) => b.date.localeCompare(a.date)).map(p => (
-              <div key={p.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+              <div key={p.id} className="bg-surface-elevated p-5 rounded-2xl border border-surface-highlight shadow-sm flex flex-col gap-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-black text-slate-900 uppercase text-xs">{p.date}</p>
+                    <p className="font-black text-ink-base uppercase text-xs">{p.date}</p>
                     <p className="text-[10px] font-black text-indigo-600 uppercase mt-1">{suppliers.find(s => s.id === p.supplierId)?.name || 'Deleted Vendor'}</p>
                   </div>
-                  <p className="text-lg font-black font-mono text-slate-900">£{p.amount.toFixed(2)}</p>
+                  <p className="text-lg font-black font-mono text-ink-base">£{p.amount.toFixed(2)}</p>
                 </div>
-                <div className="text-[10px] text-slate-500 font-bold uppercase p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <div className="text-[10px] text-ink-muted font-bold uppercase p-3 bg-surface-elevated rounded-xl border border-slate-100">
                   {p.items}
                 </div>
                 <div className="flex items-center justify-between border-t border-slate-100 pt-3">
@@ -393,7 +393,7 @@ const PurchasesView: React.FC<PurchasesViewProps> = ({
 
       {editingPurchaseId && (
         <div className="fixed inset-0 z-[1200] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+          <div className="bg-surface-elevated w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
             <div className="bg-[#0F172A] p-10 text-white flex justify-between items-center">
               <div>
                 <h3 className="text-2xl font-black uppercase tracking-tight">Ledger Correction</h3>
@@ -405,18 +405,18 @@ const PurchasesView: React.FC<PurchasesViewProps> = ({
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Arrival Date</label>
-                  <input type="date" value={editingPurchaseForm.date} onChange={e => setEditingPurchaseForm({ ...editingPurchaseForm, date: e.target.value })} className="w-full bg-slate-50 border rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600" />
+                  <input type="date" value={editingPurchaseForm.date} onChange={e => setEditingPurchaseForm({ ...editingPurchaseForm, date: e.target.value })} className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600" />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Valuation (£)</label>
-                  <input type="number" step="0.01" value={editingPurchaseForm.amount} onChange={e => setEditingPurchaseForm({ ...editingPurchaseForm, amount: parseFloat(e.target.value) || 0 })} className="w-full bg-slate-50 border rounded-xl px-4 py-4 text-lg font-black font-mono outline-none focus:border-indigo-600" />
+                  <input type="number" step="0.01" value={editingPurchaseForm.amount} onChange={e => setEditingPurchaseForm({ ...editingPurchaseForm, amount: parseFloat(e.target.value) || 0 })} className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-lg font-black font-mono outline-none focus:border-indigo-600" />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Payment Proof (Receipt)</label>
                 <div
                   onClick={() => editReceiptRef.current?.click()}
-                  className={`w-full p-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all ${editingPurchaseForm.receiptData ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-indigo-600'}`}
+                  className={`w-full p-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all ${editingPurchaseForm.receiptData ? 'border-emerald-500 bg-emerald-50' : 'border-surface-highlight hover:border-indigo-600'}`}
                 >
                   {editingPurchaseForm.receiptData ? (
                     <>
@@ -440,16 +440,16 @@ const PurchasesView: React.FC<PurchasesViewProps> = ({
 
       {showManageRegistry && (
         <div className="fixed inset-0 z-[1100] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-4xl h-[70vh] rounded-[3rem] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
+          <div className="bg-surface-elevated w-full max-w-4xl h-[70vh] rounded-[3rem] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95">
             <div className="bg-[#0F172A] p-10 text-white shrink-0 flex justify-between items-center">
               <h3 className="text-2xl font-black uppercase tracking-tight">Partner Registry</h3>
               <button onClick={() => setShowManageRegistry(false)} className="text-3xl font-light">✕</button>
             </div>
             <div className="flex-1 overflow-y-auto p-10 space-y-4">
               {suppliers.map(v => (
-                <div key={v.id} className="p-6 rounded-2xl border bg-white border-slate-100 flex justify-between items-center">
+                <div key={v.id} className="p-6 rounded-2xl border bg-surface-elevated border-slate-100 flex justify-between items-center">
                   <div>
-                    <p className="font-black text-slate-900 uppercase text-sm">{v.name}</p>
+                    <p className="font-black text-ink-base uppercase text-sm">{v.name}</p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase mt-1">Bal: £{v.outstandingBalance.toFixed(2)}</p>
                   </div>
                 </div>

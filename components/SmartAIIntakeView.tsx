@@ -162,23 +162,23 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Input Card */}
-        <div className="bg-white p-6 md:p-10 rounded-[3rem] border border-slate-200 shadow-sm flex flex-col justify-between group">
+        <div className="bg-surface-elevated p-6 md:p-10 rounded-[3rem] border border-surface-highlight shadow-sm flex flex-col justify-between group">
           <div className="space-y-8">
-            <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight">Acquisition Terminal</h4>
+            <h4 className="text-xl font-black text-ink-base uppercase tracking-tight">Acquisition Terminal</h4>
             <div
               onClick={() => fileInputRef.current?.click()}
-              className={`w-full aspect-video border-4 border-dashed rounded-[2rem] flex flex-col items-center justify-center cursor-pointer transition-all ${isProcessing ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'}`}
+              className={`w-full aspect-video border-4 border-dashed rounded-[2rem] flex flex-col items-center justify-center cursor-pointer transition-all ${isProcessing ? 'border-indigo-500 bg-indigo-50' : 'border-surface-highlight hover:border-indigo-400 hover:bg-surface-elevated'}`}
             >
               {isProcessing ? (
                 <div className="flex flex-col items-center gap-6">
-                  <div className="w-16 h-16 border-4 border-slate-200 border-t-indigo-600 rounded-full animate-spin"></div>
+                  <div className="w-16 h-16 border-4 border-surface-highlight border-t-indigo-600 rounded-full animate-spin"></div>
                   <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest animate-pulse">Analyzing Asset Modality...</p>
                 </div>
               ) : (
                 <div className="text-center space-y-4">
                   <span className="text-6xl">📷</span>
                   <div>
-                    <p className="text-lg font-black text-slate-900 uppercase">Drop Media Here</p>
+                    <p className="text-lg font-black text-ink-base uppercase">Drop Media Here</p>
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Photo / PDF / Excel</p>
                   </div>
                 </div>
@@ -194,7 +194,7 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
             <div className="relative">
               <textarea
                 placeholder="Or paste manual text entry here..."
-                className="w-full h-32 bg-slate-50 border border-slate-200 rounded-2xl p-6 text-sm font-bold outline-none focus:border-indigo-600 transition-all no-scrollbar"
+                className="w-full h-32 bg-surface-elevated border border-surface-highlight rounded-2xl p-6 text-sm font-bold outline-none focus:border-indigo-600 transition-all no-scrollbar"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.ctrlKey) {
                     processInput((e.target as HTMLTextAreaElement).value);
@@ -207,9 +207,9 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
         </div>
 
         {/* Results Card */}
-        <div className="bg-white p-6 md:p-10 rounded-[3rem] border border-slate-200 shadow-sm flex flex-col h-full">
+        <div className="bg-surface-elevated p-6 md:p-10 rounded-[3rem] border border-surface-highlight shadow-sm flex flex-col h-full">
           <div className="flex justify-between items-center mb-8">
-            <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight">AI Staging Area</h4>
+            <h4 className="text-xl font-black text-ink-base uppercase tracking-tight">AI Staging Area</h4>
             {summary && (
               <div className="flex gap-4">
                 <span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-[9px] font-black uppercase">News: {summary.news}</span>
@@ -221,13 +221,13 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
           <div className="flex-1 overflow-y-auto no-scrollbar space-y-4 min-h-[300px]">
             {stagedItems.length > 0 ? (
               stagedItems.map((item, idx) => (
-                <div key={idx} className="p-5 bg-slate-50 border border-slate-100 rounded-2xl flex justify-between items-center group/row hover:border-indigo-200 transition-all">
+                <div key={idx} className="p-5 bg-surface-elevated border border-slate-100 rounded-2xl flex justify-between items-center group/row hover:border-indigo-200 transition-all">
                   <div className="space-y-1">
-                    <p className="text-sm font-black text-slate-900 uppercase">{item.brand} {item.name}</p>
+                    <p className="text-sm font-black text-ink-base uppercase">{item.brand} {item.name}</p>
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Shelf: {item.shelfLocation} • Category: {item.category}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-black font-mono text-slate-900">x{item.qty}</p>
+                    <p className="text-lg font-black font-mono text-ink-base">x{item.qty}</p>
                     <p className="text-[9px] font-black text-indigo-600 uppercase">£{item.price.toFixed(2)}</p>
                   </div>
                 </div>

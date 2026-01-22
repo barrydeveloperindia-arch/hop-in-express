@@ -123,25 +123,25 @@ const SalaryView: React.FC<SalaryViewProps> = ({ salaries, setSalaries, staff, a
 
    return (
       <div className="space-y-8 pb-24">
-         <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+         <div className="bg-surface-elevated p-6 md:p-8 rounded-3xl border border-surface-highlight shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="flex items-center gap-4">
                <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl">💷</div>
                <div>
-                  <h4 className="text-sm font-black text-slate-900 uppercase">HMRC Payroll Protocol</h4>
+                  <h4 className="text-sm font-black text-ink-base uppercase">HMRC Payroll Protocol</h4>
                   <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">PAYE & NI Digital Ledger</p>
                </div>
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-               <input type="month" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-xs font-black uppercase outline-none focus:border-indigo-600" />
+               <input type="month" value={filterMonth} onChange={e => setFilterMonth(e.target.value)} className="w-full sm:w-auto bg-surface-elevated border border-surface-highlight rounded-xl px-4 py-3 text-xs font-black uppercase outline-none focus:border-indigo-600" />
                {isAdmin && (
                   <button onClick={runPayrollCycle} className="w-full sm:w-auto bg-indigo-600 text-white px-8 py-3.5 rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-all whitespace-nowrap">Calculate Cycle</button>
                )}
             </div>
          </div>
 
-         <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+         <div className="bg-surface-elevated rounded-[2.5rem] border border-surface-highlight shadow-sm overflow-hidden">
             <table className="w-full text-left hidden md:table">
-               <thead className="bg-slate-50 text-slate-400 text-[9px] font-black uppercase tracking-widest border-b">
+               <thead className="bg-surface-elevated text-slate-400 text-[9px] font-black uppercase tracking-widest border-b">
                   <tr>
                      <th className="px-10 py-6">Employee</th>
                      <th className="px-10 py-6">Gross Accrual</th>
@@ -155,13 +155,13 @@ const SalaryView: React.FC<SalaryViewProps> = ({ salaries, setSalaries, staff, a
                      <tr><td colSpan={5} className="py-20 text-center text-slate-300 font-black uppercase tracking-widest italic">No records for selected period</td></tr>
                   ) : (
                      visibleSalaries.map(sal => (
-                        <tr key={sal.id} className="hover:bg-slate-50 transition-all group">
+                        <tr key={sal.id} className="hover:bg-surface-elevated transition-all group">
                            <td className="px-10 py-7">
-                              <p className="font-black text-slate-900 text-sm uppercase">{sal.employeeName}</p>
+                              <p className="font-black text-ink-base text-sm uppercase">{sal.employeeName}</p>
                               <p className="text-[9px] text-slate-400 font-bold uppercase mt-1">Code: {sal.taxCode} • NI: {sal.niNumber}</p>
                            </td>
                            <td className="px-10 py-7">
-                              <span className="font-black text-slate-700">£{sal.grossPay.toFixed(2)}</span>
+                              <span className="font-black text-ink-base">£{sal.grossPay.toFixed(2)}</span>
                               {sal.totalOvertime > 0 && <span className="ml-2 text-[8px] font-black text-rose-600">+{sal.totalOvertime.toFixed(1)} OT</span>}
                            </td>
                            <td className="px-10 py-7">
@@ -181,23 +181,23 @@ const SalaryView: React.FC<SalaryViewProps> = ({ salaries, setSalaries, staff, a
             </table>
 
             {/* Mobile Salary Cards */}
-            <div className="md:hidden p-4 space-y-4 bg-slate-50">
+            <div className="md:hidden p-4 space-y-4 bg-surface-elevated">
                {visibleSalaries.length === 0 ? (
                   <div className="text-center py-10 text-slate-400 font-black uppercase text-xs tracking-widest">No records found</div>
                ) : (
                   visibleSalaries.map(sal => (
-                     <div key={sal.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                     <div key={sal.id} className="bg-surface-elevated p-5 rounded-2xl border border-surface-highlight shadow-sm flex flex-col gap-4">
                         <div className="flex justify-between items-start">
                            <div>
-                              <p className="font-black text-slate-900 uppercase text-xs">{sal.employeeName}</p>
+                              <p className="font-black text-ink-base uppercase text-xs">{sal.employeeName}</p>
                               <p className="text-[10px] text-slate-400 font-mono mt-1">Code: {sal.taxCode}</p>
                            </div>
-                           <span className="text-xl font-black font-mono text-slate-900">£{sal.totalAmount.toFixed(2)}</span>
+                           <span className="text-xl font-black font-mono text-ink-base">£{sal.totalAmount.toFixed(2)}</span>
                         </div>
                         <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-3">
                            <div>
                               <p className="text-[8px] font-black uppercase text-slate-400">Gross</p>
-                              <p className="font-black text-slate-700">£{sal.grossPay.toFixed(2)}</p>
+                              <p className="font-black text-ink-base">£{sal.grossPay.toFixed(2)}</p>
                            </div>
                            <div className="text-right">
                               <p className="text-[8px] font-black uppercase text-slate-400">Deductions</p>
@@ -213,13 +213,13 @@ const SalaryView: React.FC<SalaryViewProps> = ({ salaries, setSalaries, staff, a
 
          {selectedPayslip && (
             <div className="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4">
-               <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2rem] shadow-2xl p-6 md:p-16 relative">
+               <div className="bg-surface-elevated w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2rem] shadow-2xl p-6 md:p-16 relative">
                   <button onClick={() => setSelectedPayslip(null)} className="absolute top-6 right-6 md:top-10 md:right-10 text-3xl font-light text-slate-300 hover:text-rose-500 transition-colors">✕</button>
 
                   <div className="flex flex-col md:flex-row justify-between items-start border-b-2 border-slate-900 pb-10 mb-12 gap-8">
                      <div>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">{SHOP_INFO.name}</h1>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-4 max-w-[200px] leading-relaxed">{SHOP_INFO.address}</p>
+                        <h1 className="text-4xl font-black text-ink-base tracking-tighter uppercase leading-none">{SHOP_INFO.name}</h1>
+                        <p className="text-[10px] font-bold text-ink-muted uppercase tracking-widest mt-4 max-w-[200px] leading-relaxed">{SHOP_INFO.address}</p>
                         <div className="mt-6 flex gap-3">
                            <span className="text-[8px] font-black bg-slate-900 text-white px-3 py-1 rounded uppercase">HMRC PAYE REGISTERED</span>
                         </div>
@@ -231,9 +231,9 @@ const SalaryView: React.FC<SalaryViewProps> = ({ salaries, setSalaries, staff, a
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 mb-12">
-                     <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200">
+                     <div className="bg-surface-elevated p-8 rounded-2xl border border-surface-highlight">
                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Employee Personal Record</p>
-                        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{selectedPayslip.employeeName}</h2>
+                        <h2 className="text-xl font-black text-ink-base uppercase tracking-tight">{selectedPayslip.employeeName}</h2>
                         <div className="grid grid-cols-2 gap-4 mt-6">
                            <div>
                               <p className="text-[8px] font-bold text-slate-400 uppercase">NI Number</p>
@@ -248,11 +248,11 @@ const SalaryView: React.FC<SalaryViewProps> = ({ salaries, setSalaries, staff, a
                      <div className="text-right space-y-4 py-4">
                         <div>
                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Pay Period Ending</p>
-                           <p className="text-xl font-black text-slate-900 uppercase">{selectedPayslip.month}</p>
+                           <p className="text-xl font-black text-ink-base uppercase">{selectedPayslip.month}</p>
                         </div>
                         <div>
                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Payment Date</p>
-                           <p className="text-base font-black text-slate-700">{selectedPayslip.payDate}</p>
+                           <p className="text-base font-black text-ink-base">{selectedPayslip.payDate}</p>
                         </div>
                      </div>
                   </div>
@@ -296,7 +296,7 @@ const SalaryView: React.FC<SalaryViewProps> = ({ salaries, setSalaries, staff, a
                               <td className="py-5 px-8 text-right font-mono">—</td>
                               <td className="py-5 px-8 text-right font-mono">£{selectedPayslip.nationalInsurance.toFixed(2)}</td>
                            </tr>
-                           <tr className="bg-slate-50 text-slate-500">
+                           <tr className="bg-surface-elevated text-ink-muted">
                               <td className="py-5 px-8 uppercase">Standard Pension Contribution</td>
                               <td className="py-5 px-8 text-right font-mono">—</td>
                               <td className="py-5 px-8 text-right font-mono">£{selectedPayslip.pension.toFixed(2)}</td>
@@ -306,8 +306,8 @@ const SalaryView: React.FC<SalaryViewProps> = ({ salaries, setSalaries, staff, a
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-                     <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest border-b border-slate-200 pb-3 mb-4">Cumulative YTD Balances</h4>
+                     <div className="bg-surface-elevated p-8 rounded-xl border border-surface-highlight">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest border-b border-surface-highlight pb-3 mb-4">Cumulative YTD Balances</h4>
                         <div className="space-y-3">
                            <div className="flex justify-between text-[11px] font-bold">
                               <span className="text-slate-400 uppercase">Gross Pay YTD</span>

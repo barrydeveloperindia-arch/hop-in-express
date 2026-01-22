@@ -118,15 +118,15 @@ const AuthView: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="w-full text-center text-slate-500 text-[10px] font-bold uppercase tracking-widest hover:text-indigo-400 transition-colors"
+              className="w-full text-center text-ink-muted text-[10px] font-bold uppercase tracking-widest hover:text-indigo-400 transition-colors"
             >
               {isLogin ? "Request New Operator Access" : "Already Registered? Login"}
             </button>
           </form>
         </GlassCard>
 
-        <p className="text-center text-slate-600 text-[10px] font-medium">
-          v2.0.0 &bull; Licensed to Hop In Express &bull; <span className="text-slate-500">EngLabs Inc.</span>
+        <p className="text-center text-ink-muted text-[10px] font-medium">
+          v2.0.0 &bull; Licensed to Hop In Express &bull; <span className="text-ink-muted">EngLabs Inc.</span>
         </p>
       </div>
     </div>

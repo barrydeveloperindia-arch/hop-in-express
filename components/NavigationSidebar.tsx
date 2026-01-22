@@ -70,14 +70,14 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
             {/* Sidebar Container */}
             <aside
                 className={cn(
-                    "fixed top-0 left-0 bottom-0 w-72 bg-white/90 backdrop-blur-xl border-r border-slate-200 z-50 transition-transform duration-300 lg:translate-x-0 flex flex-col",
+                    "fixed top-0 left-0 bottom-0 w-72 bg-surface-void/95 backdrop-blur-xl border-r border-surface-highlight z-50 transition-transform duration-300 lg:translate-x-0 flex flex-col shadow-2xl",
                     isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
                 )}
             >
                 {/* Header */}
-                <div className="p-8 pb-4 flex items-center justify-between">
-                    <div className="scale-75 origin-left">
-                        <EngLabsLogo size="sm" />
+                <div className="p-8 pb-4 flex items-center justify-center">
+                    <div className="">
+                        <EngLabsLogo size="md" />
                     </div>
                 </div>
 
@@ -88,7 +88,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 
                 {/* Navigation Items */}
                 <nav className="flex-1 overflow-y-auto px-4 space-y-1">
-                    <div className="px-4 py-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                    <div className="px-4 py-2 text-[10px] font-black text-ink-muted uppercase tracking-widest">
                         Modules
                     </div>
                     {menuItems.map((item) => {
@@ -107,7 +107,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                     "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-sm font-bold",
                                     isActive
                                         ? "bg-primary text-white shadow-glow"
-                                        : "text-slate-500 hover:text-ink-base hover:bg-slate-100"
+                                        : "text-ink-muted hover:text-ink-base hover:bg-surface-highlight"
                                 )}
                             >
                                 <Icon className={cn("w-5 h-5", isActive ? "text-white" : "text-slate-400 group-hover:text-primary")} />
@@ -116,7 +116,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                         );
                     })}
 
-                    <div className="mt-8 px-4 py-2 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                    <div className="mt-8 px-4 py-2 text-[10px] font-black text-ink-muted uppercase tracking-widest">
                         System
                     </div>
                     {footerItems.map((item) => {
@@ -132,17 +132,17 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                                 className={cn(
                                     "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group text-sm font-bold",
                                     isActive
-                                        ? "bg-white text-primary border border-slate-200 shadow-sm"
-                                        : "text-slate-500 hover:text-ink-base hover:bg-slate-100"
+                                        ? "bg-surface-elevated text-primary border border-surface-highlight shadow-sm"
+                                        : "text-ink-muted hover:text-ink-base hover:bg-surface-highlight"
                                 )}
                             >
-                                <Icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-slate-400 group-hover:text-slate-600")} />
+                                <Icon className={cn("w-5 h-5", isActive ? "text-primary" : "text-slate-400 group-hover:text-ink-muted")} />
                                 {item.label}
                             </button>
                         );
                     })}
                     <div className="mt-4 px-4 py-2">
-                        <div className="bg-slate-100 rounded-lg p-3 border border-slate-200">
+                        <div className="bg-surface-highlight rounded-lg p-3 border border-surface-highlight">
                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Debug Info</p>
                             <p className="text-[10px] text-primary font-mono mt-1 break-all">
                                 ShopID: {import.meta.env.VITE_USER_ID || 'Auth UID'}

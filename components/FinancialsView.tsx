@@ -64,13 +64,13 @@ const FinancialOverview: React.FC<{
 
   return (
     <div className="space-y-10">
-      <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Financial Intelligence</h3>
+      <h3 className="text-3xl font-black text-ink-base uppercase tracking-tighter">Financial Intelligence</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-sm group">
+        <div className="bg-surface-elevated p-6 md:p-10 rounded-[2.5rem] border border-surface-highlight shadow-sm group">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue (P&L)</p>
           <h5 className="text-3xl font-black mt-4 font-mono text-emerald-600">{SHOP_INFO.currency}{stats.revenue.toLocaleString()}</h5>
         </div>
-        <div className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-sm group">
+        <div className="bg-surface-elevated p-6 md:p-10 rounded-[2.5rem] border border-surface-highlight shadow-sm group">
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Net Profit</p>
           <h5 className="text-3xl font-black mt-4 font-mono text-indigo-600">{SHOP_INFO.currency}{stats.netProfit.toLocaleString()}</h5>
         </div>
@@ -118,8 +118,8 @@ const VatAnalysis: React.FC<{
   return (
     <div className="space-y-10 animate-in slide-in-from-right-4 duration-500">
       <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-        <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">VAT Analysis Engine</h3>
-        <div className="flex items-center gap-4 bg-white border border-slate-200 p-2 rounded-2xl shadow-sm">
+        <h3 className="text-3xl font-black text-ink-base uppercase tracking-tighter">VAT Analysis Engine</h3>
+        <div className="flex items-center gap-4 bg-surface-elevated border border-surface-highlight p-2 rounded-2xl shadow-sm">
           <input
             type="date"
             value={vatDateRange.start}
@@ -143,23 +143,23 @@ const VatAnalysis: React.FC<{
           <h4 className="text-5xl font-black font-mono tracking-tighter text-emerald-400">
             {SHOP_INFO.currency}{vatSummaryData.totalVat.toFixed(2)}
           </h4>
-          <p className="text-[10px] font-bold text-slate-500 uppercase mt-4">Verified for period: {vatDateRange.start} - {vatDateRange.end}</p>
+          <p className="text-[10px] font-bold text-ink-muted uppercase mt-4">Verified for period: {vatDateRange.start} - {vatDateRange.end}</p>
         </div>
-        <div className="bg-white p-6 md:p-10 rounded-[2.5rem] border border-slate-200 shadow-sm">
+        <div className="bg-surface-elevated p-6 md:p-10 rounded-[2.5rem] border border-surface-highlight shadow-sm">
           <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.4em] mb-4">Net Trading Revenue</p>
-          <h4 className="text-5xl font-black font-mono tracking-tighter text-slate-900">
+          <h4 className="text-5xl font-black font-mono tracking-tighter text-ink-base">
             {SHOP_INFO.currency}{vatSummaryData.totalNet.toFixed(2)}
           </h4>
           <div className="w-12 h-1 bg-indigo-600 mt-4 rounded-full"></div>
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-10 py-6 bg-slate-50 border-b border-slate-100">
-          <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">HMRC Tax Band Reconciliation</p>
+      <div className="bg-surface-elevated rounded-[2.5rem] border border-surface-highlight shadow-sm overflow-hidden">
+        <div className="px-10 py-6 bg-surface-elevated border-b border-slate-100">
+          <p className="text-[10px] font-black text-ink-base uppercase tracking-widest">HMRC Tax Band Reconciliation</p>
         </div>
         <table className="w-full text-left hidden md:table">
-          <thead className="bg-white text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] border-b">
+          <thead className="bg-surface-elevated text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] border-b">
             <tr>
               <th className="px-10 py-6">UK Tax Classification</th>
               <th className="px-10 py-6 text-right">Gross Volume</th>
@@ -169,16 +169,16 @@ const VatAnalysis: React.FC<{
           </thead>
           <tbody className="divide-y divide-slate-100">
             {[20, 5, 0].map(rate => (
-              <tr key={rate} className="hover:bg-slate-50/50 transition-all group font-bold">
+              <tr key={rate} className="hover:bg-surface-elevated/50 transition-all group font-bold">
                 <td className="px-10 py-7">
-                  <span className="text-xs font-black uppercase text-slate-900">
+                  <span className="text-xs font-black uppercase text-ink-base">
                     {rate === 0 ? 'Zero-Rated' : rate === 5 ? 'Reduced Rate' : 'Standard Rate'} ({rate}%)
                   </span>
                 </td>
                 <td className="px-10 py-7 text-right font-mono text-sm">
                   {SHOP_INFO.currency}{vatSummaryData.breakdown[rate].gross.toFixed(2)}
                 </td>
-                <td className="px-10 py-7 text-right font-mono text-sm text-slate-500">
+                <td className="px-10 py-7 text-right font-mono text-sm text-ink-muted">
                   {SHOP_INFO.currency}{vatSummaryData.breakdown[rate].net.toFixed(2)}
                 </td>
                 <td className="px-10 py-7 text-right font-mono text-base text-indigo-600">
@@ -190,11 +190,11 @@ const VatAnalysis: React.FC<{
         </table>
 
         {/* Mobile VAT Cards */}
-        <div className="md:hidden p-4 space-y-4 bg-slate-50">
+        <div className="md:hidden p-4 space-y-4 bg-surface-elevated">
           {[20, 5, 0].map(rate => (
-            <div key={rate} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+            <div key={rate} className="bg-surface-elevated p-5 rounded-2xl border border-surface-highlight shadow-sm flex flex-col gap-4">
               <div>
-                <span className="text-xs font-black uppercase text-slate-900 block">
+                <span className="text-xs font-black uppercase text-ink-base block">
                   {rate === 0 ? 'Zero-Rated' : rate === 5 ? 'Reduced Rate' : 'Standard Rate'} ({rate}%)
                 </span>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Classification</p>
@@ -202,11 +202,11 @@ const VatAnalysis: React.FC<{
               <div className="grid grid-cols-2 gap-4 border-t border-slate-100 pt-3">
                 <div>
                   <p className="text-[8px] font-black uppercase text-slate-400">Gross</p>
-                  <p className="font-mono font-bold text-slate-700">{SHOP_INFO.currency}{vatSummaryData.breakdown[rate].gross.toFixed(2)}</p>
+                  <p className="font-mono font-bold text-ink-base">{SHOP_INFO.currency}{vatSummaryData.breakdown[rate].gross.toFixed(2)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-[8px] font-black uppercase text-slate-400">Net</p>
-                  <p className="font-mono font-bold text-slate-500">{SHOP_INFO.currency}{vatSummaryData.breakdown[rate].net.toFixed(2)}</p>
+                  <p className="font-mono font-bold text-ink-muted">{SHOP_INFO.currency}{vatSummaryData.breakdown[rate].net.toFixed(2)}</p>
                 </div>
               </div>
               <div className="flex justify-between items-center bg-indigo-50 p-3 rounded-xl border border-indigo-100">
@@ -387,19 +387,19 @@ const SalesLedger: React.FC = () => {
   return (
     <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
       <div className="flex justify-between items-center">
-        <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Sales Ledger</h3>
+        <h3 className="text-3xl font-black text-ink-base uppercase tracking-tighter">Sales Ledger</h3>
         <label className="bg-emerald-600 text-white px-6 py-3 rounded-xl font-black uppercase text-xs tracking-widest hover:bg-emerald-700 transition-colors cursor-pointer shadow-lg hover:shadow-emerald-500/30">
           Topic: Import Sales Sheet
           <input type="file" onChange={handleImportSales} accept=".xlsx, .xls" className="hidden" />
         </label>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+      <div className="bg-surface-elevated rounded-[2.5rem] border border-surface-highlight shadow-sm overflow-hidden">
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left whitespace-nowrap">
-            <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
+            <thead className="bg-surface-elevated text-[10px] font-black text-slate-400 uppercase tracking-widest border-b">
               <tr>
-                <th className="px-6 py-4 sticky left-0 bg-slate-50">Date</th>
+                <th className="px-6 py-4 sticky left-0 bg-surface-elevated">Date</th>
                 <th className="px-6 py-4 text-right">Total Sales</th>
                 <th className="px-6 py-4 text-right text-emerald-600">Cash Taken</th>
                 <th className="px-6 py-4 text-right text-rose-500">Cash Purch</th>
@@ -409,17 +409,17 @@ const SalesLedger: React.FC = () => {
                 <th className="px-6 py-4 text-right">Paypoint</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-xs font-bold text-slate-700">
+            <tbody className="divide-y divide-slate-100 text-xs font-bold text-ink-base">
               {salesData.map(row => (
                 <tr key={row.id} className="hover:bg-indigo-50/50 transition-colors">
-                  <td className="px-6 py-4 sticky left-0 bg-white">{row.date} <span className="text-slate-400 font-normal ml-2">{row.dayOfWeek?.slice(0, 3)}</span></td>
+                  <td className="px-6 py-4 sticky left-0 bg-surface-elevated">{row.date} <span className="text-slate-400 font-normal ml-2">{row.dayOfWeek?.slice(0, 3)}</span></td>
                   <td className="px-6 py-4 text-right">{row.totalSales.toFixed(2)}</td>
                   <td className="px-6 py-4 text-right text-emerald-600">{row.cashTaken.toFixed(2)}</td>
                   <td className="px-6 py-4 text-right text-rose-500">{row.cashPurchases.toFixed(2)}</td>
-                  <td className="px-6 py-4 text-right border-l text-slate-500">{row.categoryBreakdown.alcohol.toFixed(2)}</td>
-                  <td className="px-6 py-4 text-right text-slate-500">{row.categoryBreakdown.tobacco.toFixed(2)}</td>
-                  <td className="px-6 py-4 text-right text-slate-500">{row.categoryBreakdown.groceries.toFixed(2)}</td>
-                  <td className="px-6 py-4 text-right text-slate-500">{row.categoryBreakdown.paypoint.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-right border-l text-ink-muted">{row.categoryBreakdown.alcohol.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-right text-ink-muted">{row.categoryBreakdown.tobacco.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-right text-ink-muted">{row.categoryBreakdown.groceries.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-right text-ink-muted">{row.categoryBreakdown.paypoint.toFixed(2)}</td>
                 </tr>
               ))}
               {salesData.length === 0 && (
@@ -432,18 +432,18 @@ const SalesLedger: React.FC = () => {
         </div>
 
         {/* Mobile Sales Cards */}
-        <div className="md:hidden p-4 space-y-4 bg-slate-50">
+        <div className="md:hidden p-4 space-y-4 bg-surface-elevated">
           {salesData.length === 0 ? (
             <div className="p-10 text-center text-slate-400 uppercase tracking-widest text-xs">No Sales Data Imported</div>
           ) : (
             salesData.map(row => (
-              <div key={row.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+              <div key={row.id} className="bg-surface-elevated p-5 rounded-2xl border border-surface-highlight shadow-sm flex flex-col gap-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-black text-slate-900 uppercase text-xs">{row.date}</p>
+                    <p className="font-black text-ink-base uppercase text-xs">{row.date}</p>
                     <p className="text-[10px] text-slate-400 uppercase font-bold mt-1">{row.dayOfWeek}</p>
                   </div>
-                  <span className="text-xl font-black font-mono text-slate-900">{row.totalSales.toFixed(2)}</span>
+                  <span className="text-xl font-black font-mono text-ink-base">{row.totalSales.toFixed(2)}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 border-t border-slate-100 pt-3">
                   <div className="bg-emerald-50 p-2 rounded-lg text-center">
@@ -455,7 +455,7 @@ const SalesLedger: React.FC = () => {
                     <p className="font-bold text-rose-600 font-mono text-sm">{row.cashPurchases.toFixed(2)}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-slate-500 font-bold uppercase p-3 bg-slate-50 rounded-xl">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] text-ink-muted font-bold uppercase p-3 bg-surface-elevated rounded-xl">
                   <div className="flex justify-between"><span>Alc:</span> <span>{row.categoryBreakdown.alcohol.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Tob:</span> <span>{row.categoryBreakdown.tobacco.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Groc:</span> <span>{row.categoryBreakdown.groceries.toFixed(2)}</span></div>
@@ -539,10 +539,10 @@ const ExpenseManager: React.FC<{
 
   return (
     <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
-      <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Operational Expenses</h3>
+      <h3 className="text-3xl font-black text-ink-base uppercase tracking-tighter">Operational Expenses</h3>
 
-      <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
-        <h4 className="text-xl font-black text-slate-900 uppercase mb-6">Record New Expense</h4>
+      <div className="bg-surface-elevated p-6 md:p-8 rounded-[2.5rem] border border-surface-highlight shadow-sm">
+        <h4 className="text-xl font-black text-ink-base uppercase mb-6">Record New Expense</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Description</label>
@@ -550,7 +550,7 @@ const ExpenseManager: React.FC<{
               type="text"
               value={formData.description}
               onChange={e => setFormData({ ...formData, description: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl font-bold text-slate-900 outline-none focus:border-indigo-600"
+              className="w-full bg-surface-elevated border border-surface-highlight p-4 rounded-xl font-bold text-ink-base outline-none focus:border-indigo-600"
               placeholder="e.g. Utility Bill"
             />
           </div>
@@ -560,7 +560,7 @@ const ExpenseManager: React.FC<{
               type="number"
               value={formData.amount}
               onChange={e => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-              className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl font-bold text-slate-900 outline-none focus:border-indigo-600"
+              className="w-full bg-surface-elevated border border-surface-highlight p-4 rounded-xl font-bold text-ink-base outline-none focus:border-indigo-600"
             />
           </div>
           <div className="space-y-2">
@@ -568,7 +568,7 @@ const ExpenseManager: React.FC<{
             <select
               value={formData.category}
               onChange={e => setFormData({ ...formData, category: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl font-bold text-slate-900 outline-none focus:border-indigo-600"
+              className="w-full bg-surface-elevated border border-surface-highlight p-4 rounded-xl font-bold text-ink-base outline-none focus:border-indigo-600"
             >
               <option value="Operational Expense">Operational Expense</option>
               <option value="Payroll Expense">Payroll Expense</option>
@@ -580,7 +580,7 @@ const ExpenseManager: React.FC<{
             <select
               value={paymentAccount}
               onChange={e => setPaymentAccount(e.target.value as LedgerAccount)}
-              className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl font-bold text-slate-900 outline-none focus:border-indigo-600"
+              className="w-full bg-surface-elevated border border-surface-highlight p-4 rounded-xl font-bold text-ink-base outline-none focus:border-indigo-600"
             >
               <option value="Cash in Hand">Cash in Hand</option>
               <option value="Bank Account">Bank Account</option>
@@ -592,7 +592,7 @@ const ExpenseManager: React.FC<{
               type="date"
               value={formData.date}
               onChange={e => setFormData({ ...formData, date: e.target.value })}
-              className="w-full bg-slate-50 border border-slate-200 p-4 rounded-xl font-bold text-slate-900 outline-none focus:border-indigo-600"
+              className="w-full bg-surface-elevated border border-surface-highlight p-4 rounded-xl font-bold text-ink-base outline-none focus:border-indigo-600"
             />
           </div>
         </div>
@@ -604,13 +604,13 @@ const ExpenseManager: React.FC<{
         </button>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
-        <div className="px-10 py-6 bg-slate-50 border-b border-slate-100">
-          <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Recent Expenses</p>
+      <div className="bg-surface-elevated rounded-[2.5rem] border border-surface-highlight shadow-sm overflow-hidden">
+        <div className="px-10 py-6 bg-surface-elevated border-b border-slate-100">
+          <p className="text-[10px] font-black text-ink-base uppercase tracking-widest">Recent Expenses</p>
         </div>
         <div className="max-h-[400px] overflow-y-auto">
           <table className="w-full text-left hidden md:table">
-            <thead className="bg-white text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] border-b sticky top-0">
+            <thead className="bg-surface-elevated text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] border-b sticky top-0">
               <tr>
                 <th className="px-10 py-4">Date</th>
                 <th className="px-10 py-4">Description</th>
@@ -620,10 +620,10 @@ const ExpenseManager: React.FC<{
             </thead>
             <tbody className="divide-y divide-slate-100">
               {expenses.slice().reverse().map(exp => (
-                <tr key={exp.id} className="hover:bg-slate-50/50 transition-colors">
+                <tr key={exp.id} className="hover:bg-surface-elevated/50 transition-colors">
                   <td className="px-10 py-4 font-mono text-xs">{exp.date}</td>
-                  <td className="px-10 py-4 font-bold text-slate-700">{exp.description}</td>
-                  <td className="px-10 py-4 text-xs uppercase text-slate-500">{exp.category}</td>
+                  <td className="px-10 py-4 font-bold text-ink-base">{exp.description}</td>
+                  <td className="px-10 py-4 text-xs uppercase text-ink-muted">{exp.category}</td>
                   <td className="px-10 py-4 text-right font-mono font-bold text-rose-600">
                     {SHOP_INFO.currency}{exp.amount.toFixed(2)}
                   </td>
@@ -638,20 +638,20 @@ const ExpenseManager: React.FC<{
           </table>
 
           {/* Mobile Expense Cards */}
-          <div className="md:hidden p-4 space-y-4 bg-slate-50">
+          <div className="md:hidden p-4 space-y-4 bg-surface-elevated">
             {expenses.length === 0 ? (
               <div className="text-center py-10 text-slate-400 font-bold uppercase tracking-widest text-xs">No expenses recorded</div>
             ) : (
               expenses.slice().reverse().map(exp => (
-                <div key={exp.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-3">
+                <div key={exp.id} className="bg-surface-elevated p-5 rounded-2xl border border-surface-highlight shadow-sm flex flex-col gap-3">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="font-bold text-slate-900 uppercase text-sm">{exp.description}</p>
+                      <p className="font-bold text-ink-base uppercase text-sm">{exp.description}</p>
                       <p className="text-[10px] text-slate-400 font-mono mt-1">{exp.date}</p>
                     </div>
                     <span className="font-black font-mono text-rose-600">{SHOP_INFO.currency}{exp.amount.toFixed(2)}</span>
                   </div>
-                  <span className="self-start px-2 py-1 bg-slate-100 text-slate-500 text-[8px] font-black uppercase rounded">{exp.category}</span>
+                  <span className="self-start px-2 py-1 bg-surface-highlight text-ink-muted text-[8px] font-black uppercase rounded">{exp.category}</span>
                 </div>
               ))
             )}
@@ -670,8 +670,8 @@ const FinancialsView: React.FC<FinancialsViewProps> = ({
   return (
     <div className="flex flex-col lg:flex-row gap-12 min-h-[900px] animate-in fade-in duration-700">
       <aside className="w-full lg:w-80 shrink-0 space-y-4">
-        <div className="bg-white rounded-[2.5rem] border border-slate-200 p-6 shadow-xl">
-          <p className="px-6 py-4 text-[10px] font-black text-slate-900 uppercase tracking-[0.3em] border-b mb-4">Master Controls</p>
+        <div className="bg-surface-elevated rounded-[2.5rem] border border-surface-highlight p-6 shadow-xl">
+          <p className="px-6 py-4 text-[10px] font-black text-ink-base uppercase tracking-[0.3em] border-b mb-4">Master Controls</p>
           {[
             { id: 'overview', label: 'Financial Matrix', icon: '📊' },
             { id: 'sales-ledger', label: 'Sales Ledger', icon: '🛒' },
@@ -682,7 +682,7 @@ const FinancialsView: React.FC<FinancialsViewProps> = ({
             <button
               key={module.id}
               onClick={() => setActiveModule(module.id as any)}
-              className={`w-full flex items-center gap-4 px-6 py-5 rounded-[1.5rem] transition-all ${activeModule === module.id ? 'bg-indigo-600 text-white shadow-2xl' : 'text-slate-500 hover:bg-slate-50'}`}
+              className={`w-full flex items-center gap-4 px-6 py-5 rounded-[1.5rem] transition-all ${activeModule === module.id ? 'bg-indigo-600 text-white shadow-2xl' : 'text-ink-muted hover:bg-surface-elevated'}`}
             >
               <span className="text-xl">{module.icon}</span>
               <span className="text-[11px] font-black uppercase tracking-widest">{module.label}</span>
