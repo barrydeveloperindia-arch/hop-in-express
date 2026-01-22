@@ -39,6 +39,7 @@ const InventoryView: React.FC<InventoryViewProps> = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const isAdmin = userRole === 'Owner' || userRole === 'Manager';
+  const canEdit = isAdmin || userRole === 'Inventory Staff' || userRole === 'Till Manager'; // Till Manager might need stock check access
   const modalFileInputRef = useRef<HTMLInputElement>(null);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
@@ -97,6 +98,10 @@ const InventoryView: React.FC<InventoryViewProps> = ({
       setEditingItem({ ...existing });
       logAction('Barcode Recognition', 'inventory', `Matched asset: ${existing.name}`, 'Info');
     } else {
+      if (!canEdit) {
+        window.alert("Item not found. You do not have permission to add new items.");
+        return;
+      }
       if (confirm(`Barcode [${barcode}] not found in registry. Initiate new item enrollment?`)) {
         setEditingItem({
           id: crypto.randomUUID(),
@@ -160,8 +165,8 @@ const InventoryView: React.FC<InventoryViewProps> = ({
     setIsSaving(true);
 
     try {
-      if (userRole !== 'Owner') {
-        window.alert("Only Owners can modify inventory.");
+      if (!canEdit) {
+        window.alert("You do not have permission to modify inventory.");
         setIsSaving(false);
         return;
       }

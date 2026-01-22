@@ -35,8 +35,8 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
   const [addStaffModalOpen, setAddStaffModalOpen] = useState(false);
   const [newStaffForm, setNewStaffForm] = useState({ name: '', role: 'Cashier' as UserRole, pin: '', niNumber: '', photo: '', email: '' });
 
-  // STRICT ACCESS: Only Owner can manage staff
-  const isAdmin = userRole === 'Owner';
+  // STRICT ACCESS: Only Owner and Manager can manage staff
+  const isAdmin = userRole === 'Owner' || userRole === 'Manager';
 
   // Auto-correct selectedStaffId if invalid (e.g. stale default)
   React.useEffect(() => {

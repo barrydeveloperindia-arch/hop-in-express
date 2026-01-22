@@ -17,7 +17,7 @@ const SalaryView: React.FC<SalaryViewProps> = ({ salaries, setSalaries, staff, a
    const [filterMonth, setFilterMonth] = useState<string>(new Date().toISOString().slice(0, 7));
    const [selectedPayslip, setSelectedPayslip] = useState<SalaryRecord | null>(null);
 
-   const isAdmin = userRole === 'Owner' || userRole === 'Accountant';
+   const isAdmin = userRole === 'Owner' || userRole === 'Manager';
 
    const visibleSalaries = useMemo(() => {
       const monthSalaries = salaries.filter(s => s.month === filterMonth);

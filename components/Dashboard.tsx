@@ -15,7 +15,7 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ transactions, inventory, role, attendance, bills, staff }) => {
-  const isFinancialRole = role === 'Owner' || role === 'Accountant';
+  const isFinancialRole = role === 'Owner' || role === 'Manager';
   const todayStr = new Date().toISOString().split('T')[0];
 
   const financialSummary = useMemo(() => {

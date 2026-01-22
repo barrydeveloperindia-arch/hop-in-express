@@ -42,13 +42,13 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
 }) => {
     const menuItems: MenuItem[] = [
         { id: 'dashboard', label: 'Command Center', icon: LayoutDashboard },
-        { id: 'sales', label: 'Terminal Sales', icon: ShoppingCart },
-        { id: 'inventory', label: 'Inventory', icon: Package },
-        { id: 'staff', label: 'Crew Management', icon: Users },
+        { id: 'sales', label: 'Terminal Sales', icon: ShoppingCart, roleLimit: ['Owner', 'Manager', 'Till Manager', 'Cashier'] },
+        { id: 'inventory', label: 'Inventory', icon: Package, roleLimit: ['Owner', 'Manager', 'Till Manager', 'Inventory Staff'] },
+        { id: 'staff', label: 'Crew Management', icon: Users, roleLimit: ['Owner', 'Manager'] },
         { id: 'financials', label: 'Financials', icon: Landmark, roleLimit: ['Owner'] },
         { id: 'purchases', label: 'Procurement', icon: FileText, roleLimit: ['Owner', 'Manager'] },
         { id: 'suppliers', label: 'Supply Chain', icon: Truck, roleLimit: ['Owner', 'Manager'] },
-        { id: 'smart-intake', label: 'AI Intake', icon: Bot, roleLimit: ['Owner'] },
+        { id: 'smart-intake', label: 'AI Intake', icon: Bot, roleLimit: ['Owner', 'Manager'] },
     ];
 
     const footerItems = [

@@ -1,5 +1,5 @@
 
-export type UserRole = 'Owner' | 'Manager' | 'Cashier' | 'Accountant' | 'Stock Staff';
+export type UserRole = 'Owner' | 'Manager' | 'Till Manager' | 'Inventory Staff' | 'Cashier';
 
 export type ContractType = 'Full-time' | 'Part-time' | 'Zero-hour' | 'Contractor';
 
