@@ -23,11 +23,13 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
     const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GOOGLE_GENAI_API_KEY });
 
     let parts: any[] = [];
-    const systemInstruction = `You are a smart inventory management AI for a retail shop named "Hop In Express".
-      Automatically detect input type (Shelf Photo, Invoice, Text).
-      Extract: Item Name, Brand, Quantity, Purchase Price, Selling Price, Category, Shelf Number, Barcode, SKU.
-      If Selling Price is missing, suggest one.
-      Return JSON array of items.`;
+    const systemInstruction = `You are a smart inventory management AI for a retail shop named "Hop In Express". 
+      Analyze the input (Image or Text).
+      1. IDENTIFY items visible.
+      2. COUNT the quantity of each item. Be as precise as possible.
+      3. EXTRACT details: Brand, Name, Pack Size (if visible), Price (if visible).
+      4. If Selling Price is missing, suggest a UK market price.
+      5. Return a valid JSON array. Each object must have: name, brand, qty (number), costPrice (number), price (number), category, shelfLocation, barcode, sku.`;
 
     if (typeof input !== 'string') {
       const base64 = await fileToBase64(input);
@@ -43,8 +45,8 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
 
     try {
       const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
-        contents: [{ parts: [...parts, { text: "Analyze the input and provide the standardized inventory data as a JSON array." }] }],
+        model: 'gemini-1.5-flash',
+        contents: [{ parts: [...parts, { text: "Analyze this image/text. Count the items. Output JSON array." }] }],
         config: {
           systemInstruction,
           responseMimeType: "application/json",
