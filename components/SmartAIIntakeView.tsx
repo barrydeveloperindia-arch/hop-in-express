@@ -82,7 +82,10 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
       logAction('AI Intake Analysis', 'smart-intake', `Detected ${items.length} items from input.`, 'Info');
     } catch (err) {
       console.error("AI Analysis Error:", err);
-      alert("Failed to process input. Please try a clearer image or text.");
+      console.error("AI Analysis Error:", err);
+      // Detailed error for debugging
+      const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
+      alert(`AI Error: ${errorMessage}\n\nPlease check your API Key or Quota.`);
     } finally {
       setIsProcessing(false);
     }
@@ -195,6 +198,7 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
 
             <div className="relative">
               <textarea
+                id="manual-input-area"
                 placeholder="Or paste manual text entry here..."
                 className="w-full h-32 bg-surface-elevated border border-surface-highlight rounded-2xl p-6 text-sm font-bold outline-none focus:border-indigo-600 transition-all no-scrollbar"
                 onKeyDown={(e) => {
@@ -203,7 +207,19 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
                   }
                 }}
               ></textarea>
-              <p className="text-[8px] font-black text-slate-300 uppercase absolute bottom-4 right-4 tracking-widest">CTRL + ENTER to Scan</p>
+              <div className="absolute bottom-4 right-4 flex gap-2 items-center">
+                <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest hidden md:block">CTRL + ENTER to Scan</p>
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('manual-input-area') as HTMLTextAreaElement;
+                    if (el && el.value) processInput(el.value);
+                  }}
+                  className="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 active:scale-95 transition-all shadow-lg"
+                  title="Run AI Analysis"
+                >
+                  <span className="text-xs font-black uppercase tracking-wider">Analyze</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

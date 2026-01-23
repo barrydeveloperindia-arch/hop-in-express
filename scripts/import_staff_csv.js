@@ -35,7 +35,7 @@ const FIREBASE_CONFIG = {
     appId: env.VITE_FIREBASE_APP_ID
 };
 
-const CSV_PATH = path.resolve(__dirname, '../staff_template.csv');
+const CSV_PATH = path.resolve(__dirname, './data/staff_template.csv');
 
 async function main() {
     console.log("🚀 Starting Staff Import from CSV...");
