@@ -66,7 +66,7 @@ export const NAV_ITEMS = [
 export const INITIAL_STAFF: StaffMember[] = [
   {
     id: '1',
-    name: 'Shop Owner',
+    name: 'Bharat Anand',
     role: 'Owner',
     contractType: 'Full-time',
     pin: '1111',
@@ -83,7 +83,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     advance: 0,
     holidayEntitlement: 28,
     accruedHoliday: 0,
-    photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    photo: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
   },
   {
     id: '2',
