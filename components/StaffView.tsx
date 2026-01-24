@@ -385,7 +385,10 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
 
   const getTodayRecord = () => {
     const today = new Date().toISOString().split('T')[0];
-    return attendance.find(a => a.staffId === selectedStaffId && a.date === today && !a.clockOut);
+    const todays = attendance.filter(a => a.staffId === selectedStaffId && a.date === today);
+    const active = todays.find(a => !a.clockOut);
+    const last = [...todays].sort((a, b) => (b.clockIn || '').localeCompare(a.clockIn || ''))[0];
+    return active || last;
   };
 
   const getStaffStats = () => {
@@ -446,7 +449,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
   const dashboardStats = useMemo(() => getStaffStats(), [attendance, selectedStaffId]);
   const targetStaffName = getTargetStaff()?.name || 'Staff';
   const todayRecord = getTodayRecord();
-  const isCheckedIn = !!todayRecord;
+  const isCheckedIn = !!(todayRecord && !todayRecord.clockOut);
 
   const renderDashboard = () => {
     // Metrics Calculation
@@ -633,45 +636,71 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
               <div className="flex justify-between items-center mb-8">
                 <h3 className="font-bold text-slate-900">Attendance Overview</h3>
                 <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs font-bold text-slate-600 flex items-center gap-2">
-                  Week 22 <span className="text-slate-400">▼</span>
+                  Week {Math.ceil(new Date().getDate() / 7)} <span className="text-slate-400">▼</span>
                 </div>
               </div>
 
-              {/* Fake Chart Visualization */}
-              <div className="h-40 w-full relative mt-8">
-                {/* Horizontal Grid */}
-                {[0, 1, 2].map(i => (
-                  <div key={i} className="absolute w-full h-px bg-slate-100 border-b border-dashed border-slate-200" style={{ bottom: `${i * 33}%` }}></div>
-                ))}
+              {/* Real Chart Visualization */}
+              {(() => {
+                const days = Array.from({ length: 7 }, (_, i) => {
+                  const d = new Date();
+                  d.setDate(d.getDate() - (6 - i));
+                  return d;
+                });
 
-                {/* Data Line (SVG) */}
-                <svg className="absolute inset-0 w-full h-full overflow-visible">
-                  <path d="M0,80 C50,60 100,70 150,50 C200,30 250,50 300,40 C350,30 400,20 450,40 C500,60 550,80 600,70" fill="none" stroke="#1e1b4b" strokeWidth="3" strokeLinecap="round" />
+                const points = days.map((d, i) => {
+                  const dateStr = d.toISOString().split('T')[0];
+                  const rec = attendance.find(a => a.staffId === selectedStaffId && a.date === dateStr);
 
-                  {/* Active Point */}
-                  <circle cx="300" cy="40" r="6" fill="white" stroke="#1e1b4b" strokeWidth="3" />
+                  if (!rec || !rec.clockIn) return { x: i * 100, y: 80, hasData: false, date: d };
 
-                  {/* Tooltip Simulation */}
-                  <foreignObject x="320" y="0" width="120" height="60">
-                    <div className="bg-orange-100 p-2 rounded-lg border border-orange-200 shadow-sm">
-                      <p className="text-[10px] font-bold text-orange-800 flex items-center gap-1">📅 3 June 2023</p>
-                      <p className="text-[10px] font-bold text-orange-800 flex items-center gap-1">⏰ 8:00 am</p>
+                  const [h, m] = rec.clockIn.split(':').map(Number);
+                  const mins = h * 60 + m;
+                  // Map 06:00 (360m) to 12:00 (720m) -> 10px to 80px
+                  let y = ((mins - 360) / 360) * 70 + 10;
+                  y = Math.max(10, Math.min(80, y));
+                  return { x: i * 100, y, hasData: true, date: d, time: rec.clockIn };
+                });
+
+                const pathD = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
+                const lastPoint = points.filter(p => p.hasData).pop();
+
+                return (
+                  <div className="h-40 w-full relative mt-8">
+                    {[0, 1, 2].map(i => (
+                      <div key={i} className="absolute w-full h-px bg-slate-100 border-b border-dashed border-slate-200" style={{ bottom: `${i * 33}%` }}></div>
+                    ))}
+
+                    <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 600 80" preserveAspectRatio="none">
+                      <path d={pathD} fill="none" stroke="#1e1b4b" strokeWidth="3" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+
+                      {points.filter(p => p.hasData).map((p, i) => (
+                        <circle key={i} cx={p.x} cy={p.y} r="4" fill="white" stroke="#1e1b4b" strokeWidth="3" />
+                      ))}
+
+                      {lastPoint && (
+                        <foreignObject x={Math.min(500, lastPoint.x - 60)} y={Math.max(0, lastPoint.y - 70)} width="120" height="60">
+                          <div className="bg-orange-100 p-2 rounded-lg border border-orange-200 shadow-sm animate-in fade-in zoom-in duration-300">
+                            <p className="text-[10px] font-bold text-orange-800 flex items-center gap-1">📅 {lastPoint.date.getDate()} {lastPoint.date.toLocaleString('default', { month: 'short' })}</p>
+                            <p className="text-[10px] font-bold text-orange-800 flex items-center gap-1">⏰ {lastPoint.time}</p>
+                          </div>
+                        </foreignObject>
+                      )}
+                    </svg>
+
+                    <div className="absolute -bottom-8 left-0 right-0 flex justify-between text-xs font-black text-slate-400 uppercase">
+                      {days.map(d => <span key={d.toString()}>{d.toLocaleString('default', { weekday: 'short' }).slice(0, 2)}</span>)}
                     </div>
-                  </foreignObject>
-                </svg>
-
-                {/* X Axis */}
-                <div className="absolute -bottom-8 left-0 right-0 flex justify-between text-xs font-black text-slate-400 uppercase">
-                  <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
-                </div>
-              </div>
+                  </div>
+                );
+              })()}
 
               <div className="flex gap-6 mt-12 justify-center">
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-500">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-900"></div> Clock In On Time
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-900"></div> Clock In
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-500">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div> Clock In Late
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div> Absent
                 </div>
               </div>
             </div>
@@ -999,7 +1028,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       {/* Top Navigation */}
       <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mb-8">
         <div className="flex bg-white px-2 py-2 rounded-2xl shadow-sm border border-slate-100">
-          {[{ id: 'attendance', label: 'Dashboard' }, { id: 'registry', label: 'Registry' }, { id: 'calendar', label: 'Calendar' }, { id: 'files', label: 'Files' }].map(tab => (
+          {[{ id: 'attendance', label: 'Dashboard' }, { id: 'registry', label: 'Registry' }, { id: 'calendar', label: 'Calendar' }].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
