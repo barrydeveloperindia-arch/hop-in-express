@@ -11,7 +11,9 @@
     "serve": "node server.js",
     "android": "npm run build && npx cap sync && npx cap open android",
     "info": "echo. && echo --------------------------------------------------- && echo Hello, && echo Install your work app: && echo https://hop-in-express-command-os.web.app && echo. && echo Login: && echo Username: xxxx && echo Password: xxxx && echo --------------------------------------------------- && echo.",
-    "deploy": "npx firebase-tools deploy --only hosting"
+    "deploy": "npx firebase-tools deploy --only hosting",
+    "make-docs": "node scripts/create_doc.js",
+    "git-push": "scripts\\easy_push.bat"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.1",
