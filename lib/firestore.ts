@@ -171,3 +171,52 @@ export const addLedgerEntry = async (userId: string, entry: LedgerEntry) => {
     const ref = doc(db, 'shops', userId, 'ledger', entry.id);
     await setDoc(ref, entry);
 };
+
+// CRUD: Expenses
+export const addExpense = async (userId: string, expense: Expense) => {
+    const ref = doc(db, 'shops', userId, 'expenses', expense.id);
+    await setDoc(ref, expense);
+};
+
+// CRUD: Daily Sales (Batch Import)
+export const batchImportDailySales = async (userId: string, records: DailySalesRecord[]) => {
+    const batch = writeBatch(db);
+    records.forEach(record => {
+        const ref = doc(db, 'shops', userId, 'daily_sales', record.id);
+        batch.set(ref, record);
+    });
+    await batch.commit();
+};
+
+// CRUD: Purchases
+export const addPurchase = async (userId: string, purchase: Purchase) => {
+    const ref = doc(db, 'shops', userId, 'purchases', purchase.id);
+    await setDoc(ref, purchase);
+};
+
+export const updatePurchase = async (userId: string, purchaseId: string, updates: Partial<Purchase>) => {
+    const ref = doc(db, 'shops', userId, 'purchases', purchaseId);
+    await updateDoc(ref, updates);
+};
+
+// CRUD: Bills
+export const addBill = async (userId: string, bill: Bill) => {
+    const ref = doc(db, 'shops', userId, 'bills', bill.id);
+    await setDoc(ref, bill);
+};
+
+export const updateBill = async (userId: string, billId: string, updates: Partial<Bill>) => {
+    const ref = doc(db, 'shops', userId, 'bills', billId);
+    await updateDoc(ref, updates);
+};
+
+// CRUD: Suppliers
+export const addSupplier = async (userId: string, supplier: Supplier) => {
+    const ref = doc(db, 'shops', userId, 'suppliers', supplier.id);
+    await setDoc(ref, supplier);
+};
+
+export const updateSupplier = async (userId: string, supplierId: string, updates: Partial<Supplier>) => {
+    const ref = doc(db, 'shops', userId, 'suppliers', supplierId);
+    await updateDoc(ref, updates);
+};
