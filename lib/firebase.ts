@@ -1,4 +1,11 @@
 
+
+/**
+ * 🚨 CRITICAL CONFIGURATION 🚨
+ * DO NOT CHANGE or REMOVE the 'dbId' or database connection settings without
+ * EXPLICIT USER PERMISSION. Changing this will disconnect the live app from
+ * the 'hopinexpress1' database and cause data loss for users.
+ */
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore, initializeFirestore } from "firebase/firestore";
