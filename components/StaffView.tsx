@@ -590,6 +590,8 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {staff.map(s => {
+          const isOnline = attendance.some(a => a.staffId === s.id && a.date === new Date().toISOString().split('T')[0] && !a.clockOut);
+
           // Randomly assign a "Dept" color for the badge based on role
           const badgeColor = s.role === 'Manager' ? 'bg-rose-100 text-rose-600' : s.role === 'Owner' ? 'bg-indigo-100 text-indigo-600' : 'bg-orange-100 text-orange-600';
           const badgeLabel = s.role === 'Owner' ? 'Director' : s.role;
@@ -598,8 +600,8 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
             <div key={s.id} className="bg-white rounded-[2.5rem] p-6 relative group border border-slate-100 hover:border-indigo-100 transition-all hover:shadow-2xl hover:shadow-slate-200/50">
 
               {/* Status Icon */}
-              <div className="absolute top-8 right-8 text-emerald-500">
-                <div className="w-2 h-2 rounded-full bg-current shadow-[0_0_10px_currentColor]"></div>
+              <div className={`absolute top-8 right-8 ${isOnline ? 'text-emerald-500' : 'text-slate-300'}`}>
+                <div className={`w-2.5 h-2.5 rounded-full bg-current ${isOnline ? 'shadow-[0_0_10px_currentColor] animate-pulse' : 'opacity-30'}`}></div>
               </div>
 
               <div className="flex items-start gap-5">
