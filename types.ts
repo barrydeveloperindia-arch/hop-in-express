@@ -234,6 +234,25 @@ export interface StaffMember {
   idDocuments?: IdentificationDocs;
   startingSalary?: number;
   validUntil?: string;
+  holidayTaken?: number;
+  holidayRemaining?: number;
+}
+
+export type LeaveType = 'Annual' | 'Sick' | 'Unpaid' | 'Compassionate';
+export type LeaveStatus = 'Pending' | 'Approved' | 'Rejected' | 'Cancelled';
+
+export interface LeaveRequest {
+  id: string;
+  staffId: string;
+  type: LeaveType;
+  startDate: string; // ISO Date YYYY-MM-DD
+  endDate: string;   // ISO Date YYYY-MM-DD
+  totalDays: number;
+  status: LeaveStatus;
+  reason?: string;
+  approvedBy?: string; // Manager ID
+  approvedAt?: string;
+  createdAt: string;
 }
 
 export type ViewType =

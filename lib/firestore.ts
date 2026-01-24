@@ -41,7 +41,7 @@ export const subscribeToTransactions = (userId: string, callback: (transactions:
     });
 };
 
-import { StaffMember, AttendanceRecord, LedgerEntry, Supplier, Bill, Expense, DailySalesRecord, Purchase } from '../types';
+import { StaffMember, AttendanceRecord, LedgerEntry, Supplier, Bill, Expense, DailySalesRecord, Purchase, LeaveRequest } from '../types';
 
 // Collection Helpers
 const getStaffRef = (userId: string) => collection(db, 'shops', userId, 'staff');
@@ -168,6 +168,30 @@ export const updateStaffMember = async (userId: string, staffId: string, updates
 
 export const deleteStaffMember = async (userId: string, staffId: string) => {
     const ref = doc(db, 'shops', userId, 'staff', staffId);
+    await deleteDoc(ref);
+};
+
+// CRUD: Leaves
+export const getLeavesRef = (userId: string) => collection(db, 'shops', userId, 'leaves');
+
+export const subscribeToLeaves = (userId: string, callback: (requests: LeaveRequest[]) => void) => {
+    return onSnapshot(getLeavesRef(userId), (snapshot) => {
+        callback(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as LeaveRequest)));
+    });
+};
+
+export const addLeaveRequest = async (userId: string, request: LeaveRequest) => {
+    const ref = doc(db, 'shops', userId, 'leaves', request.id);
+    await setDoc(ref, request);
+};
+
+export const updateLeaveRequest = async (userId: string, requestId: string, updates: Partial<LeaveRequest>) => {
+    const ref = doc(db, 'shops', userId, 'leaves', requestId);
+    await updateDoc(ref, updates);
+};
+
+export const deleteLeaveRequest = async (userId: string, requestId: string) => {
+    const ref = doc(db, 'shops', userId, 'leaves', requestId);
     await deleteDoc(ref);
 };
 

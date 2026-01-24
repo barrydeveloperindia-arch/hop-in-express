@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useRef } from 'react';
 import { read, utils } from 'xlsx';
-import { StaffMember, AttendanceRecord, ViewType, UserRole } from '../types';
+import { StaffMember, AttendanceRecord, ViewType, UserRole, LeaveRequest, LeaveType, LeaveStatus } from '../types';
 import { IDCard } from './IDCard';
 import { AccessTerminal } from './AccessTerminal';
 
@@ -20,7 +20,7 @@ import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Users, Clock, Calendar, FolderOpen, FileText, Upload, Image as ImageIcon, LogOut, Mail, Phone } from 'lucide-react';
-import { addAttendanceRecord, updateAttendanceRecord, deleteAttendanceRecord, updateStaffMember, deleteStaffMember } from '../lib/firestore';
+import { addAttendanceRecord, updateAttendanceRecord, deleteAttendanceRecord, updateStaffMember, deleteStaffMember, subscribeToLeaves, addLeaveRequest, updateLeaveRequest } from '../lib/firestore';
 
 const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance, logAction, userRole, currentStaffId }) => {
   const [activeTab, setActiveTab] = useState<'registry' | 'attendance' | 'calendar' | 'files'>('attendance');
@@ -130,6 +130,20 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     { id: 2, title: 'The most important KPI', date: '30/06/2023', content: 'Rules about KPI', pinned: true }
   ]);
   const [breakActive, setBreakActive] = useState(false); // Local state for break UI
+
+  // --- Leave Management State ---
+  const [leaves, setLeaves] = useState<LeaveRequest[]>([]);
+  const [leaveModalOpen, setLeaveModalOpen] = useState(false);
+  const [newLeave, setNewLeave] = useState<Partial<LeaveRequest>>({ type: 'Annual', startDate: '', endDate: '' });
+
+  // Leave Subscription
+  React.useEffect(() => {
+    const userId = import.meta.env.VITE_USER_ID || auth.currentUser?.uid;
+    if (userId) {
+      const unsub = subscribeToLeaves(userId, setLeaves);
+      return () => unsub();
+    }
+  }, []);
 
   // --- Logic Helpers (Preserved) ---
 
@@ -831,6 +845,93 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     </div>
   );
 
+  const handleLeaveSubmit = async () => {
+    if (!auth.currentUser || !newLeave.startDate || !newLeave.endDate) return;
+    const userId = import.meta.env.VITE_USER_ID || auth.currentUser.uid;
+
+    // Validate
+    const start = new Date(newLeave.startDate);
+    const end = new Date(newLeave.endDate);
+    if (end < start) { alert("End date cannot be before start date"); return; }
+
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    const req: LeaveRequest = {
+      id: crypto.randomUUID(),
+      staffId: selectedStaffId,
+      type: newLeave.type as LeaveType,
+      startDate: newLeave.startDate,
+      endDate: newLeave.endDate,
+      totalDays: diffDays,
+      status: 'Pending',
+      reason: newLeave.reason || '',
+      approvedBy: '',
+      approvedAt: '',
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      await addLeaveRequest(userId, req);
+      alert("Leave Request Submitted");
+      setLeaveModalOpen(false);
+      setNewLeave({ type: 'Annual', startDate: '', endDate: '' });
+    } catch (e) {
+      console.error(e);
+      alert("Failed to submit request");
+    }
+  };
+
+  const renderLeaveModal = () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl animate-in fade-in zoom-in duration-300">
+        <h3 className="text-xl font-black text-slate-900 mb-6">Request Time Off</h3>
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-bold text-slate-400 uppercase">Leave Type</label>
+            <div className="flex gap-2 mt-2">
+              {['Annual', 'Sick', 'Unpaid'].map(t => (
+                <button
+                  key={t}
+                  onClick={() => setNewLeave(p => ({ ...p, type: t as any }))}
+                  className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${newLeave.type === t ? 'bg-primary text-white border-primary' : 'bg-white text-slate-600 border-slate-200'}`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-slate-400 uppercase">Start Date</label>
+              <input type="date" value={newLeave.startDate || ''} onChange={e => setNewLeave(p => ({ ...p, startDate: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm font-bold mt-1" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-400 uppercase">End Date</label>
+              <input type="date" value={newLeave.endDate || ''} onChange={e => setNewLeave(p => ({ ...p, endDate: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm font-bold mt-1" />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-slate-400 uppercase">Reason (Optional)</label>
+            <textarea
+              value={newLeave.reason || ''}
+              onChange={e => setNewLeave(p => ({ ...p, reason: e.target.value }))}
+              className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm font-bold mt-1 h-20 resize-none"
+              placeholder="Family vacation, appointment, etc..."
+            />
+          </div>
+
+          <button onClick={handleLeaveSubmit} className="w-full bg-primary hover:bg-primary-hover text-white py-4 rounded-xl font-black uppercase tracking-widest shadow-lg mt-4">
+            Submit Request
+          </button>
+          <button onClick={() => setLeaveModalOpen(false)} className="w-full text-slate-400 font-bold text-xs uppercase tracking-widest mt-4">Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderCalendar = () => {
 
     const getDates = () => {
@@ -892,12 +993,15 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
             <button onClick={handleNext} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center hover:bg-slate-100">→</button>
           </div>
 
-          <div className="flex bg-slate-50 p-1 rounded-xl">
-            {['week', 'month', 'year'].map(v => (
-              <button key={v} onClick={() => setViewPeriod(v as any)} className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${viewPeriod === v ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>
-                {v}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <button onClick={() => setLeaveModalOpen(true)} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest shadow-md hover:bg-indigo-700 transition-all">+ Request Leave</button>
+            <div className="flex bg-slate-50 p-1 rounded-xl">
+              {['week', 'month', 'year'].map(v => (
+                <button key={v} onClick={() => setViewPeriod(v as any)} className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${viewPeriod === v ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>
+                  {v}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -988,9 +1092,25 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                         const record = attendance.find(a => a.staffId === s.id && a.date === dateStr);
                         const isToday = dateStr === new Date().toISOString().split('T')[0];
 
+                        // Check Leave
+                        const leave = leaves.find(l => {
+                          const start = new Date(l.startDate);
+                          const end = new Date(l.endDate);
+                          start.setHours(0, 0, 0, 0);
+                          end.setHours(23, 59, 59, 999);
+                          const check = new Date(d);
+                          check.setHours(12, 0, 0, 0);
+
+                          return l.staffId === s.id && l.status === 'Approved' && check >= start && check <= end;
+                        });
+
                         return (
                           <td key={i} className={`p-2 border-l border-slate-50 text-center relative ${isToday ? 'bg-indigo-50/30' : ''}`}>
-                            {record ? (
+                            {leave ? (
+                              <div className={`px-2 py-1.5 rounded-lg inline-flex flex-col items-center w-full max-w-[80px] ${leave.type === 'Sick' ? 'bg-rose-100 text-rose-700' : 'bg-purple-100 text-purple-700'}`}>
+                                <span className="text-[10px] font-black uppercase">{leave.type}</span>
+                              </div>
+                            ) : record ? (
                               <div className="bg-emerald-100 text-emerald-700 px-2 py-1.5 rounded-lg inline-flex flex-col items-center w-full max-w-[80px]">
                                 <span className="text-[10px] font-black uppercase">Present</span>
                                 <span className="text-[9px] font-mono opacity-80">{record.clockIn} - {record.clockOut || 'Now'}</span>
@@ -1155,6 +1275,8 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           </div>
         </div>
       )}
+      {/* Leave Booking Modal */}
+      {leaveModalOpen && renderLeaveModal()}
     </div>
   );
 };
