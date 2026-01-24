@@ -666,7 +666,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`px-6 md:px-10 py-4 release whitespace-nowrap rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-3 ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100' : 'text-slate-400 hover:text-ink-base'}`}
+            className={`px-6 md:px-10 py-4 release whitespace-nowrap rounded-xl text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-3 ${activeTab === tab.id ? 'bg-primary text-white shadow-xl shadow-indigo-100' : 'text-slate-400 hover:text-ink-base'}`}
           >
             <span className="text-lg">{tab.icon}</span> {tab.label}
           </button>
@@ -678,10 +678,10 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           {/* Attendance Console */}
           <div className="bg-white p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] text-slate-800 shadow-xl border border-slate-100 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8 no-print">
             <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-indigo-50 rounded-3xl flex items-center justify-center text-3xl border border-indigo-100 shrink-0 text-indigo-600">🛂</div>
+              <div className="w-16 h-16 bg-indigo-50 rounded-3xl flex items-center justify-center text-3xl border border-indigo-100 shrink-0 text-primary">🛂</div>
               <div>
                 <h4 className="text-xl font-black uppercase tracking-tight text-slate-900">Attendance Console</h4>
-                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-1">Manual Terminal Control</p>
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest mt-1">Manual Terminal Control</p>
               </div>
             </div>
 
@@ -700,7 +700,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
               <div className="flex flex-wrap gap-2 w-full md:w-auto">
                 <button
                   onClick={() => setTerminalOpen(true)}
-                  className="bg-slate-900 hover:bg-black text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-slate-200 transition-all active:scale-95 whitespace-nowrap flex items-center gap-2"
+                  className="bg-ink-base hover:bg-slate-800 text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-slate-200 transition-all active:scale-95 whitespace-nowrap flex items-center gap-2"
                 >
                   <span className="text-emerald-400 animate-pulse">●</span> Terminal
                 </button>
@@ -708,13 +708,13 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                   <>
                     <button
                       onClick={() => handleAttendanceAction('IN')}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 whitespace-nowrap"
+                      className="bg-primary hover:bg-primary-hover text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 whitespace-nowrap"
                     >
                       Check-In
                     </button>
                     <button
                       onClick={() => handleAttendanceAction('OUT')}
-                      className="bg-rose-600 hover:bg-rose-700 text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 whitespace-nowrap"
+                      className="bg-slate-700 hover:bg-slate-800 text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 whitespace-nowrap"
                     >
                       Check-Out
                     </button>
@@ -735,7 +735,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
                           notes: 'Manual Override'
                         });
                       }}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 whitespace-nowrap"
+                      className="bg-primary hover:bg-primary-hover text-white px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 whitespace-nowrap"
                     >
                       + Add
                     </button>
