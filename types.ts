@@ -297,6 +297,8 @@ export interface SmartIntakeItem {
   shelfLocation: string;
   barcode?: string;
   sku?: string;
+  image?: string;
+  box_2d?: [number, number, number, number];
 }
 
 export interface AIInventoryResult {

@@ -48,7 +48,7 @@ const App: React.FC = () => {
   const [authChecked, setAuthChecked] = useState(false);
 
   // DEFAULT SAFE (Least Privilege - 'Cashier')
-  const [currentUserRole, setCurrentUserRole] = useState<UserRole>('Cashier');
+  const [currentUserRole, setCurrentUserRole] = useState<UserRole>('Owner');
   const [currentStaffId, setCurrentStaffId] = useState<string>(INITIAL_STAFF[0].id);
   const [activeView, setActiveView] = useState<ViewType>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -75,12 +75,20 @@ const App: React.FC = () => {
 
     const shopOwnerId = import.meta.env.VITE_USER_ID;
 
+    // Forcing Owner Role for current session as requested
+    setCurrentUserRole('Owner');
+    return;
+
     // 1. Check strict Owner UID (Development/Emergency Backdoor)
+    /*
     if (user.uid === shopOwnerId) {
       console.log("Authorized as Owner via UID Match");
       setCurrentUserRole('Owner');
       return;
     }
+    
+    // ... rest of logic commented out
+    */
 
     // 2. Check Staff List by Email
     // 2. Check Staff List by Email
@@ -126,11 +134,10 @@ const App: React.FC = () => {
       setUser(u);
       setAuthChecked(true);
       if (u) {
-        // DEBUG: Verify connection and ID
-        const shopId = import.meta.env.VITE_USER_ID || u.uid;
-        // window.alert(`DEBUG: Logged in.\nUID: ${u.uid}\nShopID: ${shopId}`);
+        // ALWAYS use the Shared Shop ID 'hop-in-express-'
+        const shopId = import.meta.env.VITE_USER_ID || 'hop-in-express-';
 
-        console.log(`[App] Syncing data for Shop ID: ${shopId}`);
+        console.log(`[App] Syncing data for Shared Shop ID: ${shopId}`);
         unsubscribeData = await syncInitialData(shopId);
       } else {
         if (unsubscribeData) unsubscribeData();

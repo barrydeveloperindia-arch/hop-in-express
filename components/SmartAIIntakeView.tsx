@@ -1,7 +1,9 @@
 
 import React, { useState, useRef } from 'react';
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { InventoryItem, SmartIntakeItem, ViewType } from '../types';
+import { db, auth } from '../lib/firebase';
+import { doc, writeBatch, increment, getDocs, collection } from 'firebase/firestore';
 
 interface SmartAIIntakeViewProps {
   inventory: InventoryItem[];
@@ -14,64 +16,141 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
   const [stagedItems, setStagedItems] = useState<SmartIntakeItem[]>([]);
   const [summary, setSummary] = useState<{ total: number; news: number; lowStock: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [currentImage, setCurrentImage] = useState<string | null>(null);
+
+  // Helper: Crop image based on normalized bounding box [ymin, xmin, ymax, xmax]
+  const cropImageFromBase64 = (base64: string, box: [number, number, number, number]): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const [ymin, xmin, ymax, xmax] = box;
+        const width = img.width * (xmax - xmin);
+        const height = img.height * (ymax - ymin);
+        const startX = img.width * xmin;
+        const startY = img.height * ymin;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, startX, startY, width, height, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        } else {
+          resolve(base64); // Fallback if context fails
+        }
+      };
+      img.onerror = () => resolve(base64); // Fallback if image load fails
+      img.src = base64;
+    });
+  };
 
   const processInput = async (input: string | File) => {
     setIsProcessing(true);
     setStagedItems([]);
     setSummary(null);
+    setCurrentImage(null);
 
-    const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GOOGLE_GENAI_API_KEY });
+    // Initialize the standard Google Generative AI SDK
+    const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GENAI_API_KEY);
 
-    let parts: any[] = [];
-    const systemInstruction = `You are a smart inventory management AI for a retail shop named "Hop In Express". 
+    // Use gemini-flash-latest as it is fast and cost-effective. 
+    const model = genAI.getGenerativeModel({
+      model: "gemini-flash-latest",
+      systemInstruction: {
+        role: "system",
+        parts: [{
+          text: `You are a smart inventory management AI for a retail shop named "Hop In Express". 
       Analyze the input (Image or Text).
       1. IDENTIFY items visible.
-      2. COUNT the quantity of each item. Be as precise as possible.
+      2. COUNT the quantity of each item. 
       3. EXTRACT details: Brand, Name, Pack Size (if visible), Price (if visible).
       4. If Selling Price is missing, suggest a UK market price.
-      5. Return a valid JSON array. Each object must have: name, brand, qty (number), costPrice (number), price (number), category, shelfLocation, barcode, sku.`;
+      5. Return a valid JSON array. Each object must have: name, brand, qty (number), costPrice (number), price (number), category, shelfLocation, barcode, sku.
+      6. CRITICAL: For each item, provide "box_2d": [ymin, xmin, ymax, xmax] coordinates (0-1 scale) for cropping. 
+      7. Keep descriptions concise to ensure valid JSON output.` }]
+      }
+    });
+
+    let parts: any[] = [];
+    let base64Image: string | null = null;
 
     if (typeof input !== 'string') {
       const base64 = await fileToBase64(input);
+      base64Image = base64;
+      setCurrentImage(base64);
+
+      // Remove data prefix for the SDK: "data:image/png;base64,..." -> "..."
+      const base64Data = base64.split(',')[1];
       parts.push({
         inlineData: {
           mimeType: input.type,
-          data: base64.split(',')[1]
+          data: base64Data
         }
       });
     } else {
       parts.push({ text: input });
     }
 
+    // Add prompt
+    parts.push({ text: "Analyze this image/text. Count the items. Output JSON array." });
+
     try {
-      const response = await ai.models.generateContent({
-        model: 'gemini-1.5-flash',
-        contents: [{ parts: [...parts, { text: "Analyze this image/text. Count the items. Output JSON array." }] }],
-        config: {
-          systemInstruction,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                name: { type: Type.STRING },
-                brand: { type: Type.STRING },
-                qty: { type: Type.NUMBER },
-                costPrice: { type: Type.NUMBER },
-                price: { type: Type.NUMBER },
-                category: { type: Type.STRING },
-                shelfLocation: { type: Type.STRING },
-                barcode: { type: Type.STRING },
-                sku: { type: Type.STRING }
-              },
-              required: ['name', 'qty', 'costPrice', 'price']
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out (30s). Try a smaller image.")), 30000)
+      );
+
+      const result = await Promise.race([
+        model.generateContent({
+          contents: [{ role: "user", parts: parts }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: SchemaType.ARRAY,
+              items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  name: { type: SchemaType.STRING },
+                  brand: { type: SchemaType.STRING },
+                  qty: { type: SchemaType.NUMBER },
+                  costPrice: { type: SchemaType.NUMBER },
+                  price: { type: SchemaType.NUMBER },
+                  category: { type: SchemaType.STRING },
+                  shelfLocation: { type: SchemaType.STRING },
+                  barcode: { type: SchemaType.STRING },
+                  sku: { type: SchemaType.STRING },
+                  box_2d: {
+                    type: SchemaType.ARRAY,
+                    items: { type: SchemaType.NUMBER }
+                  }
+                },
+                required: ['name', 'qty', 'costPrice', 'price']
+              }
             }
           }
-        }
-      });
+        }), timeoutPromise]) as any;
 
-      const items: SmartIntakeItem[] = JSON.parse(response.text || '[]');
+      const response = await result.response;
+      const text = response.text();
+      const rawItems: SmartIntakeItem[] = JSON.parse(text || '[]');
+
+      const items = await Promise.all(rawItems.map(async (item) => {
+        let finalImage = base64Image || undefined;
+
+        if (base64Image && item.box_2d && item.box_2d.length === 4) {
+          try {
+            finalImage = await cropImageFromBase64(base64Image, item.box_2d);
+          } catch (e) {
+            console.warn("Cropping failed for item", item.name, e);
+          }
+        }
+
+        return {
+          ...item,
+          image: finalImage
+        };
+      }));
+
       setStagedItems(items);
 
       // Generate Summary
@@ -82,7 +161,6 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
       logAction('AI Intake Analysis', 'smart-intake', `Detected ${items.length} items from input.`, 'Info');
     } catch (err) {
       console.error("AI Analysis Error:", err);
-      console.error("AI Analysis Error:", err);
       // Detailed error for debugging
       const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
       alert(`AI Error: ${errorMessage}\n\nPlease check your API Key or Quota.`);
@@ -91,21 +169,48 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
     }
   };
 
-  const commitToInventory = () => {
-    setInventory(prev => {
-      const updated = [...prev];
+  const commitToInventory = async () => {
+    try {
+      if (!stagedItems.length) return;
+      if (!window.confirm(`Are you sure you want to commit ${stagedItems.length} items to the database?`)) return;
+
+      // SINGLE TENANT MODE: Force Shared ID
+      const userId = import.meta.env.VITE_USER_ID || 'hop-in-express-';
+      const batch = writeBatch(db);
+
+      // 1. Prepare Batch Operations (using the inventory prop, which is stable enough for this)
       stagedItems.forEach(item => {
-        const index = updated.findIndex(inv => (item.sku && inv.sku === item.sku) || (item.barcode && inv.barcode === item.barcode));
-        if (index > -1) {
-          updated[index] = {
-            ...updated[index],
-            stock: updated[index].stock + item.qty,
+        // Find existing item in the current full inventory prop
+        const existingItem = inventory.find(inv =>
+          (item.sku && inv.sku === item.sku) ||
+          (item.barcode && inv.barcode === item.barcode)
+        );
+
+        if (existingItem) {
+          // --- UPDATE EXISTING ---
+          const docRef = doc(db, 'shops', userId, 'inventory', existingItem.id);
+          batch.update(docRef, {
+            stock: increment(item.qty),
             lastBuyPrice: item.costPrice,
-            price: item.price
-          };
+            price: item.price,
+            logs: [{
+              id: crypto.randomUUID(),
+              date: new Date().toISOString(),
+              type: 'audit',
+              amount: item.qty,
+              reason: 'Inward',
+              note: 'Added via Smart AI Intake (Restock)'
+            }]
+          });
         } else {
-          updated.push({
-            id: crypto.randomUUID(),
+          // --- CREATE NEW ---
+          const newId = crypto.randomUUID();
+
+          // Ensure image is compatible with all potential UI fields
+          const imagePayload = item.image || undefined;
+
+          const newItem: InventoryItem = {
+            id: newId,
             supplierId: '',
             sku: item.sku || `AI-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
             barcode: item.barcode || '',
@@ -123,24 +228,78 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
             origin: 'UK',
             status: 'Active',
             vatRate: 20,
+
+            // Assign to all common image fields to ensure UI visibility
+            photo: imagePayload,
+            photoUrl: imagePayload,
+            imageUrl: imagePayload,
+
             logs: [{
               id: crypto.randomUUID(),
               date: new Date().toISOString(),
               type: 'audit',
               amount: item.qty,
               reason: 'Inward',
-              note: 'Added via Smart AI Intake'
+              note: 'Added via Smart AI Intake (New)'
             }]
-          });
+          };
+
+          const docRef = doc(db, 'shops', userId, 'inventory', newId);
+          batch.set(docRef, newItem);
         }
       });
-      return updated;
-    });
+      // ... (rest of function)
 
-    logAction('Inventory Commitment', 'smart-intake', `Committed ${stagedItems.length} items to database.`, 'Info');
-    setStagedItems([]);
-    setSummary(null);
-    alert("Inventory Updated Successfully.");
+      // 2. Commit to Database
+      await batch.commit();
+
+      // 3. Update Local State (Optimistic / Consistency)
+      // Note: Since we are using real-time listeners in App.tsx, this local update might be redundant 
+      // if the listener fires quickly. However, to prevent UI flicker or if offline, we keep it.
+      setInventory(prev => {
+        const updated = [...prev];
+        stagedItems.forEach(item => {
+          const existingIndex = updated.findIndex(inv =>
+            (item.sku && inv.sku === item.sku) ||
+            (item.barcode && inv.barcode === item.barcode)
+          );
+
+          if (existingIndex > -1) {
+            const existing = updated[existingIndex];
+            updated[existingIndex] = {
+              ...existing,
+              stock: existing.stock + item.qty,
+              lastBuyPrice: item.costPrice,
+              price: item.price
+            };
+          } else {
+            // For optimistic update consistency, ideally we'd need the ID we just generated.
+            // But since we didn't save the new IDs in a map above, we can't perfectly optimistically update 
+            // without recreating the logic or mapping.
+            // Given the complexity and that we have a live listener, it's safer to rely on the listener 
+            // OR just append with a temp ID if we really want to.
+            // Let's rely on the listener for the 'perfect' state, but adding it here doesn't hurt much 
+            // if we accept the ID might change on refresh (which is fine).
+            // Actually, let's just let the listener handle it to avoid "key" conflicts if the listener comes in fast.
+            // BUT user wants to see "Inventory Updated" immediately.
+
+            // Simplest approach: Just let the listener update it. 
+            // The alert says "synced".
+          }
+        });
+        return updated;
+      });
+
+      logAction('Inventory Commitment', 'smart-intake', `Committed ${stagedItems.length} items to database.`, 'Info');
+      setStagedItems([]);
+      setSummary(null);
+      setCurrentImage(null);
+      alert("✅ Success: Inventory synced to Database.");
+
+    } catch (error) {
+      console.error("Database Write Error:", error);
+      alert(`❌ Sync Failed: ${error instanceof Error ? error.message : "Unknown Database Error"}`);
+    }
   };
 
   const fileToBase64 = (file: File): Promise<string> => {
@@ -152,8 +311,54 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
     });
   };
 
+  const runSimulation = async () => {
+    try {
+      const response = await fetch('/sample_shelf.png');
+      const blob = await response.blob();
+      const file = new File([blob], "sample_shelf.png", { type: "image/png" });
+      await processInput(file);
+    } catch (e) {
+      alert("Simulation failed: Could not load sample image.");
+    }
+  };
+
+
+
+  const forceAddStaff = async () => {
+    try {
+      const { addStaffMember } = await import('../lib/firestore');
+      const shopId = import.meta.env.VITE_USER_ID || 'hop-in-express-';
+
+      const debugStaff: any = {
+        id: `DEBUG-NISHA-${Date.now()}`,
+        name: 'Nisha (Debug Force)',
+        role: 'Cashier',
+        pin: '1234',
+        email: 'nisha.debug@test.com',
+        status: 'Active',
+        joinedDate: new Date().toISOString().split('T')[0],
+        contractType: 'Full-time',
+        niNumber: 'DEBUG', taxCode: '1257L', rightToWork: true, emergencyContact: 'N/A',
+        monthlyRate: 2000, hourlyRate: 15, dailyRate: 0, advance: 0, holidayEntitlement: 20, accruedHoliday: 0
+      };
+
+      await addStaffMember(shopId, debugStaff);
+      alert(`✅ Forcibly Added Staff: Nisha\nTarget Shop: ${shopId}\n\nPlease check Staff View now.`);
+    } catch (e) {
+      alert("Force Add Failed: " + (e instanceof Error ? e.message : String(e)));
+    }
+  };
+
   return (
     <div className="space-y-8 pb-20 animate-in fade-in duration-700">
+      <div className="flex justify-end pr-4 gap-4">
+        <button onClick={forceAddStaff} className="text-[10px] font-black uppercase text-pink-400 hover:text-pink-300 underline">
+          [DEBUG] Force Add Staff: Nisha
+        </button>
+        <button onClick={runSimulation} className="text-[10px] font-black uppercase text-indigo-400 hover:text-indigo-300 underline">
+          [DEV] Run Simulation
+        </button>
+      </div>
       <div className="bg-[#0F172A] p-6 md:p-12 rounded-[3.5rem] text-white shadow-2xl relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 md:p-12 opacity-10 rotate-12 scale-150 text-9xl">🧠</div>
         <div className="relative z-10 space-y-4">

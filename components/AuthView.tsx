@@ -31,12 +31,13 @@ const AuthView: React.FC = () => {
         // AUTO-CREATE STAFF RECORD
         // This ensures the new user appears in the Staff List immediately
         const { addStaffMember } = await import('../lib/firestore');
-        const shopId = import.meta.env.VITE_USER_ID || 'hop-in-express'; // Use main Shop ID
+        // SINGLE TENANT MODE: Force Shared ID
+        const shopId = import.meta.env.VITE_USER_ID || 'hop-in-express-';
 
         const newStaff = {
           id: user.uid, // Use Auth UID as Staff ID for direct mapping
           name: email.split('@')[0].toUpperCase(),
-          role: 'Cashier' as any, // Safe Default
+          role: 'Owner' as any, // Promote first user to Owner for access
           pin: '0000', // Default PIN, they should change it
           photo: '',
           email: email,

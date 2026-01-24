@@ -17,7 +17,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 // Using getFirestore to avoid potential reference errors with initializeFirestore in some bundlers
-export const db = getFirestore(app, import.meta.env.VITE_FIREBASE_DATABASE_ID);
+export const db = getFirestore(app);
 // Note: experimentalForceLongPolling disabled to let CapacitorHttp handle connection
 
 import { getStorage } from "firebase/storage";
