@@ -83,7 +83,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     advance: 0,
     holidayEntitlement: 28,
     accruedHoliday: 0,
-    photo: 'https://images.unsplash.com/photo-1566492031773-4f4e44671857?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    photo: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
   },
   {
     id: '2',
@@ -104,7 +104,7 @@ export const INITIAL_STAFF: StaffMember[] = [
     advance: 0,
     holidayEntitlement: 28,
     accruedHoliday: 2,
-    photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
   },
   {
     id: '3',
@@ -125,6 +125,6 @@ export const INITIAL_STAFF: StaffMember[] = [
     advance: 50,
     holidayEntitlement: 14,
     accruedHoliday: 0,
-    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
+    photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'
   }
 ];
