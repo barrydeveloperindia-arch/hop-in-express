@@ -41,7 +41,7 @@ export const subscribeToTransactions = (userId: string, callback: (transactions:
     });
 };
 
-import { StaffMember, AttendanceRecord, LedgerEntry, Supplier, Bill, Expense, DailySalesRecord } from '../types';
+import { StaffMember, AttendanceRecord, LedgerEntry, Supplier, Bill, Expense, DailySalesRecord, Purchase } from '../types';
 
 // Collection Helpers
 const getStaffRef = (userId: string) => collection(db, 'shops', userId, 'staff');
@@ -51,6 +51,7 @@ const getSuppliersRef = (userId: string) => collection(db, 'shops', userId, 'sup
 const getBillsRef = (userId: string) => collection(db, 'shops', userId, 'bills');
 const getExpensesRef = (userId: string) => collection(db, 'shops', userId, 'expenses');
 const getDailySalesRef = (userId: string) => collection(db, 'shops', userId, 'daily_sales');
+const getPurchasesRef = (userId: string) => collection(db, 'shops', userId, 'purchases');
 
 // Staff
 export const subscribeToStaff = (userId: string, callback: (staff: StaffMember[]) => void) => {
@@ -99,4 +100,74 @@ export const processTransaction = async (userId: string, transaction: Transactio
 
     // 3. Commit Batch
     await batch.commit();
+};
+// Attendance CRUD
+export const addAttendanceRecord = async (userId: string, record: AttendanceRecord) => {
+    const ref = doc(db, 'shops', userId, 'attendance', record.id);
+    await setDoc(ref, record);
+};
+
+export const updateAttendanceRecord = async (userId: string, recordId: string, updates: Partial<AttendanceRecord>) => {
+    const ref = doc(db, 'shops', userId, 'attendance', recordId);
+    await updateDoc(ref, updates);
+};
+
+export const deleteAttendanceRecord = async (userId: string, recordId: string) => {
+    const ref = doc(db, 'shops', userId, 'attendance', recordId);
+    await deleteDoc(ref);
+};
+
+// -- MISSING EXPORTS RESTORED --
+
+// Subscriptions
+export const subscribeToSuppliers = (userId: string, callback: (items: Supplier[]) => void) => {
+    return onSnapshot(getSuppliersRef(userId), (snapshot) => {
+        callback(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Supplier)));
+    });
+};
+
+export const subscribeToBills = (userId: string, callback: (items: Bill[]) => void) => {
+    return onSnapshot(getBillsRef(userId), (snapshot) => {
+        callback(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Bill)));
+    });
+};
+
+export const subscribeToExpenses = (userId: string, callback: (items: Expense[]) => void) => {
+    return onSnapshot(getExpensesRef(userId), (snapshot) => {
+        callback(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Expense)));
+    });
+};
+
+export const subscribeToPurchases = (userId: string, callback: (items: Purchase[]) => void) => {
+    return onSnapshot(getPurchasesRef(userId), (snapshot) => {
+        callback(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Purchase)));
+    });
+};
+
+// CRUD: Inventory
+export const addInventoryItem = async (userId: string, item: InventoryItem) => {
+    const ref = doc(db, 'shops', userId, 'inventory', item.id);
+    await setDoc(ref, item);
+};
+
+export const updateInventoryItem = async (userId: string, itemId: string, updates: Partial<InventoryItem>) => {
+    const ref = doc(db, 'shops', userId, 'inventory', itemId);
+    await updateDoc(ref, updates);
+};
+
+// CRUD: Staff
+export const addStaffMember = async (userId: string, staff: StaffMember) => {
+    const ref = doc(db, 'shops', userId, 'staff', staff.id);
+    await setDoc(ref, staff);
+};
+
+export const updateStaffMember = async (userId: string, staffId: string, updates: Partial<StaffMember>) => {
+    const ref = doc(db, 'shops', userId, 'staff', staffId);
+    await updateDoc(ref, updates);
+};
+
+// CRUD: Ledger
+export const addLedgerEntry = async (userId: string, entry: LedgerEntry) => {
+    const ref = doc(db, 'shops', userId, 'ledger', entry.id);
+    await setDoc(ref, entry);
 };
