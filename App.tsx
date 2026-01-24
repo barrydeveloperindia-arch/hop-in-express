@@ -93,15 +93,12 @@ const App: React.FC = () => {
     // 2. Check Staff List by Email
     // 2. Check Staff List by Email
 
-    if (staff.length > 0 && user.email) {
-      // Safe check for user.email inside closure if needed, but the if guard handles it for the block.
-      // However, inside the find(), TS might lose context.
-      const authEmail = user.email;
-      const matchedStaff = staff.find(s => s.email && s.email.toLowerCase() === authEmail.toLowerCase());
-      if (matchedStaff) {
-        // console.log(`Authorized as ${matchedStaff.role} via Email Match (${authEmail})`);
-        setCurrentUserRole(matchedStaff.role);
-        setCurrentStaffId(matchedStaff.id);
+    if (staff.length > 0 && user?.email) {
+      const authEmail = user!.email!;
+      const matched = staff.find(s => s.email && s.email.toLowerCase() === authEmail.toLowerCase());
+      if (matched) {
+        setCurrentUserRole(matched!.role);
+        setCurrentStaffId(matched!.id);
         return;
       }
     }

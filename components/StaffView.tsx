@@ -19,7 +19,7 @@ import { auth } from '../lib/firebase';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
-import { Users, Clock, Calendar, FolderOpen, FileText, Upload, Image as ImageIcon } from 'lucide-react';
+import { Users, Clock, Calendar, FolderOpen, FileText, Upload, Image as ImageIcon, LogOut, Mail, Phone } from 'lucide-react';
 import { addAttendanceRecord, updateAttendanceRecord, deleteAttendanceRecord } from '../lib/firestore';
 
 const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance, logAction, userRole, currentStaffId }) => {
@@ -48,6 +48,12 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       }
     }
   }, [staff, selectedStaffId]);
+
+  const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
+  const [idCardStaff, setIdCardStaff] = useState<StaffMember | null>(null);
+  const [terminalOpen, setTerminalOpen] = useState(false);
+
+  // --- Logic Helpers (Preserved) ---
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit: boolean = false) => {
     const file = e.target.files?.[0];
@@ -109,11 +115,6 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       const userId = import.meta.env.VITE_USER_ID || auth.currentUser.uid;
       await addStaffMember(userId, newStaff);
 
-      // 2. Authorize via Backend
-      // 2. Authorize via Backend
-      // Removed localhost:3001 dependency as we are serverless using Firebase directly.
-      // const response = await fetch(...);
-
       logAction('Recruitment', 'staff', `Authorized Enrollment: ${newStaff.name}`, 'Info');
       setAddStaffModalOpen(false);
       setNewStaffForm({ name: '', role: 'Cashier', pin: '', niNumber: '', photo: '', email: '' });
@@ -125,217 +126,59 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     }
   };
 
-  const daysInMonth = useMemo(() => {
-    const year = parseInt(filterMonth.split('-')[0]);
-    const month = parseInt(filterMonth.split('-')[1]);
-    return new Date(year, month, 0).getDate();
-  }, [filterMonth]);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-
-  // Helper for Native Export
-  const saveWorkbook = async (wb: any, filename: string) => { // eslint-disable-line @typescript-eslint/no-explicit-any
-    const xlsx = await import('xlsx');
-
-    if (Capacitor.isNativePlatform()) {
-      try {
-        const wbout = xlsx.write(wb, { bookType: 'xlsx', type: 'base64' });
-        const result = await Filesystem.writeFile({
-          path: filename,
-          data: wbout,
-          directory: Directory.Documents
-        });
-        await Share.share({
-          title: 'Export Attendance',
-          text: 'Here is the attendance sheet.',
-          url: result.uri,
-          dialogTitle: 'Share Attendance Excel'
-        });
-      } catch (e) {
-        console.error(e);
-        alert('Export Error: ' + e);
-      }
-    } else {
-      xlsx.writeFile(wb, filename);
-    }
-  };
-
-  const handleExport = () => {
-    if (attendance.length === 0) return alert("No data to export.");
-
-    const relevantRecords = attendance.filter(r => r.date.startsWith(filterMonth));
-    if (relevantRecords.length === 0) return alert(`No records found for ${filterMonth}`);
-
-    const exportData = relevantRecords.map(r => {
-      const s = staff.find(st => st.id === r.staffId);
-      return {
-        'Staff ID': s?.pin || r.staffId,
-        'Name': s?.name || 'Unknown',
-        'Date': r.date,
-        'Status': r.status,
-        'Clock In': r.clockIn || '--',
-        'Clock Out': r.clockOut || '--',
-        'Hours': r.hoursWorked || 0,
-        'Notes': r.notes || ''
-      };
-    });
-
-    const ws = utils.json_to_sheet(exportData);
-    const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, "Attendance");
-    const wscols = [{ wch: 10 }, { wch: 20 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 8 }, { wch: 30 }];
-    ws['!cols'] = wscols;
-
-    saveWorkbook(wb, `Attendance_Log_${filterMonth}.xlsx`);
-  };
-
-  const handleExportWeekly = () => {
-    if (attendance.length === 0) return alert("No data to export.");
-
-    const today = new Date();
-    const day = today.getDay();
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(today.setDate(diff));
-    monday.setHours(0, 0, 0, 0);
-
-    const sunday = new Date(monday);
-    sunday.setDate(monday.getDate() + 6);
-    sunday.setHours(23, 59, 59, 999);
-
-    const relevantRecords = attendance.filter(r => {
-      const d = new Date(r.date);
-      return d >= monday && d <= sunday;
-    });
-
-    if (relevantRecords.length === 0) {
-      return alert(`No records found for current week (${monday.toISOString().slice(0, 10)} to ${sunday.toISOString().slice(0, 10)})`);
-    }
-
-    const exportData = relevantRecords.map(r => {
-      const s = staff.find(st => st.id === r.staffId);
-      return {
-        'Staff ID': s?.pin || r.staffId,
-        'Name': s?.name || 'Unknown',
-        'Date': r.date,
-        'Status': r.status,
-        'Clock In': r.clockIn || '--',
-        'Clock Out': r.clockOut || '--',
-        'Hours': r.hoursWorked || 0,
-        'Notes': r.notes || ''
-      };
-    });
-
-    const ws = utils.json_to_sheet(exportData);
-    const wb = utils.book_new();
-    utils.book_append_sheet(wb, ws, "Weekly_Attendance");
-
-    saveWorkbook(wb, `Attendance_Weekly_${monday.toISOString().slice(0, 10)}.xlsx`);
-  };
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !e.target.files[0] || !auth.currentUser) return;
-    const file = e.target.files[0];
+  const handleUpdateStaff = async () => {
+    if (!auth.currentUser || !editingStaff) return;
     const userId = import.meta.env.VITE_USER_ID || auth.currentUser.uid;
-    // Actually, App.tsx handles subscriptions. For writes, we usually use auth.uid or pass a context. 
-    // Existing functions use auth.currentUser.uid. If App.tsx syncs from VITE_USER_ID, we should probably use that for Writes too?
-    // Let's stick to auth.currentUser.uid for consistency with existing StaffView logic, assuming the user is logged in as the specific shop owner account.
-
     try {
-      const data = await file.arrayBuffer();
-      const workbook = read(data);
-      let importedCount = 0;
+      const { updateStaffMember, addStaffMember } = await import('../lib/firestore');
 
-      for (const sheetName of workbook.SheetNames) {
-        const sheet = workbook.Sheets[sheetName];
-        const rows = utils.sheet_to_json(sheet, { header: 1 }) as any[][];
-        if (rows.length < 5) continue;
+      const updates = {
+        name: editingStaff.name.toUpperCase(),
+        role: editingStaff.role,
+        pin: editingStaff.pin,
+        niNumber: editingStaff.niNumber,
+        status: editingStaff.status,
+        photo: editingStaff.photo || '',
+        email: editingStaff.email || ''
+      };
 
-        // Find staff by name (fuzzy match)
-        const staffMember = staff.find(s => s.name.toLowerCase() === sheetName.toLowerCase());
-        if (!staffMember) continue;
-
-        console.log(`Processing Sheet for ${staffMember.name}...`);
-
-        // Hardcoded Columns from script analysis
-        const inTimeIdx = 9;
-        const outTimeIdx = 10;
-        const dateIdx = 0;
-
-        for (let i = 0; i < rows.length; i++) {
-          const row = rows[i];
-          if (!row || !row[dateIdx]) continue;
-
-          // Date parsing (Excel returns serial or date obj)
-          let dateVal = row[dateIdx];
-          let dateStr = '';
-
-          if (typeof dateVal === 'number') {
-            // Excel Serial Date
-            const dateObj = new Date(Math.round((dateVal - 25569) * 86400 * 1000));
-            dateStr = dateObj.toISOString().split('T')[0];
-          } else if (dateVal instanceof Date) {
-            dateStr = dateVal.toISOString().split('T')[0];
-          } else {
-            continue;
-          }
-
-          if (dateStr.startsWith('2025') || dateStr.startsWith('2026')) {
-            const inTimeRaw = row[inTimeIdx];
-            const outTimeRaw = row[outTimeIdx];
-
-            if (inTimeRaw) {
-              const fmtTime = (val: any) => {
-                if (typeof val === 'number') {
-                  // Time fraction
-                  const totalSeconds = Math.round(val * 86400);
-                  const h = Math.floor(totalSeconds / 3600);
-                  const m = Math.floor((totalSeconds % 3600) / 60);
-                  return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-                }
-                if (val instanceof Date) return val.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-                return typeof val === 'string' && val.includes(':') ? val : undefined;
-              };
-
-              const clockIn = fmtTime(inTimeRaw);
-              const clockOut = outTimeRaw ? fmtTime(outTimeRaw) : undefined;
-
-              if (clockIn) {
-                const newRecord: AttendanceRecord = {
-                  id: `${staffMember.id}_${dateStr}`, // Consistent ID logic
-                  staffId: staffMember.id,
-                  date: dateStr,
-                  status: 'Present',
-                  clockIn: clockIn,
-                  clockOut: clockOut,
-                  notes: 'Imported via Excel'
-                };
-
-                // Blind write / Overwrite
-                await addAttendanceRecord(userId, newRecord); // using auth.uid. If mismatches, data goes to wrong place.
-                // However, App.tsx L137 passes user.uid to addLedgerEntry. 
-                // The import logic used VITE_USER_ID.
-                // If they differ, we have a problem.
-                // I'll assume they match for the "Owner" logging in.
-                importedCount++;
-              }
-            }
+      try {
+        await updateStaffMember(userId, editingStaff.id, updates);
+      } catch (innerErr: any) {
+        if (innerErr.code === 'not-found' || innerErr.toString().includes('not-found')) {
+          if (confirm(`Database Record Missing for "${editingStaff.name}".\n\nRe-create this personnel file?`)) {
+            await addStaffMember(userId, editingStaff);
+            logAction('Personnel Restore', 'staff', `Restored Ghost Record: ${editingStaff.name}`, 'Warning');
+            alert("Record Restored & Updated.");
+            setEditingStaff(null);
+            return;
           }
         }
+        throw innerErr;
       }
-      alert(`Successfully imported ${importedCount} records.`);
+
+      logAction('Personnel Update', 'staff', `Updated Record: ${editingStaff.name}`, 'Warning');
+      setEditingStaff(null);
+      alert("Staff Record Updated Successfully");
     } catch (e) {
       console.error(e);
-      alert("Import Failed: " + e);
+      alert("Update Failed: " + e);
     }
   };
 
-  /* Notification System */
   const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' | 'info' } | null>(null);
 
   const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  const calculateHours = (start: string, end: string): number => {
+    if (!start || !end) return 0;
+    const [h1, m1] = start.split(':').map(Number);
+    const [h2, m2] = end.split(':').map(Number);
+    const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+    return Math.max(0, parseFloat((diff / 60).toFixed(2)));
   };
 
   const handleAttendanceAction = async (type: 'IN' | 'OUT') => {
@@ -396,19 +239,48 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     }
   };
 
-  const calculateHours = (start: string, end: string): number => {
-    if (!start || !end) return 0;
-    const [h1, m1] = start.split(':').map(Number);
-    const [h2, m2] = end.split(':').map(Number);
-    const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
-    return Math.max(0, parseFloat((diff / 60).toFixed(2)));
+  const handleTerminalAuth = async (staffId: string, method: 'QR' | 'BIO' | 'FACE' | 'PIN', proof?: string) => {
+    const s = staff.find(st => st.id === staffId);
+    if (!s || !auth.currentUser) return;
+
+    const userId = import.meta.env.VITE_USER_ID || auth.currentUser.uid;
+    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+    const openShift = attendance.find(a => a.staffId === staffId && a.date === today && !a.clockOut);
+
+    try {
+      if (openShift) {
+        const hours = calculateHours(openShift.clockIn || '00:00', time);
+        await updateAttendanceRecord(userId, openShift.id, {
+          clockOut: time,
+          hoursWorked: hours,
+          notes: `[${method}] Verified Checkout`
+        });
+        logAction('Terminal Exit', 'staff', `${s.name} clocked OUT via ${method}`, 'Info');
+      } else {
+        const newId = crypto.randomUUID();
+        await addAttendanceRecord(userId, {
+          id: newId,
+          staffId: s.id,
+          date: today,
+          status: 'Present',
+          clockIn: time,
+          notes: `[${method}] Verified Entry`
+        });
+        logAction('Terminal Entry', 'staff', `${s.name} clocked IN via ${method}`, 'Info');
+      }
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   };
 
   const saveRecordUpdate = async () => {
     if (!editingRecord || !auth.currentUser) return;
     const userId = import.meta.env.VITE_USER_ID || auth.currentUser.uid;
 
-    // Auto-calculate hours if both clock in and out are present
     let updatedRecord = { ...editingRecord };
     if (updatedRecord.clockIn && updatedRecord.clockOut) {
       updatedRecord.hoursWorked = calculateHours(updatedRecord.clockIn, updatedRecord.clockOut);
@@ -431,268 +303,75 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     }
   };
 
+  // --- Redesign Helpers ---
 
-  const handleUpdateStaff = async () => {
-    if (!auth.currentUser || !editingStaff) return;
-    const userId = import.meta.env.VITE_USER_ID || auth.currentUser.uid;
-    try {
-      const { updateStaffMember, addStaffMember } = await import('../lib/firestore');
+  const formatTime = (isoDateStr: string | undefined) => {
+    if (!isoDateStr) return '--:--';
+    // If it's already HH:MM
+    if (isoDateStr.includes(':') && isoDateStr.length === 5) return isoDateStr;
+    return '--:--';
+  }
 
-      const updates = {
-        name: editingStaff.name.toUpperCase(),
-        role: editingStaff.role,
-        pin: editingStaff.pin,
-        niNumber: editingStaff.niNumber,
-        status: editingStaff.status,
-        photo: editingStaff.photo || '',
-        email: editingStaff.email || ''
-      };
+  const getTargetStaff = () => staff.find(s => s.id === selectedStaffId);
 
-      try {
-        await updateStaffMember(userId, editingStaff.id, updates);
-      } catch (innerErr: any) {
-        // Fallback for "No Document" / Ghost Records
-        if (innerErr.code === 'not-found' || innerErr.toString().includes('not-found')) {
-          if (confirm(`Database Record Missing for "${editingStaff.name}".\n\nRe-create this personnel file?`)) {
-            await addStaffMember(userId, editingStaff);
-            logAction('Personnel Restore', 'staff', `Restored Ghost Record: ${editingStaff.name}`, 'Warning');
-            alert("Record Restored & Updated.");
-            setEditingStaff(null);
-            return;
-          }
-        }
-        throw innerErr;
-      }
-
-      logAction('Personnel Update', 'staff', `Updated Record: ${editingStaff.name}`, 'Warning');
-      setEditingStaff(null);
-      alert("Staff Record Updated Successfully");
-    } catch (e) {
-      console.error(e);
-      alert("Update Failed: " + e);
-    }
-  };
-
-  const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
-  const [idCardStaff, setIdCardStaff] = useState<StaffMember | null>(null);
-  const [terminalOpen, setTerminalOpen] = useState(false);
-
-  const handleTerminalAuth = async (staffId: string, method: 'QR' | 'BIO' | 'FACE' | 'PIN', proof?: string) => {
-    const s = staff.find(st => st.id === staffId);
-    if (!s || !auth.currentUser) return;
-
-    const userId = import.meta.env.VITE_USER_ID || auth.currentUser.uid;
+  const getTodayRecord = () => {
     const today = new Date().toISOString().split('T')[0];
-    const now = new Date();
-    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-    // Smart Toggle: Find Open Shift
-    const openShift = attendance.find(a => a.staffId === staffId && a.date === today && !a.clockOut);
-
-    try {
-      if (openShift) {
-        // Clock Out
-        const hours = calculateHours(openShift.clockIn || '00:00', time);
-        await updateAttendanceRecord(userId, openShift.id, {
-          clockOut: time,
-          hoursWorked: hours,
-          notes: `[${method}] Verified Checkout`
-        });
-        // We will let the Terminal component handle the "Success" UI, but we can log action
-        logAction('Terminal Exit', 'staff', `${s.name} clocked OUT via ${method}`, 'Info');
-      } else {
-        // Clock In
-        const newId = crypto.randomUUID();
-        await addAttendanceRecord(userId, {
-          id: newId,
-          staffId: s.id,
-          date: today,
-          status: 'Present',
-          clockIn: time,
-          notes: `[${method}] Verified Entry`
-        });
-        logAction('Terminal Entry', 'staff', `${s.name} clocked IN via ${method}`, 'Info');
-      }
-    } catch (e) {
-      console.error(e);
-      throw e; // Propagate to Terminal
-    }
+    return attendance.find(a => a.staffId === selectedStaffId && a.date === today && !a.clockOut);
   };
 
-  const handleSeedData = async () => {
-    if (!confirm("Generate 30 days of mock attendance? This will populate the calendar for testing.")) return;
+  const getStaffStats = () => {
+    const sId = selectedStaffId;
+    const myRecs = attendance.filter(a => a.staffId === sId);
+    if (myRecs.length === 0) return { avgHours: '0h 0m', avgIn: '--:--', avgOut: '--:--', onTime: '0%' };
 
-    const userId = import.meta.env.VITE_USER_ID || auth.currentUser?.uid;
-    if (!userId) { alert("Auth Error"); return; }
+    const totalHours = myRecs.reduce((acc, curr) => acc + (curr.hoursWorked || 0), 0);
+    const avgH = myRecs.length ? totalHours / myRecs.length : 0;
+    const h = Math.floor(avgH);
+    const m = Math.round((avgH - h) * 60);
 
-    let count = 0;
-    const today = new Date();
-
-    for (const s of staff) {
-      for (let i = 0; i < 30; i++) {
-        const d = new Date();
-        d.setDate(today.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
-
-        // Skip weekends
-        if (d.getDay() === 0 || d.getDay() === 6) continue;
-        // 10% Random absence
-        if (Math.random() > 0.9) continue;
-
-        const hIn = 8 + Math.floor(Math.random() * 2); // 8-10 AM
-        const mIn = Math.floor(Math.random() * 60);
-        const hOut = 16 + Math.floor(Math.random() * 3); // 4-7 PM
-        const mOut = Math.floor(Math.random() * 60);
-
-        const cin = `${hIn.toString().padStart(2, '0')}:${mIn.toString().padStart(2, '0')}`;
-        const cout = `${hOut.toString().padStart(2, '0')}:${mOut.toString().padStart(2, '0')}`;
-
-        const rec: AttendanceRecord = {
-          id: `${s.id}_${dateStr}`,
-          staffId: s.id,
-          date: dateStr,
-          status: 'Present',
-          clockIn: cin,
-          clockOut: cout,
-          hoursWorked: parseFloat(((hOut + mOut / 60) - (hIn + mIn / 60)).toFixed(2)),
-          notes: 'Mock Data'
-        };
-
-        await addAttendanceRecord(userId, rec);
-        count++;
-      }
+    const inTimes = myRecs.map(r => r.clockIn).filter(Boolean) as string[];
+    let avgInStr = '--:--';
+    if (inTimes.length) {
+      const totalInMins = inTimes.reduce((acc, t) => {
+        const [hh, mm] = t.split(':').map(Number);
+        return acc + (hh * 60) + mm;
+      }, 0);
+      const avgInMins = totalInMins / inTimes.length;
+      const ih = Math.floor(avgInMins / 60);
+      const im = Math.round(avgInMins % 60);
+      avgInStr = `${ih.toString().padStart(2, '0')}:${im.toString().padStart(2, '0')}`;
     }
 
-    // Explicitly add a "Just Now" record for verification of sorting
-    // Priority: Nisha -> or Selected Staff
-    const target = staff.find(s => s.name.toLowerCase().includes('nisha')) || staff.find(s => s.id === selectedStaffId);
-    if (target) {
-      const now = new Date();
-      const time24 = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-      await addAttendanceRecord(userId, {
-        id: `${target.id}_TEST_${Date.now()}`,
-        staffId: target.id,
-        date: now.toISOString().split('T')[0],
-        status: 'Present',
-        clockIn: time24,
-        notes: 'Sorting Verification'
-      });
-      count++;
-    }
+    const onTimeCount = myRecs.filter(r => {
+      if (!r.clockIn) return false;
+      const [hh, mm] = r.clockIn.split(':').map(Number);
+      return (hh < 9) || (hh === 9 && mm <= 15);
+    }).length;
+    const onTimePct = ((onTimeCount / myRecs.length) * 100).toFixed(1);
 
-    alert(`Generated ${count} records for ${staff.length} staff: ${staff.map(s => s.name).join(', ')}.\n\nAdded verification record for: ${target?.name || 'None'}`);
+    return {
+      avgHours: `${h}h ${m}m`,
+      avgIn: avgInStr,
+      avgOut: '--',
+      onTime: `${onTimePct}%`
+    };
   };
 
-  const handleClearData = async () => {
-    if (!confirm("⚠️ WARNING: This will DELETE ALL ATTENDANCE RECORDS.\n\nUse this to start fresh for testing.\nAre you sure?")) return;
-
-    const userId = import.meta.env.VITE_USER_ID || auth.currentUser?.uid;
-    if (!userId) return;
-
-    let count = 0;
-    const records = [...attendance];
-
-    for (const r of records) {
-      await deleteAttendanceRecord(userId, r.id);
-      count++;
-    }
-
-    alert(`Cleared ${count} records. List should be empty.`);
-    window.location.reload();
-  };
-
-  // Sort attendance: Newest Check-In (Date + Time) > Oldest
+  // Sort helpers
   const sortedAttendance = useMemo(() => {
-
-    // Helper to get comparable value from record
     const getSortValue = (rec: AttendanceRecord) => {
-      // 1. Parse Date
       let val = new Date(rec.date).getTime();
       if (isNaN(val)) val = 0;
-
-      // 2. Parse Time (Handle 12h AM/PM and 24h)
       const timeStr = (rec.clockIn || '00:00').trim().toUpperCase();
-      let hours = 0;
-      let minutes = 0;
-
+      let hours = 0; let minutes = 0;
       try {
-        if (timeStr.includes('PM') || timeStr.includes('AM')) {
-          // 12-Hour Format
-          const isPM = timeStr.includes('PM');
-          const isAM = timeStr.includes('AM');
-          const clean = timeStr.replace('PM', '').replace('AM', '').trim();
-          const parts = clean.split(':');
-          hours = parseInt(parts[0]) || 0;
-          minutes = parseInt(parts[1]) || 0;
-
-          if (isPM && hours < 12) hours += 12;
-          if (isAM && hours === 12) hours = 0;
-        } else {
-          // 24-Hour Format
-          const parts = timeStr.split(':');
-          hours = parseInt(parts[0]) || 0;
-          minutes = parseInt(parts[1]) || 0;
-        }
-      } catch (e) {
-        // Fallback for weird strings
-      }
-
-      // Add milliseconds representing time of day
+        const parts = timeStr.split(':');
+        hours = parseInt(parts[0]) || 0;
+        minutes = parseInt(parts[1]) || 0;
+      } catch (e) { }
       val += (hours * 3600000) + (minutes * 60000);
       return val;
     };
-
-    // --- Redesign Helpers ---
-
-    const getTargetStaff = () => staff.find(s => s.id === selectedStaffId);
-
-    const getTodayRecord = () => {
-      const today = new Date().toISOString().split('T')[0];
-      return attendance.find(a => a.staffId === selectedStaffId && a.date === today && !a.clockOut);
-    };
-
-    const getStaffStats = () => {
-      const sId = selectedStaffId;
-      const myRecs = attendance.filter(a => a.staffId === sId);
-      if (myRecs.length === 0) return { avgHours: '0h 0m', avgIn: '--:--', avgOut: '--:--', onTime: '0%' };
-
-      // Avg Hours
-      const totalHours = myRecs.reduce((acc, curr) => acc + (curr.hoursWorked || 0), 0);
-      const avgH = myRecs.length ? totalHours / myRecs.length : 0;
-      const h = Math.floor(avgH);
-      const m = Math.round((avgH - h) * 60);
-
-      // Avg Check In
-      // Simple average of minutes from midnight
-      const inTimes = myRecs.map(r => r.clockIn).filter(Boolean) as string[];
-      let avgInStr = '--:--';
-      if (inTimes.length) {
-        const totalInMins = inTimes.reduce((acc, t) => {
-          const [hh, mm] = t.split(':').map(Number);
-          return acc + (hh * 60) + mm;
-        }, 0);
-        const avgInMins = totalInMins / inTimes.length;
-        const ih = Math.floor(avgInMins / 60);
-        const im = Math.round(avgInMins % 60);
-        avgInStr = `${ih.toString().padStart(2, '0')}:${im.toString().padStart(2, '0')}`;
-      }
-
-      // On Time (Assume 9:00 AM is target)
-      const onTimeCount = myRecs.filter(r => {
-        if (!r.clockIn) return false;
-        const [hh, mm] = r.clockIn.split(':').map(Number);
-        return (hh < 9) || (hh === 9 && mm <= 15); // 9:15 Buffer
-      }).length;
-      const onTimePct = ((onTimeCount / myRecs.length) * 100).toFixed(1);
-
-      return {
-        avgHours: `${h}h ${m}m`,
-        avgIn: avgInStr,
-        avgOut: '--', // hard to avg varied shifts
-        onTime: `${onTimePct}%`
-      };
-    };
-
     return [...attendance].sort((a, b) => getSortValue(b) - getSortValue(a));
   }, [attendance]);
 
@@ -701,7 +380,8 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
   const todayRecord = getTodayRecord();
   const isCheckedIn = !!todayRecord;
 
-  // Render Helpers
+  // --- RENDER ---
+
   const renderDashboard = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Greeting Header */}
@@ -764,11 +444,11 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
             { label: 'Avg Hours', value: dashboardStats.avgHours, icon: Clock, color: 'text-primary' },
             { label: 'Avg Check-in', value: dashboardStats.avgIn, icon: Users, color: 'text-emerald-500' },
             { label: 'On-time Arrival', value: dashboardStats.onTime, icon: Calendar, color: 'text-emerald-600' },
-            { label: 'Avg Check-out', value: dashboardStats.avgOut, icon: 'LogOut', color: 'text-rose-500' }
+            { label: 'Avg Check-out', value: dashboardStats.avgOut, icon: LogOut, color: 'text-rose-500' }
           ].map((stat, i) => (
             <div key={i} className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between">
               <div className={`w-10 h-10 rounded-full ${stat.color === 'text-primary' ? 'bg-indigo-50' : 'bg-slate-50'} flex items-center justify-center mb-4`}>
-                {stat.icon === 'LogOut' ? <LogOut className={`w-5 h-5 ${stat.color}`} /> : <stat.icon className={`w-5 h-5 ${stat.color}`} />}
+                <stat.icon className={`w-5 h-5 ${stat.color}`} />
               </div>
               <div>
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
@@ -892,272 +572,229 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
             </table>
           </div>
         </div>
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Secure PIN</label>
-                      <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.pin} onChange={e => setNewStaffForm({ ...newStaffForm, pin: e.target.value })} placeholder="0000" />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">NI Number</label>
-                      <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={newStaffForm.niNumber} onChange={e => setNewStaffForm({ ...newStaffForm, niNumber: e.target.value })} placeholder="QQ123456A" />
-                    </div>
+      </div>
+    </div>
+  );
+
+  const renderRegistry = () => (
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex justify-between items-center mb-6 px-2">
+        <div>
+          <h3 className="font-black text-2xl text-slate-900 tracking-tight">Personnel Registry</h3>
+          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Active Staff Members</p>
+        </div>
+        <button onClick={() => { setEditingStaff(null); setAddStaffModalOpen(true); }} className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center gap-2">
+          <span>+</span> Recruit
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {staff.map(s => {
+          // Randomly assign a "Dept" color for the badge based on role
+          const badgeColor = s.role === 'Manager' ? 'bg-rose-100 text-rose-600' : s.role === 'Owner' ? 'bg-indigo-100 text-indigo-600' : 'bg-orange-100 text-orange-600';
+          const badgeLabel = s.role === 'Owner' ? 'Director' : s.role;
+
+          return (
+            <div key={s.id} className="bg-white rounded-[2.5rem] p-6 relative group border border-slate-100 hover:border-indigo-100 transition-all hover:shadow-2xl hover:shadow-slate-200/50">
+
+              {/* Status Icon */}
+              <div className="absolute top-8 right-8 text-emerald-500">
+                <div className="w-2 h-2 rounded-full bg-current shadow-[0_0_10px_currentColor]"></div>
+              </div>
+
+              <div className="flex items-start gap-5">
+                {/* Photo */}
+                <div className="w-24 h-24 rounded-[1.5rem] bg-slate-100 overflow-hidden shadow-inner shrink-0 relative order-1">
+                  {s.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-3xl">👤</div>}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0 pt-1 order-2">
+                  <h4 className="font-black text-lg text-slate-900 leading-tight truncate">{s.name}</h4>
+                  <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wide">{s.role}</p>
+
+                  {/* Actions (Floating near text) */}
+                  <div className="flex items-center gap-2 mt-4">
+                    <button className="w-9 h-9 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all" title="Email">
+                      <Mail className="w-4 h-4" />
+                    </button>
+                    <button className="w-9 h-9 rounded-full border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 transition-all" title="Call">
+                      <Phone className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button onClick={handleAddNewStaff} className="w-full bg-[#0F172A] text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.5em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all mt-4">
-                    Authorize Enrollment
-                  </button>
-                </div >
-              </div >
-            </div >
-          )
-        }
-
-{/* EDIT STAFF MODAL */ }
-{
-  editingStaff && (
-    <div className="fixed inset-0 z-[1000] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-4">
-      <div className="bg-surface-elevated w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
-        <div className="bg-[#0F172A] p-10 text-white flex justify-between items-center">
-          <div>
-            <h3 className="text-2xl font-black uppercase tracking-tight">Personnel File</h3>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mt-1">Update & Modify</p>
-          </div>
-          <button onClick={() => setEditingStaff(null)} className="text-4xl font-light hover:rotate-90 transition-all px-4">✕</button>
-        </div>
-        <div className="p-10 space-y-6">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-            <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.name} onChange={e => setEditingStaff({ ...editingStaff, name: e.target.value })} />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Role</label>
-              <select className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.role} onChange={e => setEditingStaff({ ...editingStaff, role: e.target.value as any })}>
-                <option value="Cashier">Cashier</option>
-                <option value="Manager">Manager</option>
-                <option value="Stock Clerk">Stock Clerk</option>
-                <option value="Accountant">Accountant</option>
-                <option value="Owner">Owner</option>
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Profile Photo</label>
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-surface-highlight rounded-2xl border flex items-center justify-center overflow-hidden relative">
-                  {editingStaff.photo ? (
-                    <img src={editingStaff.photo} className="w-full h-full object-cover" />
-                  ) : <span className="text-2xl">📷</span>}
                 </div>
-                <label className="bg-slate-200 hover:bg-slate-300 text-ink-base px-3 py-2 rounded-lg text-[10px] font-bold uppercase cursor-pointer transition-colors">
-                  Upload
-                  <input type="file" onChange={(e) => handlePhotoUpload(e, true)} className="hidden" accept="image/*" />
-                </label>
-                <button
-                  onClick={() => setIdCardStaff(editingStaff)}
-                  className="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-3 py-2 rounded-lg text-[10px] font-bold uppercase transition-colors"
-                >
-                  Generate ID
+              </div>
+
+              {/* Footer / Badge */}
+              <div className="flex justify-between items-center mt-6 pl-1">
+                <button onClick={() => { setEditingStaff(s); setAddStaffModalOpen(true); }} className="text-[10px] font-black uppercase text-slate-300 hover:text-indigo-600 transition-colors">
+                  View Profile
                 </button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Status</label>
-              <select className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.status} onChange={e => setEditingStaff({ ...editingStaff, status: e.target.value as any })}>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-                <option value="Pending Approval">Pending</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">PIN</label>
-              <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.pin} onChange={e => setEditingStaff({ ...editingStaff, pin: e.target.value })} />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">NI Number</label>
-              <input className="w-full bg-surface-elevated border rounded-xl px-4 py-3 text-sm font-bold outline-none focus:border-indigo-600" value={editingStaff.niNumber} onChange={e => setEditingStaff({ ...editingStaff, niNumber: e.target.value })} />
-            </div>
-          </div>
-
-          <div className="bg-surface-elevated p-4 rounded-xl text-[10px] text-slate-400 text-center font-mono">
-            ID: {editingStaff.id}
-          </div>
-
-
-          <button onClick={handleUpdateStaff} className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.5em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all mt-4">
-            Save Changes
-          </button>
-
-          <button
-            onClick={async () => {
-              if (!window.confirm("Are you sure you want to PERMANENTLY delete this staff member? This cannot be undone.")) return;
-              if (!auth.currentUser) return;
-              try {
-                const { deleteStaffMember } = await import('../lib/firestore');
-                await deleteStaffMember(auth.currentUser.uid, editingStaff.id);
-                setEditingStaff(null);
-                alert("Staff Member Deleted.");
-              } catch (e) {
-                alert("Delete Failed: " + e);
-              }
-            }}
-            className="w-full bg-rose-50 text-rose-600 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-100 transition-all mt-2"
-          >
-            Delete Personnel
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-{/* Attendance Update Modal */ }
-{
-  editingRecord && (
-    <div className="fixed inset-0 z-[1000] bg-slate-900/90 backdrop-blur-xl flex items-center justify-center p-4">
-      <div className="bg-surface-elevated w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col">
-        <div className="bg-indigo-600 p-10 text-white flex justify-between items-center">
-          <div>
-            <h3 className="text-2xl font-black uppercase tracking-tight">Shift Modification</h3>
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40 mt-1">Personnel Record Override</p>
-          </div>
-          <button onClick={() => { setEditingRecord(null); setIsAddMode(false); }} className="text-4xl font-light hover:rotate-90 transition-all px-4">✕</button>
-        </div>
-        <div className="p-12 space-y-8">
-          <div className="grid grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Personnel</label>
-              <select
-                value={editingRecord.staffId}
-                onChange={e => setEditingRecord({ ...editingRecord, staffId: e.target.value })}
-                className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600"
-              >
-                {staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Value Date</label>
-              <input
-                type="date"
-                value={editingRecord.date}
-                onChange={e => setEditingRecord({ ...editingRecord, date: e.target.value })}
-                className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xs font-black outline-none focus:border-indigo-600"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Clock In (Start)</label>
-              <input
-                type="time"
-                value={editingRecord.clockIn || ''}
-                onChange={e => setEditingRecord({ ...editingRecord, clockIn: e.target.value })}
-                className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xl font-black font-mono outline-none focus:border-indigo-600"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Clock Out (End)</label>
-              <input
-                type="time"
-                value={editingRecord.clockOut || ''}
-                onChange={e => setEditingRecord({ ...editingRecord, clockOut: e.target.value })}
-                className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xl font-black font-mono outline-none focus:border-indigo-600"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Administrative Notes</label>
-            <textarea
-              value={editingRecord.notes || ''}
-              onChange={e => setEditingRecord({ ...editingRecord, notes: e.target.value })}
-              placeholder="Reason for manual adjustment..."
-              className="w-full bg-surface-elevated border rounded-xl px-4 py-4 text-xs font-bold outline-none focus:border-indigo-600 h-24"
-            />
-          </div>
-
-          <div className="bg-surface-elevated p-6 rounded-2xl flex justify-between items-center">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Recalculated Engagement</span>
-            <span className="text-2xl font-black font-mono text-indigo-600">{calculateHours(editingRecord.clockIn || '', editingRecord.clockOut || '')} Hours</span>
-          </div>
-
-          <button
-            onClick={saveRecordUpdate}
-            className="w-full bg-[#0F172A] text-white py-6 rounded-2xl font-black text-[11px] uppercase tracking-[0.5em] shadow-xl hover:scale-[1.02] active:scale-95 transition-all mt-4"
-          >
-            {isAddMode ? 'Authorize New Record' : 'Apply Overwrites'}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-{/* Day Details Modal (Individual Focus) */ }
-{
-  dayDetails && (
-    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[1100] flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setDayDetails(null)}>
-      <div className="bg-surface-elevated rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl scale-100 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <h3 className="text-xl font-black uppercase text-ink-base leading-none">
-              {new Date(dayDetails.date).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric' })}
-            </h3>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
-              {new Date(dayDetails.date).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
-            </p>
-          </div>
-          <button onClick={() => setDayDetails(null)} className="w-10 h-10 rounded-full bg-surface-highlight hover:bg-slate-200 flex items-center justify-center text-ink-muted font-bold text-lg">✕</button>
-        </div>
-
-        <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-          {dayDetails.records.map((rec, idx) => (
-            <div key={rec.id} className="bg-surface-elevated p-5 rounded-2xl border border-slate-100 flex justify-between items-center group hover:border-indigo-200 transition-colors">
-              <div className="flex items-center gap-4">
-                <span className="w-8 h-8 rounded-xl bg-surface-elevated border border-surface-highlight text-slate-400 flex items-center justify-center text-[10px] font-black shadow-sm group-hover:text-indigo-600 group-hover:border-indigo-200">{idx + 1}</span>
-                <div>
-                  <p className="text-sm font-black text-slate-800 uppercase tabular-nums tracking-tight">
-                    {rec.clockIn} <span className="text-slate-300 px-1">→</span> {rec.clockOut || 'ACTIVE'}
-                  </p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{rec.clockOut ? 'Completed Shift' : 'Currently On Shift'}</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <span className={`text-sm font-black ${rec.hoursWorked ? 'text-emerald-600' : 'text-indigo-600 animate-pulse'}`}>
-                  {rec.hoursWorked ? `${rec.hoursWorked}h` : 'Running'}
+                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${badgeColor}`}>
+                  {badgeLabel}
                 </span>
               </div>
-            </div>
-          ))}
-        </div>
 
-        <div className="mt-8 pt-6 border-t border-slate-100 flex justify-between items-end">
-          <div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Duration</p>
-            <p className="text-sm font-bold text-ink-muted">{staff.find(s => s.id === selectedStaffId)?.name}</p>
-          </div>
-          <span className="text-4xl font-black text-ink-base tabular-nums tracking-tight">
-            {dayDetails.records.reduce((acc, curr) => acc + (curr.hoursWorked || 0), 0).toFixed(2)}<span className="text-lg text-slate-400 ml-1">h</span>
-          </span>
-        </div>
+              {/* ID Card Shortcut */}
+              <button onClick={() => setIdCardStaff(s)} className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-all p-2 text-slate-300 hover:text-indigo-600">
+                <span className="text-xs">🪪</span>
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
-  )
-}
+  );
 
-{ idCardStaff && <IDCard staff={idCardStaff} onClose={() => setIdCardStaff(null)} /> }
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans pb-24 relative selection:bg-indigo-100">
+      {/* Toast */}
+      {notification && (
+        <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-right-10 duration-300 ${notification.type === 'success' ? 'bg-emerald-600' : notification.type === 'error' ? 'bg-rose-600' : 'bg-indigo-600'} text-white`}>
+          <span className="text-xl">{notification.type === 'success' ? '✅' : notification.type === 'error' ? '⚠️' : 'ℹ️'}</span>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-80">{notification.type === 'success' ? 'Success' : notification.type === 'error' ? 'Alert' : 'Info'}</p>
+            <p className="font-bold text-sm">{notification.message}</p>
+          </div>
+        </div>
+      )}
 
-<AccessTerminal
-  isOpen={terminalOpen}
-  onClose={() => setTerminalOpen(false)}
-  staff={staff}
-  onAuthenticate={handleTerminalAuth}
-  userRole={userRole} // Pass current role for secure closing
-/>
+      {/* Top Navigation */}
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mb-8">
+        <div className="flex bg-white px-2 py-2 rounded-2xl shadow-sm border border-slate-100">
+          {[{ id: 'attendance', label: 'Dashboard' }, { id: 'registry', label: 'Registry' }, { id: 'calendar', label: 'Calendar' }, { id: 'files', label: 'Files' }].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-primary text-white shadow-md' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <select
+              value={selectedStaffId}
+              onChange={e => setSelectedStaffId(e.target.value)}
+              disabled={!isAdmin}
+              className="bg-white border border-slate-200 pl-4 pr-10 py-2.5 rounded-xl text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-primary/20 appearance-none shadow-sm min-w-[200px]"
+            >
+              {staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">▼</div>
+          </div>
+          {isAdmin && <button onClick={() => setTerminalOpen(true)} className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-black transition-all">🛂</button>}
+          {isAdmin && <button onClick={() => { setEditingStaff(null); setIsAddMode(true); }} className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg hover:bg-primary-hover transition-all">+</button>}
+        </div>
+      </div>
 
-      </div >
-    );
-  };
+      {activeTab === 'attendance' && renderDashboard()}
+      {activeTab === 'registry' && renderRegistry()}
+      {(activeTab === 'calendar' || activeTab === 'files') && (
+        <div className="text-center py-20 bg-white rounded-3xl border border-slate-100">
+          <h2 className="text-xl font-bold">Coming Soon</h2>
+        </div>
+      )}
+
+      {/* Modals */}
+      {terminalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-5xl">
+            <button onClick={() => setTerminalOpen(false)} className="absolute -top-12 right-0 text-white font-black uppercase">Close</button>
+            <AccessTerminal isOpen={terminalOpen} onAuthenticate={handleTerminalAuth} staff={staff} onClose={() => setTerminalOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {(isAddMode || editingRecord) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+            <h3 className="text-xl font-black text-slate-900 mb-6">{isAddMode ? 'Quick Entry' : 'Edit Entry'}</h3>
+            {/* Logic for quick entry form here if needed, or re-use editingRecord fields */}
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-bold text-slate-400 uppercase">Staff Member</label>
+                <select
+                  disabled={!isAddMode}
+                  value={editingRecord?.staffId}
+                  onChange={e => setEditingRecord(prev => prev ? ({ ...prev, staffId: e.target.value }) : null)}
+                  className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm font-bold text-slate-900 outline-primary mt-1"
+                >
+                  {staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-400 uppercase">Clock In</label>
+                  <input
+                    type="time"
+                    value={editingRecord?.clockIn || ''}
+                    onChange={e => setEditingRecord(prev => prev ? ({ ...prev, clockIn: e.target.value }) : null)}
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm font-bold outline-primary mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-400 uppercase">Clock Out</label>
+                  <input
+                    type="time"
+                    value={editingRecord?.clockOut || ''}
+                    onChange={e => setEditingRecord(prev => prev ? ({ ...prev, clockOut: e.target.value }) : null)}
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl text-sm font-bold outline-primary mt-1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-8">
+              <button onClick={() => { setIsAddMode(false); setEditingRecord(null); }} className="flex-1 py-3 bg-slate-100 rounded-xl font-bold">Close</button>
+              <button onClick={saveRecordUpdate} className="flex-1 py-3 bg-primary text-white rounded-xl font-bold shadow-lg">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {addStaffModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+            <h3 className="text-xl font-black text-slate-900 mb-6">{editingStaff ? 'Edit Personnel' : 'Recruit Personnel'}</h3>
+            <div className="space-y-4">
+              <input placeholder="Full Name" className="w-full bg-slate-50 border-slate-200 p-3 rounded-xl outline-primary font-bold" value={editingStaff ? editingStaff.name : newStaffForm.name} onChange={e => editingStaff ? setEditingStaff({ ...editingStaff, name: e.target.value }) : setNewStaffForm({ ...newStaffForm, name: e.target.value })} />
+              <div className="grid grid-cols-2 gap-4">
+                <input placeholder="PIN" className="w-full bg-slate-50 border-slate-200 p-3 rounded-xl outline-primary font-bold" value={editingStaff ? editingStaff.pin : newStaffForm.pin} onChange={e => editingStaff ? setEditingStaff({ ...editingStaff, pin: e.target.value }) : setNewStaffForm({ ...newStaffForm, pin: e.target.value })} />
+                <select
+                  className="w-full bg-slate-50 border-slate-200 p-3 rounded-xl outline-primary font-bold"
+                  value={editingStaff ? editingStaff.role : newStaffForm.role}
+                  onChange={e => editingStaff ? setEditingStaff({ ...editingStaff, role: e.target.value as any }) : setNewStaffForm({ ...newStaffForm, role: e.target.value as any })}
+                >
+                  <option value="Cashier">Cashier</option>
+                  <option value="Manager">Manager</option>
+                  <option value="Owner">Owner</option>
+                </select>
+              </div>
+              <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center cursor-pointer hover:border-primary transition-colors relative">
+                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={e => handlePhotoUpload(e, !!editingStaff)} />
+                <p className="text-xs font-bold text-slate-400 uppercase">Upload Profile Photo</p>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-8">
+              <button onClick={() => { setAddStaffModalOpen(false); setEditingStaff(null); }} className="flex-1 py-3 text-slate-400 font-bold">Cancel</button>
+              <button onClick={editingStaff ? handleUpdateStaff : handleAddNewStaff} className="flex-1 py-3 bg-primary text-white rounded-xl font-bold">{editingStaff ? 'Update' : 'Confirm'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {idCardStaff && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+          <div className="relative">
+            <button onClick={() => setIdCardStaff(null)} className="absolute -top-12 right-0 text-white font-bold">Close</button>
+            <IDCard staff={idCardStaff} onClose={() => setIdCardStaff(null)} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default StaffView;
