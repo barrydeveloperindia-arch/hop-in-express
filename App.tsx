@@ -158,7 +158,10 @@ const App: React.FC = () => {
 
     const { subscribeToStaff, subscribeToAttendance, subscribeToLedger, subscribeToSuppliers, subscribeToBills, subscribeToExpenses, subscribeToPurchases } = await import('./lib/firestore');
 
-    const unsubStaff = subscribeToStaff(uid, (items) => setStaff(items.length ? items : INITIAL_STAFF));
+    const unsubStaff = subscribeToStaff(uid, (items) => {
+      console.log("[App] Staff Synced:", items.length, "items");
+      setStaff(items.length ? items : INITIAL_STAFF);
+    });
     const unsubAttendance = subscribeToAttendance(uid, (items) => setAttendance(items));
     const unsubLedger = subscribeToLedger(uid, (items) => setLedgerEntries(items));
     const unsubSuppliers = subscribeToSuppliers(uid, (items) => setSuppliers(items.length ? items : INITIAL_SUPPLIERS));
