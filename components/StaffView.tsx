@@ -330,12 +330,19 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     }
   };
 
+  /* Notification System */
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' | 'info' } | null>(null);
+
+  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
   const handleAttendanceAction = async (type: 'IN' | 'OUT') => {
     if (!auth.currentUser) return;
 
     const userId = import.meta.env.VITE_USER_ID || auth.currentUser.uid;
     const today = new Date().toISOString().split('T')[0];
-    // Force 24-hour format HH:MM manually to ensure sorting consistency
     const nowObj = new Date();
     const time = `${nowObj.getHours().toString().padStart(2, '0')}:${nowObj.getMinutes().toString().padStart(2, '0')}`;
     const targetStaff = staff.find(s => s.id === selectedStaffId);
@@ -345,7 +352,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     if (type === 'IN') {
       const alreadyIn = attendance.some(a => a.staffId === selectedStaffId && a.date === today && !a.clockOut);
       if (alreadyIn) {
-        alert(`${targetStaff.name} is already checked in for today.`);
+        showNotification(`${targetStaff.name} is already checked in.`, 'error');
         return;
       }
       const newRecord: AttendanceRecord = {
@@ -358,21 +365,18 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       };
 
       try {
-        // DEBUG: Trace ID
-        // alert(`Debug: Checking In ${targetStaff.name}\nTarget Shop: ${userId}`);
-
         await addAttendanceRecord(userId, newRecord);
         logAction('Staff Check-in', 'staff', `Authorized entry for ${targetStaff.name} at ${time}`, 'Info');
-        alert("Check-In Successful. List should update.");
+        showNotification(`✅ Check-In Successful: ${targetStaff.name} at ${time}`, 'success');
       } catch (err) {
         console.error("Error checking in:", err);
-        alert("Failed to check in: " + err);
+        showNotification("Failed to check in " + err, 'error');
       }
 
     } else {
       const recordToUpdate = attendance.find(a => a.staffId === selectedStaffId && a.date === today && !a.clockOut);
       if (!recordToUpdate) {
-        alert(`No active check-in record found for ${targetStaff.name} today.`);
+        showNotification(`No active shift found for ${targetStaff.name}`, 'error');
         return;
       }
 
@@ -384,9 +388,10 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       try {
         await updateAttendanceRecord(userId, recordToUpdate.id, updates);
         logAction('Staff Check-out', 'staff', `Authorized exit for ${targetStaff.name} at ${time}`, 'Info');
+        showNotification(`✅ Check-Out Successful: ${targetStaff.name} at ${time}`, 'success');
       } catch (err) {
         console.error("Error checking out:", err);
-        alert("Failed to check out. Please try again.");
+        showNotification("Failed to check out.", 'error');
       }
     }
   };
@@ -641,7 +646,17 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
   }, [attendance]);
 
   return (
-    <div className="space-y-10 pb-24 animate-in fade-in duration-700">
+    <div className="space-y-10 pb-24 animate-in fade-in duration-700 relative">
+      {/* Dynamic Toast Notification */}
+      {notification && (
+        <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-right-10 duration-300 ${notification.type === 'success' ? 'bg-emerald-600' : notification.type === 'error' ? 'bg-rose-600' : 'bg-indigo-600'} text-white`}>
+          <span className="text-xl">{notification.type === 'success' ? '✅' : notification.type === 'error' ? '⚠️' : 'ℹ️'}</span>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-80">{notification.type === 'success' ? 'Success' : notification.type === 'error' ? 'Alert' : 'Info'}</p>
+            <p className="font-bold text-sm">{notification.message}</p>
+          </div>
+        </div>
+      )}
       <div className="flex bg-surface-elevated p-2 rounded-2xl border border-surface-highlight w-full md:w-auto shadow-lg no-print overflow-x-auto">
         {[
           { id: 'attendance', label: 'Shift Logs', icon: '⏱️' },
