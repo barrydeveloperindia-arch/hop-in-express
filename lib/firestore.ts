@@ -81,3 +81,22 @@ export const subscribeToDailySales = (userId: string, callback: (records: DailyS
         callback(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as DailySalesRecord)));
     });
 };
+// Transactions
+export const processTransaction = async (userId: string, transaction: Transaction) => {
+    const batch = writeBatch(db);
+
+    // 1. Add Transaction Record
+    const txRef = doc(db, 'shops', userId, 'transactions', transaction.id);
+    batch.set(txRef, transaction);
+
+    // 2. Update Inventory Stock
+    transaction.items.forEach(item => {
+        const itemRef = doc(db, 'shops', userId, 'inventory', item.id);
+        batch.update(itemRef, {
+            stock: increment(-item.qty)
+        });
+    });
+
+    // 3. Commit Batch
+    await batch.commit();
+};
