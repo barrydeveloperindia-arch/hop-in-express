@@ -20,11 +20,13 @@ import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Users, Clock, Calendar, FolderOpen, FileText, Upload, Image as ImageIcon, LogOut, Mail, Phone } from 'lucide-react';
-import { addAttendanceRecord, updateAttendanceRecord, deleteAttendanceRecord } from '../lib/firestore';
+import { addAttendanceRecord, updateAttendanceRecord, deleteAttendanceRecord, updateStaffMember } from '../lib/firestore';
 
 const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance, logAction, userRole, currentStaffId }) => {
   const [activeTab, setActiveTab] = useState<'registry' | 'attendance' | 'calendar' | 'files'>('attendance');
-  const [calendarMode, setCalendarMode] = useState<'individual' | 'roster'>('individual');
+  const [calendarMode, setCalendarMode] = useState<'individual' | 'roster'>('roster');
+  const [viewPeriod, setViewPeriod] = useState<'week' | 'month' | 'year'>('week');
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [weekOffset, setWeekOffset] = useState(0);
   const [filterMonth, setFilterMonth] = useState(new Date().toISOString().slice(0, 7));
   const [dayDetails, setDayDetails] = useState<{ date: string, records: AttendanceRecord[] } | null>(null);
@@ -37,6 +39,40 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
 
   // STRICT ACCESS: Only Owner and Manager can manage staff
   const isAdmin = userRole === 'Owner' || userRole === 'Manager';
+
+  // --- AUTO-ASSIGN AVATARS UTILITY (MIGRATION) ---
+  const handleAutoAssignAvatars = async () => {
+    if (!isAdmin) return;
+    if (!confirm("⚠️ ADMIN ACTION: This will overwrite profile photos for ALL staff members with studio-quality avatars.\n\nProceed?")) return;
+
+    const userId = import.meta.env.VITE_USER_ID || auth.currentUser?.uid;
+    if (!userId) { alert("User ID missing"); return; }
+
+    try {
+      let count = 0;
+      for (const s of staff) {
+        let url = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80'; // Default Male
+
+        const name = s.name.toUpperCase();
+
+        // Specific Mappings
+        if (name.includes('BHARAT')) url = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
+        else if (name.includes('NISHA')) url = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
+        else if (name.includes('GAURAV') || name.includes('SALIL') || name.includes('SHIV')) url = 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
+        else if (name.includes('HARSH') || name.includes('NARAYAN') || name.includes('PARAS') || name.includes('PARTH') || name.includes('SMIT')) url = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
+        else if (name.includes('SHOP OWNER')) url = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80';
+
+        if (s.photo !== url) {
+          await updateStaffMember(userId, s.id, { photo: url });
+          count++;
+        }
+      }
+      alert(`✅ Updated ${count} staff profiles with new avatars.`);
+    } catch (e) {
+      console.error(e);
+      alert("Update failed: " + e);
+    }
+  };
 
   // Auto-correct selectedStaffId if invalid (e.g. stale default)
   React.useEffect(() => {
@@ -60,16 +96,11 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     if (!file) return;
 
     try {
-      // 1. Compress the image first (Client-side optimization)
       const { compressImage } = await import('../lib/storage_utils');
       const compressedFile = await compressImage(file);
-
-      // 2. Convert to Base64 String
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
-
-        // 3. Update State
         if (isEdit && editingStaff) {
           setEditingStaff(prev => prev ? ({ ...prev, photo: base64String }) : null);
         } else {
@@ -99,9 +130,9 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
         role: newStaffForm.role,
         pin: newStaffForm.pin,
         photo: newStaffForm.photo,
-        email: newStaffForm.email, // Added for RBAC
+        email: newStaffForm.email,
         loginBarcode: `STAFF-${Math.floor(Math.random() * 10000)}`,
-        status: 'Pending Approval', // Initially Pending until Authorized by Backend
+        status: 'Pending Approval',
         joinedDate: new Date().toISOString().split('T')[0],
         contractType: 'Full-time',
         niNumber: newStaffForm.niNumber || 'PENDING',
@@ -111,7 +142,6 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
         monthlyRate: 0, hourlyRate: 11.44, dailyRate: 0, advance: 0, holidayEntitlement: 28, accruedHoliday: 0
       };
 
-      // 1. Create in Firestore (Pending)
       const userId = import.meta.env.VITE_USER_ID || auth.currentUser.uid;
       await addStaffMember(userId, newStaff);
 
@@ -303,11 +333,8 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     }
   };
 
-  // --- Redesign Helpers ---
-
   const formatTime = (isoDateStr: string | undefined) => {
     if (!isoDateStr) return '--:--';
-    // If it's already HH:MM
     if (isoDateStr.includes(':') && isoDateStr.length === 5) return isoDateStr;
     return '--:--';
   }
@@ -357,7 +384,6 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     };
   };
 
-  // Sort helpers
   const sortedAttendance = useMemo(() => {
     const getSortValue = (rec: AttendanceRecord) => {
       let val = new Date(rec.date).getTime();
@@ -380,11 +406,8 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
   const todayRecord = getTodayRecord();
   const isCheckedIn = !!todayRecord;
 
-  // --- RENDER ---
-
   const renderDashboard = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Greeting Header */}
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">Good afternoon, {targetStaffName.split(' ')[0]}!</h1>
@@ -401,9 +424,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
         </div>
       </div>
 
-      {/* KPI Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Today Status Card */}
         <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
           <div className="flex justify-between items-start mb-6 w-full z-10">
             <h3 className="font-bold text-slate-900 text-lg">Today</h3>
@@ -438,7 +459,6 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           </button>
         </div>
 
-        {/* Metrics Grid */}
         <div className="lg:col-span-5 grid grid-cols-2 gap-4">
           {[
             { label: 'Avg Hours', value: dashboardStats.avgHours, icon: Clock, color: 'text-primary' },
@@ -458,7 +478,6 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           ))}
         </div>
 
-        {/* Attendance Chart */}
         <div className="lg:col-span-3 bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-slate-900">Attendance</h3>
@@ -487,7 +506,6 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* My Team */}
         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
           <div className="flex items-center justify-between mb-8">
             <h3 className="font-bold text-slate-900 text-lg">My Team</h3>
@@ -530,7 +548,6 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           </div>
         </div>
 
-        {/* Working History */}
         <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
           <div className="flex items-center justify-between mb-8">
             <h3 className="font-bold text-slate-900 text-lg">Working History</h3>
@@ -583,9 +600,12 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           <h3 className="font-black text-2xl text-slate-900 tracking-tight">Personnel Registry</h3>
           <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Active Staff Members</p>
         </div>
-        <button onClick={() => { setEditingStaff(null); setAddStaffModalOpen(true); }} className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center gap-2">
-          <span>+</span> Recruit
-        </button>
+        <div className="flex items-center">
+          {isAdmin && <button onClick={handleAutoAssignAvatars} className="bg-white text-slate-400 hover:text-indigo-600 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-100 hover:border-indigo-100 mr-2 transition-all">Sync Photos</button>}
+          <button onClick={() => { setEditingStaff(null); setAddStaffModalOpen(true); }} className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center gap-2">
+            <span>+</span> Recruit
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -648,6 +668,142 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     </div>
   );
 
+  const renderCalendar = () => {
+
+    const getDates = () => {
+      const d = [];
+      const start = new Date(currentDate);
+
+      if (viewPeriod === 'week') {
+        const day = start.getDay();
+        const diff = start.getDate() - day + (day === 0 ? -6 : 1);
+        start.setDate(diff);
+        for (let i = 0; i < 7; i++) {
+          d.push(new Date(start));
+          start.setDate(start.getDate() + 1);
+        }
+      } else if (viewPeriod === 'month') {
+        start.setDate(1);
+        const month = start.getMonth();
+        while (start.getMonth() === month) {
+          d.push(new Date(start));
+          start.setDate(start.getDate() + 1);
+        }
+      }
+      return d;
+    };
+
+    const dates = getDates();
+
+    const handlePrev = () => {
+      const newDa = new Date(currentDate);
+      if (viewPeriod === 'week') newDa.setDate(newDa.getDate() - 7);
+      if (viewPeriod === 'month') newDa.setMonth(newDa.getMonth() - 1);
+      if (viewPeriod === 'year') newDa.setFullYear(newDa.getFullYear() - 1);
+      setCurrentDate(newDa);
+    };
+
+    const handleNext = () => {
+      const newDa = new Date(currentDate);
+      if (viewPeriod === 'week') newDa.setDate(newDa.getDate() + 7);
+      if (viewPeriod === 'month') newDa.setMonth(newDa.getMonth() + 1);
+      if (viewPeriod === 'year') newDa.setFullYear(newDa.getFullYear() + 1);
+      setCurrentDate(newDa);
+    };
+
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
+        <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+
+          <div className="flex bg-slate-50 p-1 rounded-xl">
+            <button onClick={() => setCalendarMode('individual')} className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${calendarMode === 'individual' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}>My Schedule</button>
+            <button onClick={() => setCalendarMode('roster')} className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${calendarMode === 'roster' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}>Team Roster</button>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <button onClick={handlePrev} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center hover:bg-slate-100">←</button>
+            <div className="text-center min-w-[120px]">
+              <span className="block text-sm font-black uppercase text-slate-900">{viewPeriod === 'year' ? currentDate.getFullYear() : currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+              {viewPeriod === 'week' && <span className="block text-[10px] font-bold text-slate-400">Week {Math.ceil(currentDate.getDate() / 7)}</span>}
+            </div>
+            <button onClick={handleNext} className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center hover:bg-slate-100">→</button>
+          </div>
+
+          <div className="flex bg-slate-50 p-1 rounded-xl">
+            {['week', 'month', 'year'].map(v => (
+              <button key={v} onClick={() => setViewPeriod(v as any)} className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${viewPeriod === v ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-600'}`}>
+                {v}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden p-6 relative min-h-[400px]">
+          {viewPeriod === 'year' && (
+            <div className="flex items-center justify-center h-full text-slate-400 font-bold uppercase tracking-widest">Year View Coming Soon</div>
+          )}
+
+          {viewPeriod !== 'year' && (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="p-4 text-left min-w-[150px] sticky left-0 bg-white z-10">
+                      <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Personnel</span>
+                    </th>
+                    {dates.map((d, i) => (
+                      <th key={i} className={`p-2 text-center min-w-[100px] border-l border-slate-50 ${d.toDateString() === new Date().toDateString() ? 'bg-indigo-50/50' : ''}`}>
+                        <div className="flex flex-col items-center">
+                          <span className="text-[10px] font-black uppercase text-slate-300">{d.toLocaleString('default', { weekday: 'short' })}</span>
+                          <span className={`text-sm font-black ${d.toDateString() === new Date().toDateString() ? 'text-indigo-600' : 'text-slate-700'}`}>{d.getDate()}</span>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {(calendarMode === 'roster' ? staff : [staff.find(s => s.id === selectedStaffId) || staff[0]]).map(s => (
+                    <tr key={s.id} className="hover:bg-slate-50/50 transition-colors group">
+                      <td className="p-4 sticky left-0 bg-white group-hover:bg-slate-50/50 transition-colors z-10 border-r border-slate-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-slate-100 overflow-hidden border border-slate-200">
+                            {s.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : null}
+                          </div>
+                          <div>
+                            <p className="text-xs font-black uppercase text-slate-900">{s.name.split(' ')[0]}</p>
+                            <p className="text-[9px] font-bold text-slate-400">{s.role}</p>
+                          </div>
+                        </div>
+                      </td>
+                      {dates.map((d, i) => {
+                        const dateStr = d.toISOString().split('T')[0];
+                        const record = attendance.find(a => a.staffId === s.id && a.date === dateStr);
+                        const isToday = dateStr === new Date().toISOString().split('T')[0];
+
+                        return (
+                          <td key={i} className={`p-2 border-l border-slate-50 text-center relative ${isToday ? 'bg-indigo-50/30' : ''}`}>
+                            {record ? (
+                              <div className="bg-emerald-100 text-emerald-700 px-2 py-1.5 rounded-lg inline-flex flex-col items-center w-full max-w-[80px]">
+                                <span className="text-[10px] font-black uppercase">Present</span>
+                                <span className="text-[9px] font-mono opacity-80">{record.clockIn} - {record.clockOut || 'Now'}</span>
+                              </div>
+                            ) : (
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-100 inline-block"></span>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-24 relative selection:bg-indigo-100">
       {/* Toast */}
@@ -693,11 +849,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
 
       {activeTab === 'attendance' && renderDashboard()}
       {activeTab === 'registry' && renderRegistry()}
-      {(activeTab === 'calendar' || activeTab === 'files') && (
-        <div className="text-center py-20 bg-white rounded-3xl border border-slate-100">
-          <h2 className="text-xl font-bold">Coming Soon</h2>
-        </div>
-      )}
+      {activeTab === 'calendar' && renderCalendar()}
 
       {/* Modals */}
       {terminalOpen && (
