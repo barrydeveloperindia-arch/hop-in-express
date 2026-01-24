@@ -740,7 +740,52 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
 
         <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden p-6 relative min-h-[400px]">
           {viewPeriod === 'year' && (
-            <div className="flex items-center justify-center h-full text-slate-400 font-bold uppercase tracking-widest">Year View Coming Soon</div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="p-4 text-left min-w-[200px] sticky left-0 bg-white z-10">
+                      <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Personnel</span>
+                    </th>
+                    {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => (
+                      <th key={i} className="p-2 text-center min-w-[60px] border-l border-slate-50">
+                        <span className="text-[10px] font-black uppercase text-slate-300">{m}</span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {(calendarMode === 'roster' ? staff : [staff.find(s => s.id === selectedStaffId) || staff[0]]).map(s => (
+                    <tr key={s.id} className="hover:bg-slate-50/50 transition-colors group">
+                      <td className="p-4 sticky left-0 bg-white group-hover:bg-slate-50/50 transition-colors z-10 border-r border-slate-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 overflow-hidden border border-slate-200">
+                            {s.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : null}
+                          </div>
+                          <span className="text-xs font-black uppercase text-slate-900">{s.name.split(' ')[0]}</span>
+                        </div>
+                      </td>
+                      {Array.from({ length: 12 }).map((_, monthIdx) => {
+                        const count = attendance.filter(a => {
+                          const d = new Date(a.date);
+                          return a.staffId === s.id && d.getMonth() === monthIdx && d.getFullYear() === currentDate.getFullYear();
+                        }).length;
+
+                        return (
+                          <td key={monthIdx} className="p-2 border-l border-slate-50 text-center">
+                            {count > 0 ? (
+                              <div className={`text-[10px] font-black px-2 py-1 rounded-lg ${count > 20 ? 'bg-emerald-100 text-emerald-700' : count > 10 ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-500'}`}>
+                                {count}d
+                              </div>
+                            ) : <span className="text-slate-200">-</span>}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
 
           {viewPeriod !== 'year' && (
