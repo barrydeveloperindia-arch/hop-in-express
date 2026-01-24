@@ -16,8 +16,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
-// Using getFirestore to avoid potential reference errors with initializeFirestore in some bundlers
-export const db = getFirestore(app);
+// Using getFirestore with explicit Database ID to support multi-db projects
+// VITE_FIREBASE_DATABASE_ID is set to 'hopinexpress1' in .env.local
+const dbId = import.meta.env.VITE_FIREBASE_DATABASE_ID || 'hopinexpress1';
+export const db = getFirestore(app, dbId);
 // Note: experimentalForceLongPolling disabled to let CapacitorHttp handle connection
 
 import { getStorage } from "firebase/storage";
