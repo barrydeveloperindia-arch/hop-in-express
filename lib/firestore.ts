@@ -166,6 +166,11 @@ export const updateStaffMember = async (userId: string, staffId: string, updates
     await updateDoc(ref, updates);
 };
 
+export const deleteStaffMember = async (userId: string, staffId: string) => {
+    const ref = doc(db, 'shops', userId, 'staff', staffId);
+    await deleteDoc(ref);
+};
+
 // CRUD: Ledger
 export const addLedgerEntry = async (userId: string, entry: LedgerEntry) => {
     const ref = doc(db, 'shops', userId, 'ledger', entry.id);

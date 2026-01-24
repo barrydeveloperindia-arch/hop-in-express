@@ -20,7 +20,7 @@ import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
 import { Users, Clock, Calendar, FolderOpen, FileText, Upload, Image as ImageIcon, LogOut, Mail, Phone } from 'lucide-react';
-import { addAttendanceRecord, updateAttendanceRecord, deleteAttendanceRecord, updateStaffMember } from '../lib/firestore';
+import { addAttendanceRecord, updateAttendanceRecord, deleteAttendanceRecord, updateStaffMember, deleteStaffMember } from '../lib/firestore';
 
 const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance, logAction, userRole, currentStaffId }) => {
   const [activeTab, setActiveTab] = useState<'registry' | 'attendance' | 'calendar' | 'files'>('attendance');
@@ -71,6 +71,36 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     } catch (e) {
       console.error(e);
       alert("Update failed: " + e);
+    }
+  };
+
+  const handleCleanupTestStaff = async () => {
+    if (!isAdmin) return;
+    if (!confirm("⚠️ ADMIN ACTION: This will PERMANENTLY DELETE staff members with names like 'Test', 'Oooo', 'Shop Owner'.\n\nProceed?")) return;
+
+    const userId = import.meta.env.VITE_USER_ID || auth.currentUser?.uid;
+    if (!userId) { alert("User ID missing"); return; }
+
+    const targets = staff.filter(s => {
+      const n = s.name.toUpperCase();
+      return n.includes('TEST') || n.includes('OOOO') || n.includes('SHOP OWNER') || n.includes('RECRUIT');
+    });
+
+    if (targets.length === 0) {
+      alert("No test staff found matching criteria.");
+      return;
+    }
+
+    try {
+      let count = 0;
+      for (const s of targets) {
+        await deleteStaffMember(userId, s.id);
+        count++;
+      }
+      alert(`✅ Deleted ${count} test staff records.`);
+    } catch (e) {
+      console.error(e);
+      alert("Cleanup failed: " + e);
     }
   };
 
@@ -705,6 +735,7 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
         </div>
         <div className="flex items-center">
           {isAdmin && <button onClick={handleAutoAssignAvatars} className="bg-white text-slate-400 hover:text-indigo-600 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-100 hover:border-indigo-100 mr-2 transition-all">Sync Photos</button>}
+          {isAdmin && <button onClick={handleCleanupTestStaff} className="bg-white text-rose-400 hover:text-rose-600 px-4 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-100 hover:border-rose-100 mr-2 transition-all">Cleanup Data</button>}
           <button onClick={() => { setEditingStaff(null); setAddStaffModalOpen(true); }} className="bg-primary hover:bg-primary-hover text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-200 transition-all active:scale-95 flex items-center gap-2">
             <span>+</span> Recruit
           </button>
