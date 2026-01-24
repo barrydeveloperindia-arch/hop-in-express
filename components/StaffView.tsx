@@ -89,6 +89,18 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
   const [idCardStaff, setIdCardStaff] = useState<StaffMember | null>(null);
   const [terminalOpen, setTerminalOpen] = useState(false);
 
+  // --- Personal Dashboard State (New) ---
+  const [tasks, setTasks] = useState([
+    { id: 1, title: 'Making work certificate John Doe', date: '30/06/2023', status: 'In progress', assignee: 'Binne', priority: 'High' },
+    { id: 2, title: 'Call Jack Russel', date: '03/06/2023 10:30 am', status: 'Pending', assignee: 'Me', priority: 'Medium' },
+    { id: 3, title: 'Interview with John Duboscok', date: '03/06/2023 10:30 am', status: 'Pending', assignee: 'Me', priority: 'High' }
+  ]);
+  const [notes, setNotes] = useState([
+    { id: 1, title: 'Resilience in hospitals', date: '05/05/2023', content: 'Talking about resilience in nursing', pinned: true },
+    { id: 2, title: 'The most important KPI', date: '30/06/2023', content: 'Rules about KPI', pinned: true }
+  ]);
+  const [breakActive, setBreakActive] = useState(false); // Local state for break UI
+
   // --- Logic Helpers (Preserved) ---
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>, isEdit: boolean = false) => {
@@ -406,192 +418,283 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
   const todayRecord = getTodayRecord();
   const isCheckedIn = !!todayRecord;
 
-  const renderDashboard = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-end gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Good afternoon, {targetStaffName.split(' ')[0]}!</h1>
-          <p className="text-slate-400 font-medium mt-1">You have <span className="text-primary font-bold">0</span> leave requests pending.</p>
-        </div>
-        <div className="hidden md:flex bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 items-center gap-4">
-          <div className="text-right">
-            <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">Current Time</p>
-            <p className="text-xl font-bold text-slate-900">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-          </div>
-          <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
-            <Clock className="w-5 h-5" />
-          </div>
-        </div>
-      </div>
+  const renderDashboard = () => {
+    // Metrics Calculation
+    const myRecords = attendance.filter(a => a.staffId === selectedStaffId);
+    const totalWorkingDays = 20; // Assumption for calculation (e.g. business days)
+    const presentDays = myRecords.filter(r => r.status === 'Present').length;
+    const attendanceRate = Math.min(100, Math.round((presentDays / totalWorkingDays) * 100));
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-4 bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between relative overflow-hidden">
-          <div className="flex justify-between items-start mb-6 w-full z-10">
-            <h3 className="font-bold text-slate-900 text-lg">Today</h3>
-            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isCheckedIn ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-              {isCheckedIn ? 'Present' : 'Absent'}
-            </span>
-          </div>
+    const lateArrivals = myRecords.filter(r => {
+      if (!r.clockIn) return false;
+      const [h, m] = r.clockIn.split(':').map(Number);
+      return h > 9 || (h === 9 && m > 0);
+    }).length;
+    const delayRate = myRecords.length ? Math.round((lateArrivals / myRecords.length) * 100) : 0;
 
-          <div className="flex items-center gap-8 mb-8 z-10">
-            <div className="relative w-24 h-24 flex items-center justify-center">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="48" cy="48" r="40" stroke="#F1F5F9" strokeWidth="8" fill="none" />
-                <circle cx="48" cy="48" r="40" stroke={isCheckedIn ? "#10B981" : "#FBBF24"} strokeWidth="8" fill="none" strokeDasharray="251" strokeDashoffset={isCheckedIn ? "50" : "180"} strokeLinecap="round" />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl font-black text-slate-900">{isCheckedIn ? "100%" : "0%"}</span>
-              </div>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-slate-500 leading-tight">
-                {isCheckedIn ? "You are clocked in and active." : "You have not marked yourself as present today!"}
-              </p>
-              {!isCheckedIn && <p className="text-xs font-bold text-rose-500 mt-2">Action Required</p>}
-            </div>
-          </div>
+    let overtimeMins = 0;
+    let negativeMins = 0;
+    myRecords.forEach(r => {
+      if (r.hoursWorked) {
+        const diff = r.hoursWorked - 8;
+        if (diff > 0) overtimeMins += diff * 60;
+        else negativeMins += Math.abs(diff) * 60;
+      }
+    });
+    const formatDuration = (mins: number) => {
+      const h = Math.floor(mins / 60);
+      const m = Math.round(mins % 60);
+      return `${h}:${m.toString().padStart(2, '0')}`;
+    };
 
-          <button
-            onClick={() => handleAttendanceAction(isCheckedIn ? 'OUT' : 'IN')}
-            className={`w-full py-4 rounded-xl text-sm font-black uppercase tracking-widest text-white shadow-lg transition-all active:scale-95 ${isCheckedIn ? 'bg-slate-900 hover:bg-black' : 'bg-primary hover:bg-primary-hover'} z-10`}
-          >
-            {isCheckedIn ? 'Check Out' : 'Mark Present'}
+    return (
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
+        <div className="flex justify-between items-end mb-4">
+          <h1 className="text-3xl font-black text-slate-900">Personal Dashboard</h1>
+          <button className="text-xs font-bold bg-white border border-slate-200 px-4 py-2 rounded-xl text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-2">
+            <span className="text-lg">::</span> Manage widgets
           </button>
         </div>
 
-        <div className="lg:col-span-5 grid grid-cols-2 gap-4">
-          {[
-            { label: 'Avg Hours', value: dashboardStats.avgHours, icon: Clock, color: 'text-primary' },
-            { label: 'Avg Check-in', value: dashboardStats.avgIn, icon: Users, color: 'text-emerald-500' },
-            { label: 'On-time Arrival', value: dashboardStats.onTime, icon: Calendar, color: 'text-emerald-600' },
-            { label: 'Avg Check-out', value: dashboardStats.avgOut, icon: LogOut, color: 'text-rose-500' }
-          ].map((stat, i) => (
-            <div key={i} className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between">
-              <div className={`w-10 h-10 rounded-full ${stat.color === 'text-primary' ? 'bg-indigo-50' : 'bg-slate-50'} flex items-center justify-center mb-4`}>
-                <stat.icon className={`w-5 h-5 ${stat.color}`} />
-              </div>
-              <div>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
-                <p className="text-xl font-black text-slate-900 mt-1">{stat.value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
-        <div className="lg:col-span-3 bg-white rounded-3xl p-6 shadow-sm border border-slate-100 relative">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-slate-900">Attendance</h3>
-            <button className="text-[10px] font-bold text-primary uppercase">View Stats</button>
-          </div>
-          <div className="flex flex-col items-center justify-center py-4">
-            <div className="relative w-32 h-32 mb-6">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="64" cy="64" r="56" stroke="#F1F5F9" strokeWidth="12" fill="none" />
-                <circle cx="64" cy="64" r="56" stroke="#10B981" strokeWidth="12" fill="none" strokeDasharray="351" strokeDashoffset="100" strokeLinecap="round" />
-                <circle cx="64" cy="64" r="56" stroke="#fbbf24" strokeWidth="12" fill="none" strokeDasharray="351" strokeDashoffset="310" strokeLinecap="round" className="opacity-80" />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl font-black text-slate-900">{attendance.length}</span>
-                <span className="text-[10px] font-bold text-slate-400 uppercase">Total</span>
-              </div>
-            </div>
-            <div className="w-full space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="flex items-center gap-2 font-medium text-slate-600"><span className="w-2 h-2 rounded-full bg-emerald-500"></span> On Time</span>
-                <span className="font-bold text-slate-900">{dashboardStats.onTime}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="font-bold text-slate-900 text-lg">My Team</h3>
-            <div className="flex gap-4 text-[10px] font-bold uppercase text-slate-400">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-primary rounded-full"></span> Active</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-rose-400 rounded-full"></span> Offline</span>
-            </div>
-          </div>
-
+          {/* Column 1: Calendar & Schedule */}
           <div className="space-y-6">
-            <div className="grid grid-cols-5 text-[10px] font-black uppercase text-slate-400 tracking-widest pb-4 border-b border-slate-50">
-              <div className="col-span-2">Member</div>
-              <div className="text-center">Role</div>
-              <div className="text-center">Status</div>
-              <div className="text-right">ID</div>
-            </div>
-            {staff.map(s => {
-              const isOnline = attendance.some(a => a.staffId === s.id && a.date === new Date().toISOString().split('T')[0] && !a.clockOut);
-              return (
-                <div key={s.id} className="grid grid-cols-5 items-center group">
-                  <div className="col-span-2 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
-                      {s.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : <span className="text-xs font-black text-slate-400">{s.name.slice(0, 2)}</span>}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-900">{s.name}</span>
-                      <span className="text-[10px] font-medium text-slate-400">{s.email || 'No Email'}</span>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <span className="px-2 py-1 rounded bg-slate-50 text-[10px] font-bold text-slate-600 uppercase">{s.role}</span>
-                  </div>
-                  <div className="text-center flex justify-center">
-                    <div className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-primary' : 'bg-rose-300'}`}></div>
-                  </div>
-                  <div className="text-right text-xs font-mono text-slate-400">#{s.pin}</div>
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+              <div className="flex justify-between items-center mb-6">
+                <span className="font-black text-lg text-slate-900">{new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+                <div className="flex gap-2">
+                  <button className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">←</button>
+                  <button className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400">→</button>
                 </div>
-              );
-            })}
+              </div>
+              <div className="grid grid-cols-7 text-center gap-y-4 text-sm mb-2">
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => <span key={d} className="font-bold text-slate-300">{d}</span>)}
+              </div>
+              <div className="grid grid-cols-7 text-center gap-y-4 text-sm font-bold text-slate-700">
+                {Array.from({ length: 31 }, (_, i) => i + 1).map(d => {
+                  const isToday = d === new Date().getDate();
+                  return (
+                    <div key={d} className={`w-8 h-8 mx-auto flex items-center justify-center rounded-full ${isToday ? 'bg-black text-white' : 'hover:bg-slate-50'}`}>
+                      {d}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-bold text-slate-900">Schedule (3)</h3>
+              </div>
+              <div className="space-y-3">
+                {tasks.slice(1).map(t => (
+                  <div key={t.id} className="p-3 rounded-2xl border border-slate-100 flex items-start gap-3 hover:border-indigo-100 transition-colors cursor-pointer group">
+                    <div className="mt-1 w-4 h-4 rounded-full border-2 border-slate-200 group-hover:border-indigo-500 transition-colors"></div>
+                    <div>
+                      <p className="text-xs font-bold text-slate-900 line-clamp-1">{t.title}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">{t.date}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Column 2: Tasks & Notes */}
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 min-h-[300px]">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-bold text-slate-900">Tasks ({tasks.length})</h3>
+                <button className="text-slate-400 hover:text-black transition-colors">+</button>
+              </div>
+              <div className="space-y-4">
+                {tasks.map((task, i) => (
+                  <div key={i} className={`p-4 rounded-2xl border transition-all cursor-pointer relative group ${i === 0 ? 'bg-orange-100/50 border-orange-100' : 'bg-white border-slate-50 hover:bg-slate-50'}`}>
+                    <div className="flex items-start gap-3">
+                      <div className={`mt-1 w-5 h-5 rounded-full border-2 flex items-center justify-center ${i === 0 ? 'border-orange-400' : 'border-slate-200'}`}>
+                        {i === 0 && <div className="w-2.5 h-2.5 bg-orange-400 rounded-full"></div>}
+                      </div>
+                      <div>
+                        <p className={`text-xs font-black ${i === 0 ? 'text-orange-900' : 'text-slate-900'} line-clamp-2`}>{task.title}</p>
+                        <p className={`text-[10px] mt-1 ${i === 0 ? 'text-orange-700' : 'text-slate-400'}`}>{task.date}</p>
+                        {i === 0 && (
+                          <div className="flex items-center gap-4 mt-3">
+                            <span className="text-[10px] font-bold flex items-center gap-1"><span className="text-orange-500">👤</span> {task.assignee}</span>
+                            <span className="text-[10px] font-bold flex items-center gap-1"><span className="text-orange-500">⚡</span> In progress</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-bold text-slate-900">Notes ({notes.length})</h3>
+                <span className="text-[10px] uppercase font-black text-slate-400">Pinned</span>
+              </div>
+              <div className="space-y-4">
+                {notes.map((note, i) => (
+                  <div key={i} className="flex gap-4 group cursor-pointer">
+                    <div className="mt-1 text-slate-400 group-hover:text-indigo-500 transition-colors">📌</div>
+                    <div>
+                      <p className="text-xs font-black text-slate-900">{note.title}</p>
+                      <p className="text-[10px] font-bold text-slate-400 mt-0.5">{note.date} • {note.content}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Column 3 (Double Width): Clock & Graph */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Clock Widget */}
+            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 relative overflow-hidden">
+              <div className="flex justify-between items-start mb-12">
+                <div>
+                  <h3 className="font-bold text-slate-900">Clock In / Out</h3>
+                  <div className="flex items-center gap-2 mt-2 text-slate-400 text-xs font-bold">
+                    <Clock className="w-3 h-3" />
+                    <span>{new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  </div>
+                </div>
+                {/* Visual Connector from Screenshot */}
+                <div className="hidden md:flex gap-4">
+                  <div className="bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <p className="text-[10px] font-black uppercase text-slate-400 mb-1">Clock In</p>
+                    <p className="text-lg font-black text-slate-900">{todayRecord?.clockIn || '--:--'}</p>
+                  </div>
+                  <div className="bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                    <p className="text-[10px] font-black uppercase text-slate-400 mb-1">Clock Out</p>
+                    <p className="text-lg font-black text-slate-900">{todayRecord?.clockOut || '--:--'}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center justify-center mb-10">
+                <p className="text-5xl font-black text-slate-900 tabular-nums tracking-tight">
+                  {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </p>
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Current Time</p>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => handleAttendanceAction(isCheckedIn ? 'OUT' : 'IN')}
+                  className={`flex-1 py-4 rounded-xl text-sm font-black uppercase tracking-widest text-white shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${isCheckedIn ? 'bg-slate-900 hover:bg-black' : 'bg-primary hover:bg-primary-hover'}`}
+                >
+                  {isCheckedIn ? 'Clock Out' : 'Clock In'} <span>{isCheckedIn ? '→' : '←'}</span>
+                </button>
+                <button
+                  onClick={() => setBreakActive(!breakActive)}
+                  className={`flex-1 py-4 rounded-xl text-sm font-black uppercase tracking-widest border transition-all active:scale-95 flex items-center justify-center gap-2 ${breakActive ? 'bg-orange-100 text-orange-600 border-orange-200' : 'bg-white text-slate-900 border-slate-200 hover:border-slate-300'}`}
+                >
+                  {breakActive ? 'End Break' : 'Start Break'} <span className="text-lg">☕</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Attendance Chart Widget */}
+            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 min-h-[300px]">
+              <div className="flex justify-between items-center mb-8">
+                <h3 className="font-bold text-slate-900">Attendance Overview</h3>
+                <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100 text-xs font-bold text-slate-600 flex items-center gap-2">
+                  Week 22 <span className="text-slate-400">▼</span>
+                </div>
+              </div>
+
+              {/* Fake Chart Visualization */}
+              <div className="h-40 w-full relative mt-8">
+                {/* Horizontal Grid */}
+                {[0, 1, 2].map(i => (
+                  <div key={i} className="absolute w-full h-px bg-slate-100 border-b border-dashed border-slate-200" style={{ bottom: `${i * 33}%` }}></div>
+                ))}
+
+                {/* Data Line (SVG) */}
+                <svg className="absolute inset-0 w-full h-full overflow-visible">
+                  <path d="M0,80 C50,60 100,70 150,50 C200,30 250,50 300,40 C350,30 400,20 450,40 C500,60 550,80 600,70" fill="none" stroke="#1e1b4b" strokeWidth="3" strokeLinecap="round" />
+
+                  {/* Active Point */}
+                  <circle cx="300" cy="40" r="6" fill="white" stroke="#1e1b4b" strokeWidth="3" />
+
+                  {/* Tooltip Simulation */}
+                  <foreignObject x="320" y="0" width="120" height="60">
+                    <div className="bg-orange-100 p-2 rounded-lg border border-orange-200 shadow-sm">
+                      <p className="text-[10px] font-bold text-orange-800 flex items-center gap-1">📅 3 June 2023</p>
+                      <p className="text-[10px] font-bold text-orange-800 flex items-center gap-1">⏰ 8:00 am</p>
+                    </div>
+                  </foreignObject>
+                </svg>
+
+                {/* X Axis */}
+                <div className="absolute -bottom-8 left-0 right-0 flex justify-between text-xs font-black text-slate-400 uppercase">
+                  <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+                </div>
+              </div>
+
+              <div className="flex gap-6 mt-12 justify-center">
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-500">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-900"></div> Clock In On Time
+                </div>
+                <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-500">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div> Clock In Late
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="font-bold text-slate-900 text-lg">Working History</h3>
-            <button className="px-4 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors">Show All</button>
+        {/* Bottom Row: Indicators */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-xs font-black uppercase text-slate-900 flex items-center gap-2"><Clock className="w-4 h-4" /> Delay Rate</span>
+              <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">↗ +2%</span>
+            </div>
+            <div className="space-y-2">
+              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div className="h-full bg-slate-300 w-[20%]"></div>
+              </div>
+              <p className="text-3xl font-black text-slate-900">{delayRate}%</p>
+            </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="text-[10px] font-black uppercase text-slate-400 tracking-widest border-b border-slate-50">
-                <tr>
-                  <th className="pb-4 text-left pl-4">Date</th>
-                  <th className="pb-4 text-left">Arrival</th>
-                  <th className="pb-4 text-left">Departure</th>
-                  <th className="pb-4 text-right pr-4">Hours</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {sortedAttendance.filter(a => a.staffId === selectedStaffId).slice(0, 5).map(rec => (
-                  <tr key={rec.id} className="group hover:bg-slate-50/50 transition-colors">
-                    <td className="py-4 pl-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-indigo-50 text-primary flex items-center justify-center text-xs font-bold">
-                          {new Date(rec.date).getDate()}
-                        </div>
-                        <span className="text-xs font-bold text-slate-700">{rec.date === new Date().toISOString().split('T')[0] ? 'Today' : rec.date}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 text-xs font-medium text-slate-600">{rec.clockIn}</td>
-                    <td className="py-4 text-xs font-medium text-slate-600">{rec.clockOut || 'Active'}</td>
-                    <td className="py-4 pr-4 text-right">
-                      <div className="flex flex-col items-end">
-                        <span className="text-xs font-bold text-slate-900">{rec.hoursWorked || 0}h</span>
-                        <span className="text-[10px] text-emerald-500 font-medium">{rec.hoursWorked ? 'Successful' : 'Pending'}</span>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-xs font-black uppercase text-slate-900 flex items-center gap-2"><Users className="w-4 h-4" /> Attendance Rate</span>
+              <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">↗ +2%</span>
+            </div>
+            <div className="space-y-2">
+              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div className="h-full bg-slate-300 w-[45%]"></div>
+              </div>
+              <p className="text-3xl font-black text-slate-900">{attendanceRate}%</p>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-xs font-black uppercase text-slate-900 flex items-center gap-2"><Clock className="w-4 h-4" /> Overtime</span>
+              <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">↗ +2%</span>
+            </div>
+            <p className="text-3xl font-black text-slate-900 mt-6">{formatDuration(overtimeMins)}</p>
+          </div>
+
+          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-xs font-black uppercase text-slate-900 flex items-center gap-2"><LogOut className="w-4 h-4" /> Negative Hours</span>
+              <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">↗ +2%</span>
+            </div>
+            <p className="text-3xl font-black text-slate-900 mt-6">{formatDuration(negativeMins)}</p>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderRegistry = () => (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
