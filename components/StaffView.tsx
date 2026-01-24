@@ -676,23 +676,23 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       {activeTab === 'attendance' && (
         <div className="space-y-8">
           {/* Attendance Console */}
-          <div className="bg-[#0F172A] p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] text-white shadow-2xl flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8 no-print">
+          <div className="bg-white p-6 md:p-10 rounded-[2.5rem] md:rounded-[3rem] text-slate-800 shadow-xl border border-slate-100 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8 no-print">
             <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-surface-elevated/10 rounded-3xl flex items-center justify-center text-3xl border border-white/10 shrink-0">🛂</div>
+              <div className="w-16 h-16 bg-indigo-50 rounded-3xl flex items-center justify-center text-3xl border border-indigo-100 shrink-0 text-indigo-600">🛂</div>
               <div>
-                <h4 className="text-xl font-black uppercase tracking-tight">Attendance Console</h4>
-                <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mt-1">Manual Terminal Control</p>
+                <h4 className="text-xl font-black uppercase tracking-tight text-slate-900">Attendance Console</h4>
+                <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-1">Manual Terminal Control</p>
               </div>
             </div>
 
-            <div className="w-full xl:w-auto flex flex-col md:flex-row flex-wrap items-center gap-4 bg-surface-elevated/5 p-4 rounded-[2rem] border border-white/10">
+            <div className="w-full xl:w-auto flex flex-col md:flex-row flex-wrap items-center gap-4 bg-slate-50 p-4 rounded-[2rem] border border-slate-200">
               <div className="flex flex-col gap-1 w-full md:w-auto">
                 <label className="text-[8px] font-black text-slate-400 uppercase tracking-widest ml-1">Personnel Focus</label>
                 <select
                   value={selectedStaffId}
                   onChange={e => setSelectedStaffId(e.target.value)}
                   disabled={!isAdmin}
-                  className="bg-slate-900 border border-white/20 rounded-xl px-4 py-3 md:py-2 text-xs font-black uppercase outline-none focus:border-indigo-400 w-full md:min-w-[180px]"
+                  className="bg-white border border-slate-200 rounded-xl px-4 py-3 md:py-2 text-xs font-black uppercase outline-none focus:border-indigo-400 w-full md:min-w-[180px] text-slate-700 shadow-sm"
                 >
                   {staff.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
@@ -700,9 +700,9 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
               <div className="flex flex-wrap gap-2 w-full md:w-auto">
                 <button
                   onClick={() => setTerminalOpen(true)}
-                  className="bg-black hover:bg-slate-900 border border-slate-700 text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all active:scale-95 whitespace-nowrap flex items-center gap-2"
+                  className="bg-slate-900 hover:bg-black text-white flex-1 md:flex-none px-6 md:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-slate-200 transition-all active:scale-95 whitespace-nowrap flex items-center gap-2"
                 >
-                  <span className="text-emerald-500 animate-pulse">●</span> Terminal
+                  <span className="text-emerald-400 animate-pulse">●</span> Terminal
                 </button>
                 {isAdmin && (
                   <>
