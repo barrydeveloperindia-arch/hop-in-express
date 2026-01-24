@@ -142,14 +142,7 @@ export const NavigationSidebar: React.FC<NavigationSidebarProps> = ({
                             </button>
                         );
                     })}
-                    <div className="mt-4 px-4 py-2">
-                        <div className="bg-surface-highlight rounded-lg p-3 border border-surface-highlight">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Debug Info</p>
-                            <p className="text-[10px] text-primary font-mono mt-1 break-all">
-                                ShopID: {import.meta.env.VITE_USER_ID || 'Auth UID'}
-                            </p>
-                        </div>
-                    </div>
+
                 </nav>
 
                 {/* Footer */}
