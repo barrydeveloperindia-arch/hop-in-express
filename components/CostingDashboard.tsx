@@ -23,7 +23,7 @@ const CostingDashboard: React.FC<CostingDashboardProps> = ({ transactions, inven
     };
 
     const dashboardData = useMemo(() => {
-        const itemAgg: Record<string, { name: string, qty: number, revenue: number, cost: number, minMargin: number, maxMargin: number }> = {};
+        const itemAgg: Record<string, { name: string, qty: number, revenue: number, netRevenue: number, cost: number, minMargin: number, maxMargin: number }> = {};
         const timeAgg: Record<string, { revenue: number, cost: number }> = {};
 
         transactions.forEach(t => {
@@ -37,12 +37,21 @@ const CostingDashboard: React.FC<CostingDashboardProps> = ({ transactions, inven
                 const cost = (item.costPrice || 0) * item.qty;
                 timeAgg[key].cost += cost;
 
+                // VAT Calc
+                // Default to 0 if undefined? No, standard is 20, but food is 0. 
+                // If the transaction record has no vatRate, we might have a problem.
+                // But the historical simulation put vatRate in.
+                const vatRate = item.vatRate !== undefined ? item.vatRate : 20;
+                const rateMultiplier = vatRate / 100;
+                const netPrice = item.price / (1 + rateMultiplier);
+
                 // Item Analysis
                 if (!itemAgg[item.name]) {
                     itemAgg[item.name] = {
                         name: item.name,
                         qty: 0,
                         revenue: 0,
+                        netRevenue: 0,
                         cost: 0,
                         minMargin: 100, // Placeholder
                         maxMargin: -100
@@ -52,11 +61,10 @@ const CostingDashboard: React.FC<CostingDashboardProps> = ({ transactions, inven
                 const entry = itemAgg[item.name];
                 entry.qty += item.qty;
                 entry.revenue += (item.price * item.qty);
+                entry.netRevenue += (netPrice * item.qty);
                 entry.cost += cost;
 
                 // Margin for this specific sale instance
-                const rateMultiplier = (item.vatRate || 20) / 100;
-                const netPrice = item.price / (1 + rateMultiplier);
                 const unitMarginPct = netPrice ? ((netPrice - (item.costPrice || 0)) / netPrice) * 100 : 0;
 
                 if (unitMarginPct < entry.minMargin) entry.minMargin = unitMarginPct;
@@ -74,9 +82,8 @@ const CostingDashboard: React.FC<CostingDashboardProps> = ({ transactions, inven
             }));
 
         const items = Object.values(itemAgg).map(i => {
-            const netRevenue = i.revenue / 1.2; // roughly assuming 20% vat for aggregate stats if mixed
-            const totalProfit = netRevenue - i.cost;
-            const avgMargin = netRevenue ? (totalProfit / netRevenue) * 100 : 0;
+            const totalProfit = i.netRevenue - i.cost;
+            const avgMargin = i.netRevenue ? (totalProfit / i.netRevenue) * 100 : 0;
             return { ...i, avgMargin };
         });
 
