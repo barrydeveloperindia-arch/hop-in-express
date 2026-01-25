@@ -6,7 +6,7 @@ import { Html5Qrcode } from "html5-qrcode";
 import { addInventoryItem, updateInventoryItem } from '../lib/firestore';
 import { auth, storage, db } from '../lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, writeBatch, collection, getDocs } from 'firebase/firestore';
 import * as XLSX from 'xlsx';
 import { compressImage } from '../lib/storage_utils';
 
@@ -339,6 +339,21 @@ const InventoryView: React.FC<InventoryViewProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* DEBUG HEADER */}
+      <div className="bg-red-500 text-white p-4 rounded-xl flex justify-between items-center text-xs font-bold">
+        <span>DEBUG: Inventory View Active</span>
+        <button
+          className="bg-white text-red-600 px-4 py-2 rounded-lg shadow-lg border-2 border-red-800"
+          onClick={() => {
+            alert("Debug Click Working");
+            const res = confirm("Run Import?");
+            if (res) (document.getElementById('hidden-import-btn') as HTMLButtonElement)?.click();
+          }}
+        >
+          TEST CLICK & RUN IMPORT
+        </button>
+      </div>
+
       <div className="bg-surface-elevated p-6 rounded-3xl border border-surface-highlight shadow-sm flex flex-col gap-6 no-print">
         <div className="flex flex-col xl:flex-row gap-6 items-center justify-between">
           <div className="flex flex-col gap-1 w-full xl:max-w-xl">
@@ -427,6 +442,104 @@ const InventoryView: React.FC<InventoryViewProps> = ({
 
               {isAdmin && (
                 <>
+                  <button
+                    id="hidden-import-btn"
+                    onClick={async () => {
+                      console.log("Button Clicked");
+                      if (!confirm("Start Legacy Sales Registry Import?")) return;
+
+                      setIsSyncing(true);
+                      alert("Starting Import Process..."); // Debug Alert
+
+                      try {
+                        console.log("Fetching JSON...");
+                        const res = await fetch('/processed_sales_import.json');
+                        if (!res.ok) throw new Error(`JSON file not found: ${res.status}`);
+
+                        const items = await res.json();
+                        console.log(`Loaded ${items.length} items from JSON`);
+                        alert(`Loaded ${items.length} items. Processing...`);
+
+                        // Use top-level db import
+                        const userId = import.meta.env.VITE_USER_ID || 'hop-in-express-';
+                        const existingRef = collection(db, 'shops', userId, 'inventory');
+
+                        console.log("Checking existing inventory...");
+                        const snapshot = await getDocs(existingRef);
+                        const existingBarcodes = new Set(snapshot.docs.map(d => d.data().barcode));
+                        console.log(`Found ${existingBarcodes.size} existing items.`);
+
+                        let added = 0;
+                        let skipped = 0;
+                        let batch = writeBatch(db);
+                        let count = 0;
+
+                        for (const item of items) {
+                          if (existingBarcodes.has(item.barcode)) {
+                            skipped++;
+                            continue;
+                          }
+
+                          const newId = crypto.randomUUID();
+                          const newItem: InventoryItem = {
+                            id: newId,
+                            supplierId: '',
+                            sku: item.barcode,
+                            barcode: item.barcode,
+                            name: item.name,
+                            brand: '',
+                            stock: 0,
+                            minStock: 5,
+                            costPrice: item.costPrice,
+                            lastBuyPrice: item.costPrice,
+                            price: item.price,
+                            category: item.category,
+                            shelfLocation: item.subCategory || 'General',
+                            unitType: 'pcs',
+                            packSize: '1',
+                            origin: 'UK',
+                            status: 'Active',
+                            vatRate: 20,
+                            logs: [{
+                              id: crypto.randomUUID(),
+                              date: new Date().toISOString(),
+                              type: 'audit',
+                              amount: 0,
+                              reason: 'Inward',
+                              note: `Imported from Sales Register (${item.totalSold} sold previously)`
+                            }]
+                          };
+
+                          batch.set(doc(db, 'shops', userId, 'inventory', newId), newItem as any);
+                          added++;
+                          count++;
+                          existingBarcodes.add(item.barcode);
+
+                          if (count >= 400) {
+                            console.log("Committing batch...");
+                            await batch.commit();
+                            batch = writeBatch(db);
+                            count = 0;
+                          }
+                        }
+
+                        if (count > 0) await batch.commit();
+
+                        alert(`✅ SUCCESS\n\nAdded: ${added}\nSkipped: ${skipped} (Duplicates)`);
+                        window.location.reload();
+
+                      } catch (e: any) {
+                        console.error("Import Error:", e);
+                        alert("❌ Import Failed:\n" + e.message);
+                      } finally {
+                        setIsSyncing(false);
+                      }
+                    }}
+                    className="hidden md:block bg-amber-600 text-white px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg hover:bg-amber-700 transition-all h-[38px] whitespace-nowrap"
+                  >
+                    📂 Import Register
+                  </button>
+
                   <button
                     onClick={() => setEditingItem({
                       id: crypto.randomUUID(), barcode: '', sku: generateSKU('Groceries', inventory),

@@ -23,10 +23,163 @@ import { Users, Clock, Calendar, FolderOpen, FileText, Upload, Image as ImageIco
 import { addAttendanceRecord, updateAttendanceRecord, deleteAttendanceRecord, updateStaffMember, deleteStaffMember, subscribeToLeaves, addLeaveRequest, updateLeaveRequest } from '../lib/firestore';
 
 const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance, logAction, userRole, currentStaffId }) => {
-  const [activeTab, setActiveTab] = useState<'registry' | 'attendance' | 'calendar' | 'files'>('attendance');
+  const [activeTab, setActiveTab] = useState<'registry' | 'attendance' | 'calendar' | 'files' | 'requests' | 'chart'>('attendance');
   const [calendarMode, setCalendarMode] = useState<'individual' | 'roster'>('roster');
   const [viewPeriod, setViewPeriod] = useState<'week' | 'month' | 'year'>('week');
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  // ... (existing code)
+
+  const handleSyncRoles = async () => {
+    const userId = import.meta.env.VITE_USER_ID || auth.currentUser?.uid;
+    if (!userId) {
+      alert("Cannot sync roles: User ID missing");
+      return;
+    }
+
+    let updates = 0;
+    for (const s of staff) {
+      const name = s.name.toLowerCase();
+      let newRole = s.role;
+      let shouldUpdate = false;
+
+      if (name.includes('salil') || name.includes('bharat')) {
+        if (s.role !== 'Owner') {
+          newRole = 'Owner';
+          shouldUpdate = true;
+        }
+      } else if (name.includes('gaurav')) {
+        if (s.role !== 'Manager') {
+          newRole = 'Manager';
+          shouldUpdate = true;
+        }
+      } else {
+        // Demote if wrongly assigned Highest Level roles
+        if (s.role === 'Owner' || s.role === 'Manager') {
+          newRole = 'Inventory Staff';
+          shouldUpdate = true;
+        }
+      }
+
+      if (shouldUpdate) {
+        await updateStaffMember(userId, s.id, { role: newRole as any });
+        updates++;
+      }
+    }
+    if (updates > 0) {
+      alert(`Synced roles for ${updates} staff members.`);
+      window.location.reload(); // Refresh to reflect changes
+    } else {
+      alert("All roles are already in sync.");
+    }
+  };
+
+  const renderOrgChart = () => {
+    // Level 1: Founders (Salil & Bharat)
+    const owners = staff.filter(s => s.name.toLowerCase().includes('salil') || s.name.toLowerCase().includes('bharat'));
+    // Level 2: Managers (Gaurav Panchal)
+    const managers = staff.filter(s => s.name.toLowerCase().includes('gaurav'));
+    // Level 3: Employees (Rest of Staff)
+    const employees = staff.filter(s =>
+      !s.name.toLowerCase().includes('salil') &&
+      !s.name.toLowerCase().includes('bharat') &&
+      !s.name.toLowerCase().includes('gaurav')
+    );
+
+    const Card = ({ s, color }: { s: StaffMember, color: string }) => (
+      <div className={`bg-white p-4 rounded-2xl shadow-sm border-2 ${color} w-64 relative group hover:-translate-y-1 transition-transform duration-300`}>
+        {/* Connection Dot Top */}
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 bg-slate-200 rounded-full border-4 border-slate-50 z-10"></div>
+        {/* Connection Dot Bottom */}
+        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-4 h-4 bg-slate-200 rounded-full border-4 border-slate-50 z-10"></div>
+
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-100">
+            {s.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-2xl">👤</div>}
+          </div>
+          <div>
+            <h4 className="font-black text-slate-900 text-sm">{s.name}</h4>
+            <p className="text-[10px] font-bold text-slate-400 uppercase mt-0.5">{s.role}</p>
+            {/* Show Founder badge for Salil/Bharat */}
+            {(s.name.toLowerCase().includes('salil') || s.name.toLowerCase().includes('bharat')) && <span className="inline-block mt-2 px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[9px] font-black rounded-full">FOUNDER</span>}
+          </div>
+        </div>
+      </div>
+    );
+
+    return (
+      <div className="animate-in fade-in zoom-in duration-500 py-12 overflow-x-auto min-h-[600px] flex justify-center">
+        <div className="flex flex-col items-center gap-16 min-w-max px-8">
+
+          {/* Sync Admin Actions */}
+          {isAdmin && (
+            <button onClick={handleSyncRoles} className="absolute top-4 right-4 bg-slate-900 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg hover:bg-black transition-all">
+              ⚡ Sync DB Roles
+            </button>
+          )}
+
+          {/* Level 1: Owners */}
+          <div className="relative">
+            <div className="flex gap-8">
+              {owners.map(s => <Card key={s.id} s={s} color="border-indigo-100" />)}
+            </div>
+            {/* Lines down from Owners */}
+            {owners.length > 0 && <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-px h-8 bg-slate-300"></div>}
+          </div>
+
+          {/* Level 2: Managers */}
+          {managers.length > 0 && (
+            <div className="relative w-full flex justify-center">
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-px h-8 bg-slate-300"></div>
+              {/* Horizontal linking bar if multiple managers */}
+              {managers.length > 1 && <div className="absolute -top-4 left-10 right-10 h-px bg-slate-300 border-t border-dashed border-slate-300"></div>}
+
+              <div className="flex gap-8 relative">
+                {/* Vertical connector for grouped managers */}
+                {managers.length > 1 && managers.map((_, i) => {
+                  // Logic to draw lines up to horizontal bar is complex in pure CSS without fixed widths.
+                  // Simplified: Just center them. 
+                  return null;
+                })}
+
+                {managers.map(s => (
+                  <div key={s.id} className="relative flex flex-col items-center">
+                    {/* Line Up */}
+                    <div className="absolute -top-8 w-px h-8 bg-slate-300"></div>
+                    <Card s={s} color="border-rose-100" />
+                    {/* Line Down */}
+                    <div className="absolute -bottom-8 w-px h-8 bg-slate-300"></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Level 3: Employees */}
+          {employees.length > 0 && (
+            <div className="relative w-full flex justify-center">
+              {/* Horizontal linking bar for employees */}
+              <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-px h-8 bg-slate-300"></div>
+
+              {/* Massive Horizontal Bus */}
+              <div className="absolute -top-4 w-[90%] h-px bg-slate-300"></div>
+
+              <div className="grid grid-cols-4 gap-x-6 gap-y-12 pt-4">
+                {employees.map(s => (
+                  <div key={s.id} className="relative flex flex-col items-center">
+                    {/* Connector Up to Bus */}
+                    <div className="absolute -top-12 w-px h-12 bg-slate-300"></div>
+                    <Card s={s} color="border-slate-100" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const [weekOffset, setWeekOffset] = useState(0);
   const [filterMonth, setFilterMonth] = useState(new Date().toISOString().slice(0, 7));
   const [dayDetails, setDayDetails] = useState<{ date: string, records: AttendanceRecord[] } | null>(null);
@@ -759,10 +912,36 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
 
           <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-xs font-black uppercase text-slate-900 flex items-center gap-2"><LogOut className="w-4 h-4" /> Negative Hours</span>
-              <span className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full">↗ +2%</span>
+              <span className="text-xs font-black uppercase text-slate-900 flex items-center gap-2"><div className="w-4 h-4 flex items-center justify-center bg-purple-100 rounded text-[10px]">🏖️</div> Annual Leave</span>
+              <button
+                onClick={() => setLeaveModalOpen(true)}
+                className="text-[10px] font-black text-white bg-slate-900 px-3 py-1.5 rounded-lg hover:bg-black transition-all"
+              >
+                BOOK
+              </button>
             </div>
-            <p className="text-3xl font-black text-slate-900 mt-6">{formatDuration(negativeMins)}</p>
+
+            {(() => {
+              const s = getTargetStaff();
+              const entitlement = s?.holidayEntitlement || 28;
+              const used = leaves
+                .filter(l => l.staffId === selectedStaffId && l.status === 'Approved' && l.type === 'Annual')
+                .reduce((acc, curr) => acc + curr.totalDays, 0);
+              const remaining = entitlement - used;
+              const percentage = Math.max(0, (remaining / entitlement) * 100);
+
+              return (
+                <div className="space-y-2">
+                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div className="h-full bg-purple-500 w-full transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
+                  </div>
+                  <div className="flex justify-between items-end mt-4">
+                    <p className="text-3xl font-black text-slate-900">{remaining}</p>
+                    <p className="text-xs font-bold text-slate-400 mb-1">/ {entitlement} Days Left</p>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -1132,15 +1311,83 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
     );
   };
 
+  const renderLeaveRequests = () => {
+    const pendingRequests = leaves.filter(l => l.status === 'Pending').sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+    const handleAction = async (req: LeaveRequest, status: 'Approved' | 'Rejected') => {
+      if (!auth.currentUser) return;
+      await updateLeaveRequest(import.meta.env.VITE_USER_ID || auth.currentUser.uid, req.id, {
+        status,
+        approvedBy: auth.currentUser.uid,
+        approvedAt: new Date().toISOString()
+      });
+      alert(`Request ${status} Successfully`);
+    }
+
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <h3 className="font-black text-2xl text-slate-900 tracking-tight mb-6">Pending Requests ({pendingRequests.length})</h3>
+
+        {pendingRequests.length === 0 ? (
+          <div className="p-12 text-center border-2 border-dashed border-slate-200 rounded-[2rem]">
+            <span className="text-4xl">🏝️</span>
+            <p className="mt-4 font-bold text-slate-400">No pending leave requests</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {pendingRequests.map(req => {
+              const s = staff.find(st => st.id === req.staffId);
+              return (
+                <div key={req.id} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-4 opacity-10 text-9xl">✈️</div>
+
+                  <div className="flex items-center gap-3 relative z-10">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 overflow-hidden">
+                      {s?.photo ? <img src={s.photo} className="w-full h-full object-cover" /> : null}
+                    </div>
+                    <div>
+                      <h4 className="font-black text-slate-900">{s?.name}</h4>
+                      <span className="text-xs font-bold text-slate-400 uppercase">{req.type} Leave</span>
+                    </div>
+                  </div>
+
+                  <div className="my-6 relative z-10">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-xs font-bold text-slate-500 uppercase">Duration</span>
+                      <span className="font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg">{req.totalDays} Days</span>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                      <div className="flex justify-between text-sm font-bold text-slate-900">
+                        <span>{new Date(req.startDate).toLocaleDateString()}</span>
+                        <span className="text-slate-300">➜</span>
+                        <span>{new Date(req.endDate).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    {req.reason && <p className="mt-3 text-xs font-medium text-slate-500 italic">"{req.reason}"</p>}
+                  </div>
+
+                  <div className="flex gap-3 relative z-10">
+                    <button onClick={() => handleAction(req, 'Rejected')} className="flex-1 py-3 bg-white border border-slate-200 text-slate-400 font-black uppercase text-xs rounded-xl hover:bg-rose-50 hover:text-rose-600 hover:border-rose-100 transition-all">Reject</button>
+                    <button onClick={() => handleAction(req, 'Approved')} className="flex-1 py-3 bg-slate-900 text-white font-black uppercase text-xs rounded-xl shadow-lg hover:bg-emerald-600 transition-all">Approve</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-24 relative selection:bg-indigo-100">
       {/* Toast */}
       {notification && (
-        <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-right-10 duration-300 ${notification.type === 'success' ? 'bg-emerald-600' : notification.type === 'error' ? 'bg-rose-600' : 'bg-indigo-600'} text-white`}>
-          <span className="text-xl">{notification.type === 'success' ? '✅' : notification.type === 'error' ? '⚠️' : 'ℹ️'}</span>
+        <div className={`fixed top-6 right-6 z-50 px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-in slide-in-from-right-10 duration-300 ${notification!.type === 'success' ? 'bg-emerald-600' : notification!.type === 'error' ? 'bg-rose-600' : 'bg-indigo-600'} text-white`}>
+          <span className="text-xl">{notification!.type === 'success' ? '✅' : notification!.type === 'error' ? '⚠️' : 'ℹ️'}</span>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-80">{notification.type === 'success' ? 'Success' : notification.type === 'error' ? 'Alert' : 'Info'}</p>
-            <p className="font-bold text-sm">{notification.message}</p>
+            <p className="text-[10px] font-black uppercase tracking-widest opacity-80">{notification!.type === 'success' ? 'Success' : notification!.type === 'error' ? 'Alert' : 'Info'}</p>
+            <p className="font-bold text-sm">{notification!.message}</p>
           </div>
         </div>
       )}
@@ -1148,13 +1395,24 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       {/* Top Navigation */}
       <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mb-8">
         <div className="flex bg-white px-2 py-2 rounded-2xl shadow-sm border border-slate-100">
-          {[{ id: 'attendance', label: 'Dashboard' }, { id: 'registry', label: 'Registry' }, { id: 'calendar', label: 'Calendar' }].map(tab => (
+          {[
+            { id: 'attendance', label: 'Dashboard' },
+            { id: 'registry', label: 'Registry' },
+            { id: 'calendar', label: 'Calendar' },
+            { id: 'chart', label: 'Org Chart' },
+            ...(isAdmin ? [{ id: 'requests', label: 'Requests' }] : [])
+          ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-6 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-primary text-white shadow-md' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
             >
               {tab.label}
+              {tab.id === 'requests' && isAdmin && (
+                <span className="ml-2 bg-rose-500 text-white text-[9px] px-1.5 py-0.5 rounded-full">
+                  {leaves.filter(l => l.status === 'Pending').length}
+                </span>
+              )}
             </button>
           ))}
         </div>
@@ -1178,6 +1436,8 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
       {activeTab === 'attendance' && renderDashboard()}
       {activeTab === 'registry' && renderRegistry()}
       {activeTab === 'calendar' && renderCalendar()}
+      {activeTab === 'requests' && renderLeaveRequests()}
+      {activeTab === 'chart' && renderOrgChart()}
 
       {/* Modals */}
       {terminalOpen && (
@@ -1241,13 +1501,13 @@ const StaffView: React.FC<StaffViewProps> = ({ staff, attendance, setAttendance,
           <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
             <h3 className="text-xl font-black text-slate-900 mb-6">{editingStaff ? 'Edit Personnel' : 'Recruit Personnel'}</h3>
             <div className="space-y-4">
-              <input placeholder="Full Name" className="w-full bg-slate-50 border-slate-200 p-3 rounded-xl outline-primary font-bold" value={editingStaff ? editingStaff.name : newStaffForm.name} onChange={e => editingStaff ? setEditingStaff({ ...editingStaff, name: e.target.value }) : setNewStaffForm({ ...newStaffForm, name: e.target.value })} />
+              <input placeholder="Full Name" className="w-full bg-slate-50 border-slate-200 p-3 rounded-xl outline-primary font-bold" value={editingStaff ? editingStaff.name : newStaffForm.name} onChange={e => editingStaff ? setEditingStaff({ ...editingStaff!, name: e.target.value }) : setNewStaffForm({ ...newStaffForm, name: e.target.value })} />
               <div className="grid grid-cols-2 gap-4">
-                <input placeholder="PIN" className="w-full bg-slate-50 border-slate-200 p-3 rounded-xl outline-primary font-bold" value={editingStaff ? editingStaff.pin : newStaffForm.pin} onChange={e => editingStaff ? setEditingStaff({ ...editingStaff, pin: e.target.value }) : setNewStaffForm({ ...newStaffForm, pin: e.target.value })} />
+                <input placeholder="PIN" className="w-full bg-slate-50 border-slate-200 p-3 rounded-xl outline-primary font-bold" value={editingStaff ? editingStaff.pin : newStaffForm.pin} onChange={e => editingStaff ? setEditingStaff({ ...editingStaff!, pin: e.target.value }) : setNewStaffForm({ ...newStaffForm, pin: e.target.value })} />
                 <select
                   className="w-full bg-slate-50 border-slate-200 p-3 rounded-xl outline-primary font-bold"
                   value={editingStaff ? editingStaff.role : newStaffForm.role}
-                  onChange={e => editingStaff ? setEditingStaff({ ...editingStaff, role: e.target.value as any }) : setNewStaffForm({ ...newStaffForm, role: e.target.value as any })}
+                  onChange={e => editingStaff ? setEditingStaff({ ...editingStaff!, role: e.target.value as any }) : setNewStaffForm({ ...newStaffForm, role: e.target.value as any })}
                 >
                   <option value="Cashier">Cashier</option>
                   <option value="Manager">Manager</option>

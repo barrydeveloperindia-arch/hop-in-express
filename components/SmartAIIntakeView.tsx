@@ -54,9 +54,9 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
     // Initialize the standard Google Generative AI SDK
     const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_GENAI_API_KEY);
 
-    // Use gemini-flash-latest as it is fast and cost-effective. 
+    // Use gemini-1.5-flash which is the current stable flash model
     const model = genAI.getGenerativeModel({
-      model: "gemini-flash-latest",
+      model: "gemini-1.5-flash",
       systemInstruction: {
         role: "system",
         parts: [{
@@ -159,11 +159,19 @@ const SmartAIIntakeView: React.FC<SmartAIIntakeViewProps> = ({ inventory, setInv
       setSummary({ total: items.length, news, lowStock });
 
       logAction('AI Intake Analysis', 'smart-intake', `Detected ${items.length} items from input.`, 'Info');
-    } catch (err) {
+    } catch (err: any) {
       console.error("AI Analysis Error:", err);
-      // Detailed error for debugging
-      const errorMessage = err instanceof Error ? err.message : JSON.stringify(err);
-      alert(`AI Error: ${errorMessage}\n\nPlease check your API Key or Quota.`);
+
+      let msg = "Unknown AI Error";
+      if (err.message) msg = err.message;
+
+      if (msg.includes("403")) {
+        alert("⛔ ACCESS DENIED (403)\n\nPlease enable the 'Generative Language API' in your Google Cloud Console for this API Key.");
+      } else if (msg.includes("404")) {
+        alert("⛔ MODEL NOT FOUND (404)\n\nThe model 'gemini-1.5-flash' is not available for your API Key/Region. Check your Google Cloud settings.");
+      } else {
+        alert(`❌ AI Error: ${msg}`);
+      }
     } finally {
       setIsProcessing(false);
     }

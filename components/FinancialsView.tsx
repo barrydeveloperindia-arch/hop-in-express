@@ -19,60 +19,156 @@ interface FinancialsViewProps {
   logAction: (action: string, module: ViewType, details: string, severity?: 'Info' | 'Warning' | 'Critical') => void;
 }
 
-type FinancialSubModule = 'overview' | 'sales-ledger' | 'purchase-ledger' | 'master-register' | 'vat-summary';
+type FinancialSubModule = 'overview' | 'sales-ledger' | 'purchase-ledger' | 'master-register' | 'vat-summary' | 'sales-analytics' | 'costing-analytics';
 
 const FinancialOverview: React.FC<{
   ledger: LedgerEntry[];
-}> = ({ ledger }) => {
-  const accountBalances = useMemo(() => {
-    const balances: Record<LedgerAccount, { debit: number, credit: number, total: number }> = {
-      'Sales Revenue': { debit: 0, credit: 0, total: 0 },
-      'Cost of Goods Sold': { debit: 0, credit: 0, total: 0 },
-      'Inventory Asset': { debit: 0, credit: 0, total: 0 },
-      'Accounts Payable': { debit: 0, credit: 0, total: 0 },
-      'Cash in Hand': { debit: 0, credit: 0, total: 0 },
-      'Bank Account': { debit: 0, credit: 0, total: 0 },
-      'VAT Liability': { debit: 0, credit: 0, total: 0 },
-      'Operational Expense': { debit: 0, credit: 0, total: 0 },
-      'Payroll Expense': { debit: 0, credit: 0, total: 0 },
-      'Stock Variance': { debit: 0, credit: 0, total: 0 }
+  setActiveModule?: (module: FinancialSubModule) => void;
+}> = ({ ledger, setActiveModule }) => {
+  const stats = useMemo(() => {
+    const balances: Record<string, number> = {
+      revenue: 0,
+      cogs: 0,
+      opex: 0, // Operational + Payroll
+      assets: 0, // Cash + Bank
+      liabilities: 0, // VAT + Payable
+      inventory: 0
     };
 
     ledger.forEach(entry => {
-      if (entry.type === 'Debit') balances[entry.account].debit += entry.amount;
-      else balances[entry.account].credit += entry.amount;
-    });
+      // Helper to handle Debit/Credit direction based on Account Type
+      // Liability/Income: Credit +, Debit -
+      // Asset/Expense: Debit +, Credit -
 
-    Object.keys(balances).forEach(acc => {
-      const a = acc as LedgerAccount;
-      if (['Inventory Asset', 'Cash in Hand', 'Bank Account', 'Cost of Goods Sold', 'Operational Expense', 'Payroll Expense'].includes(a)) {
-        balances[a].total = balances[a].debit - balances[a].credit;
-      } else {
-        balances[a].total = balances[a].credit - balances[a].debit;
+      const amt = entry.amount;
+      const isCredit = entry.type === 'Credit';
+
+      switch (entry.account) {
+        case 'Sales Revenue':
+          balances.revenue += isCredit ? amt : -amt;
+          break;
+        case 'Cost of Goods Sold':
+          balances.cogs += isCredit ? -amt : amt;
+          break;
+        case 'Operational Expense':
+        case 'Payroll Expense':
+          balances.opex += isCredit ? -amt : amt;
+          break;
+        case 'Cash in Hand':
+        case 'Bank Account':
+          balances.assets += isCredit ? -amt : amt;
+          break;
+        case 'VAT Liability':
+        case 'Accounts Payable':
+          balances.liabilities += isCredit ? amt : -amt;
+          break;
+        case 'Inventory Asset':
+          balances.inventory += isCredit ? -amt : amt;
+          break;
       }
     });
 
-    return balances;
+    const grossProfit = balances.revenue - balances.cogs;
+    const netProfit = grossProfit - balances.opex;
+    const grossMargin = balances.revenue ? (grossProfit / balances.revenue) * 100 : 0;
+    const netMargin = balances.revenue ? (netProfit / balances.revenue) * 100 : 0;
+
+    return {
+      revenue: balances.revenue,
+      cogs: balances.cogs,
+      opex: balances.opex,
+      assets: balances.assets,
+      liabilities: balances.liabilities,
+      inventory: balances.inventory,
+      grossProfit,
+      netProfit,
+      grossMargin,
+      netMargin
+    };
   }, [ledger]);
 
-  const stats = useMemo(() => {
-    const revenue = accountBalances['Sales Revenue'].total;
-    const cogs = accountBalances['Cost of Goods Sold'].total;
-    const opEx = accountBalances['Operational Expense'].total + accountBalances['Payroll Expense'].total;
-    return { revenue, grossProfit: revenue - cogs, netProfit: revenue - cogs - opEx };
-  }, [accountBalances]);
-
   return (
-    <div className="space-y-10">
-      <h3 className="text-3xl font-black text-ink-base uppercase tracking-tighter">Financial Intelligence</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-surface-elevated p-6 md:p-10 rounded-[2.5rem] border border-surface-highlight shadow-sm group">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue (P&L)</p>
-          <h5 className="text-3xl font-black mt-4 font-mono text-emerald-600">{SHOP_INFO.currency}{stats.revenue.toLocaleString()}</h5>
+    <div className="space-y-8">
+      <div className="flex justify-between items-end">
+        <div>
+          <h3 className="text-3xl font-black text-ink-base uppercase tracking-tighter">Financial Intelligence</h3>
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Real-time P&L & Balance Sheet Metrics</p>
         </div>
-        <div className="bg-surface-elevated p-6 md:p-10 rounded-[2.5rem] border border-surface-highlight shadow-sm group">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Net Profit</p>
-          <h5 className="text-3xl font-black mt-4 font-mono text-indigo-600">{SHOP_INFO.currency}{stats.netProfit.toLocaleString()}</h5>
+        <div className="text-right hidden md:block">
+          <p className="text-[10px] font-black uppercase text-indigo-500 tracking-widest">Liquid Assets</p>
+          <p className="text-2xl font-black font-mono text-ink-base">{SHOP_INFO.currency}{stats.assets.toLocaleString()}</p>
+        </div>
+      </div>
+
+      {/* Primary KPI Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        {/* Revenue */}
+        <div className="bg-surface-elevated p-6 rounded-[2rem] border border-surface-highlight shadow-sm relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-5 scale-150 rotate-12 text-5xl group-hover:scale-125 transition-transform">💰</div>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Revenue</p>
+          <h5 className="text-3xl font-black mt-3 font-mono text-emerald-600">{SHOP_INFO.currency}{stats.revenue.toLocaleString()}</h5>
+          <div className="mt-4 flex gap-2">
+            <span className="text-[9px] font-bold bg-emerald-50 text-emerald-700 px-2 py-1 rounded-lg uppercase">Gross Income</span>
+          </div>
+        </div>
+
+        {/* Net Profit */}
+        <div className="bg-[#0F172A] p-6 rounded-[2rem] shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 opacity-10 scale-150 -rotate-12 text-5xl text-indigo-500">📈</div>
+          <p className="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Net Profit (EBITDA)</p>
+          <h5 className="text-3xl font-black mt-3 font-mono text-white">{SHOP_INFO.currency}{stats.netProfit.toLocaleString()}</h5>
+          <div className="mt-4 flex gap-2">
+            <span className={`text-[9px] font-bold px-2 py-1 rounded-lg uppercase ${stats.netMargin > 15 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}`}>
+              {stats.netMargin.toFixed(1)}% Margin
+            </span>
+          </div>
+        </div>
+
+        {/* Expenses */}
+        <div className="bg-surface-elevated p-6 rounded-[2rem] border border-surface-highlight shadow-sm group">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Op. Expenses</p>
+          <h5 className="text-3xl font-black mt-3 font-mono text-rose-500">{SHOP_INFO.currency}{stats.opex.toLocaleString()}</h5>
+          <p className="text-[10px] font-bold text-slate-300 mt-4 uppercase">Includes Payroll & Overheads</p>
+        </div>
+
+        {/* COGS */}
+        <div
+          onClick={() => setActiveModule && setActiveModule('costing-analytics')}
+          className="bg-surface-elevated p-6 rounded-[2rem] border border-surface-highlight shadow-sm group cursor-pointer hover:border-amber-400 transition-all active:scale-95 relative overflow-hidden"
+        >
+          <div className="flex justify-between items-start z-10 relative">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cost of Goods</p>
+            <span className="text-[9px] font-black uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">Analyze →</span>
+          </div>
+          <h5 className="text-3xl font-black mt-3 font-mono text-amber-500 z-10 relative">{SHOP_INFO.currency}{stats.cogs.toLocaleString()}</h5>
+          <div className="mt-4 flex gap-2 z-10 relative">
+            <span className="text-[9px] font-bold bg-amber-50 text-amber-700 px-2 py-1 rounded-lg uppercase">{stats.grossMargin.toFixed(1)}% Gross Margin</span>
+          </div>
+          <div className="absolute -right-4 -bottom-4 opacity-5 text-amber-500 transform rotate-12 group-hover:scale-110 transition-transform">
+            <span className="text-8xl">🏷️</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Secondary Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-surface-highlight/30 p-6 rounded-3xl border border-surface-highlight flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Liabilities</p>
+            <p className="text-xl font-black font-mono text-ink-base mt-1">{SHOP_INFO.currency}{stats.liabilities.toLocaleString()}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[9px] font-bold text-slate-400 uppercase">VAT & Payables</p>
+          </div>
+        </div>
+        <div className="bg-surface-highlight/30 p-6 rounded-3xl border border-surface-highlight flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Asset Valuation</p>
+            <p className="text-xl font-black font-mono text-ink-base mt-1">{SHOP_INFO.currency}{(stats.inventory + stats.assets).toLocaleString()}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-[9px] font-bold text-slate-400 uppercase">Cash + Stock</p>
+          </div>
         </div>
       </div>
     </div>
@@ -234,6 +330,8 @@ import { addExpense } from '../lib/firestore';
 import { DailySalesRecord } from '../types';
 import * as XLSX from 'xlsx';
 import { batchImportDailySales, subscribeToDailySales } from '../lib/firestore';
+import SalesLedgerDashboard from './SalesLedgerDashboard';
+import CostingDashboard from './CostingDashboard';
 
 const SalesLedger: React.FC = () => {
   const [salesData, setSalesData] = useState<DailySalesRecord[]>([]);
@@ -674,7 +772,8 @@ const FinancialsView: React.FC<FinancialsViewProps> = ({
           <p className="px-6 py-4 text-[10px] font-black text-ink-base uppercase tracking-[0.3em] border-b mb-4">Master Controls</p>
           {[
             { id: 'overview', label: 'Financial Matrix', icon: '📊' },
-            { id: 'sales-ledger', label: 'Sales Ledger', icon: '🛒' },
+            { id: 'sales-analytics', label: 'Sales Analytics', icon: '📈' },
+            { id: 'sales-ledger', label: 'Daily Sales Import', icon: '🛒' },
             { id: 'vat-summary', label: 'VAT Breakdown', icon: '📜' },
             { id: 'expenses', label: 'Op. Expenses', icon: '💸' },
             { id: 'master-register', label: 'Master Register', icon: '📕' }
@@ -692,7 +791,9 @@ const FinancialsView: React.FC<FinancialsViewProps> = ({
       </aside>
 
       <main className="flex-1 min-w-0">
-        {activeModule === 'overview' && <FinancialOverview ledger={ledger} />}
+        {activeModule === 'overview' && <FinancialOverview ledger={ledger} setActiveModule={setActiveModule as any} />}
+        {activeModule === 'sales-analytics' && <SalesLedgerDashboard transactions={transactions} inventory={inventory} />}
+        {activeModule === 'costing-analytics' && <CostingDashboard transactions={transactions} inventory={inventory} />}
         {activeModule === 'vat-summary' && <VatAnalysis transactions={transactions} />}
         {activeModule === 'expenses' && <ExpenseManager expenses={expenses} postToLedger={postToLedger} logAction={logAction} />}
         {/* Placeholders for other modules not requested for refactoring yet, but keeping structure */}

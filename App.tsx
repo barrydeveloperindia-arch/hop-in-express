@@ -14,6 +14,7 @@ import HelpSupportView from './components/HelpSupportView';
 import AboutUsView from './components/AboutUsView';
 import SplashScreen from './components/SplashScreen';
 import AICommandCenter from './components/AICommandCenter';
+import SalesLedgerDashboard from './components/SalesLedgerDashboard';
 
 import AuthView from './components/AuthView';
 import { NavigationSidebar } from './components/NavigationSidebar';

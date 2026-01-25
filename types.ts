@@ -269,6 +269,7 @@ export type ViewType =
   | 'expenses'
   | 'suppliers'
   | 'salary'
+  | 'sales-ledger'
   | 'support';
 
 export interface SalaryRecord {

@@ -12,7 +12,8 @@ import {
     Bot,
     Info,
     HelpCircle,
-    Menu
+    Menu,
+    LineChart
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { EngLabsLogo } from '../App';
