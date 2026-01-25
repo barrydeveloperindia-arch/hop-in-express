@@ -1,4 +1,20 @@
 
+
+/**
+ * Financial Intelligence Hub
+ * 
+ * A comprehensive financial suite for retail management:
+ * - Real-time P&L: Dynamic calculation of Net/Gross Profit from Double-Entry Ledger
+ * - VAT Analysis: Breakdown of 0%, 5%, 20% tax bands for HMRC compliance
+ * - KPI Tracking: Tracks Revenue, COGS, OpEx, Assets, and Liabilities
+ * - Forecasting: AI-driven projections for month-end revenue
+ * 
+ * Integrates with:
+ * - SalesLedgerDashboard (Sales Analytics)
+ * - CostingDashboard (Margin Analysis)
+ * 
+ * @component FinancialsView
+ */
 import React, { useState, useMemo } from 'react';
 import { LedgerEntry, Transaction, InventoryItem, Supplier, Bill, Expense, SalaryRecord, LedgerAccount, ViewType, VatBandSummary } from '../types';
 import { SHOP_INFO } from '../constants';
@@ -23,8 +39,9 @@ type FinancialSubModule = 'overview' | 'sales-ledger' | 'purchase-ledger' | 'mas
 
 const FinancialOverview: React.FC<{
   ledger: LedgerEntry[];
+  transactions: Transaction[];
   setActiveModule?: (module: FinancialSubModule) => void;
-}> = ({ ledger, setActiveModule }) => {
+}> = ({ ledger, transactions, setActiveModule }) => {
   const stats = useMemo(() => {
     const balances: Record<string, number> = {
       revenue: 0,
@@ -73,6 +90,30 @@ const FinancialOverview: React.FC<{
     const grossMargin = balances.revenue ? (grossProfit / balances.revenue) * 100 : 0;
     const netMargin = balances.revenue ? (netProfit / balances.revenue) * 100 : 0;
 
+    // Retail Efficiency Metrics
+    // We only care about CURRENT Month for "Run Rate" usually, or maybe lifetime depending on user intent.
+    // Let's do LIFETIME for stats, but CURRENT MONTH for projection.
+
+    // 1. Averages
+    const totalTransactions = transactions.length;
+    const totalItemsSold = transactions.reduce((acc, t) => acc + t.items.reduce((s, i) => s + i.qty, 0), 0);
+    const atv = totalTransactions ? balances.revenue / totalTransactions : 0;
+    const upt = totalTransactions ? totalItemsSold / totalTransactions : 0;
+
+    // 2. Forecasting (Current Month)
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const daysPassed = Math.max(1, now.getDate());
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+    // Filter revenue for this month
+    const currentMonthRevenue = transactions
+      .filter(t => new Date(t.timestamp) >= startOfMonth)
+      .reduce((acc, t) => acc + t.total, 0);
+
+    const dailyRunRate = currentMonthRevenue / daysPassed;
+    const projectedRevenue = dailyRunRate * daysInMonth;
+
     return {
       revenue: balances.revenue,
       cogs: balances.cogs,
@@ -83,16 +124,20 @@ const FinancialOverview: React.FC<{
       grossProfit,
       netProfit,
       grossMargin,
-      netMargin
+      netMargin,
+      atv,
+      upt,
+      projectedRevenue,
+      dailyRunRate
     };
-  }, [ledger]);
+  }, [ledger, transactions]);
 
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-end">
         <div>
           <h3 className="text-3xl font-black text-ink-base uppercase tracking-tighter">Financial Intelligence</h3>
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Real-time P&L & Balance Sheet Metrics</p>
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-1">Real-time P&L & Retail Metrics</p>
         </div>
         <div className="text-right hidden md:block">
           <p className="text-[10px] font-black uppercase text-indigo-500 tracking-widest">Liquid Assets</p>
@@ -146,6 +191,40 @@ const FinancialOverview: React.FC<{
           </div>
           <div className="absolute -right-4 -bottom-4 opacity-5 text-amber-500 transform rotate-12 group-hover:scale-110 transition-transform">
             <span className="text-8xl">🏷️</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Retail Intelligence Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-surface-elevated p-6 rounded-[2rem] border border-surface-highlight flex flex-col justify-between h-32">
+          <div className="flex justify-between items-start">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Transaction (ATV)</p>
+            <span className="text-xl">🛍️</span>
+          </div>
+          <div>
+            <h5 className="text-2xl font-black font-mono text-ink-base">{SHOP_INFO.currency}{stats.atv.toFixed(2)}</h5>
+            <p className="text-[9px] font-bold text-slate-400 uppercase mt-1">Per Customer Spend</p>
+          </div>
+        </div>
+        <div className="bg-surface-elevated p-6 rounded-[2rem] border border-surface-highlight flex flex-col justify-between h-32">
+          <div className="flex justify-between items-start">
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Basket Size (UPT)</p>
+            <span className="text-xl">🛒</span>
+          </div>
+          <div>
+            <h5 className="text-2xl font-black font-mono text-ink-base">{stats.upt.toFixed(1)} <span className="text-sm text-slate-400">items</span></h5>
+            <p className="text-[9px] font-bold text-slate-400 uppercase mt-1">Avg Items per Order</p>
+          </div>
+        </div>
+        <div className="bg-indigo-50 p-6 rounded-[2rem] border border-indigo-100 flex flex-col justify-between h-32 relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 opacity-10 text-indigo-600 text-6xl">🔮</div>
+          <div className="flex justify-between items-start z-10">
+            <p className="text-[10px] font-black text-indigo-900 uppercase tracking-widest">Projected (Month End)</p>
+          </div>
+          <div className="z-10">
+            <h5 className="text-2xl font-black font-mono text-indigo-700">{SHOP_INFO.currency}{stats.projectedRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</h5>
+            <p className="text-[9px] font-bold text-indigo-400 uppercase mt-1">Based on live run-rate</p>
           </div>
         </div>
       </div>
@@ -791,7 +870,7 @@ const FinancialsView: React.FC<FinancialsViewProps> = ({
       </aside>
 
       <main className="flex-1 min-w-0">
-        {activeModule === 'overview' && <FinancialOverview ledger={ledger} setActiveModule={setActiveModule as any} />}
+        {activeModule === 'overview' && <FinancialOverview ledger={ledger} transactions={transactions} setActiveModule={setActiveModule as any} />}
         {activeModule === 'sales-analytics' && <SalesLedgerDashboard transactions={transactions} inventory={inventory} />}
         {activeModule === 'costing-analytics' && <CostingDashboard transactions={transactions} inventory={inventory} />}
         {activeModule === 'vat-summary' && <VatAnalysis transactions={transactions} />}

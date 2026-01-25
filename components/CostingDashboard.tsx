@@ -1,4 +1,18 @@
 
+
+/**
+ * Costing & Margin Analysis Engine
+ * 
+ * Provides deep-dive analytics into profitability:
+ * - Item-Level Margins: Calculates potential profit vs actual realized profit
+ * - Cost Trend Analysis: Gross Revenue vs Cost of Goods Sold over time
+ * - Efficiency Alerts: Flags products with <15% margin
+ * - High Cost Inventory: Identifies capital-heavy stock
+ * 
+ * Features interactive sorting and filtering for full inventory audits.
+ * 
+ * @component CostingDashboard
+ */
 import React, { useState, useMemo } from 'react';
 import { Transaction, InventoryItem } from '../types';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, BarChart, Bar } from 'recharts';

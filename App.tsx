@@ -1,3 +1,16 @@
+/**
+ * Hop-in Express - Main Application Entry Point
+ * 
+ * This is the root component that handles:
+ * 1. Authentication State (Firebase) - Manages User Login/Logout
+ * 2. Data Synchronization (Firestore) - Real-time listeners for Inventory, Transactions, Ledger
+ * 3. Routing/Navigation - Switching between Dashboard, Inventory, Staff, and Financial views
+ * 4. Context Provision - Passes global state down to child components
+ * 
+ * @module App
+ * @author Antigravity
+ * @version 1.2.0 (Production)
+ */
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { auth } from './lib/firebase';

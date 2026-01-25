@@ -1,4 +1,17 @@
 
+/**
+ * Sales Analytics Dashboard
+ * 
+ * Visualizes transactional data to provide insights on:
+ * - Hour-by-Hour Sales Performance (Heatmaps)
+ * - Weekly/Monthly Revenue Trends
+ * - Category Distribution (Alcohol, Tobacco, Groceries, etc.)
+ * - Payment Method Splits (Cash vs Card)
+ * 
+ * Uses Recharts for data visualization using live Transaction data.
+ * 
+ * @component SalesLedgerDashboard
+ */
 import React, { useState, useMemo } from 'react';
 import { Transaction, InventoryItem } from '../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, PieChart, Pie, Cell } from 'recharts';
@@ -156,7 +169,7 @@ const SalesLedgerDashboard: React.FC<SalesLedgerDashboardProps> = ({ transaction
                                     dataKey="value"
                                 >
                                     {dashboardData.topCategories.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        <Cell key={`cell-${entry.name}-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
                                 <Tooltip />
