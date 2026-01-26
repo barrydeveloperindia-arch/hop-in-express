@@ -6,10 +6,12 @@ import { CategoryGrid } from '../organisms/CategoryGrid';
 import { ProductCard } from '../organisms/ProductCard';
 import { NavigationDock } from '../organisms/NavigationDock';
 import { ImpulseRail } from '../organisms/ImpulseRail';
+import { RecipeCard } from '../organisms/RecipeCard'; // New
 import { Typography } from '../atoms/Typography';
 import { Product } from '../../lib/firestore';
 import { COLORS } from '../../lib/theme';
 import { StatusBar } from 'expo-status-bar';
+import { RecipeService } from '../../services/recipe/RecipeService.v1'; // New
 
 interface HomeTemplateProps {
     inventory: Product[];
@@ -67,7 +69,17 @@ export const HomeTemplate: React.FC<HomeTemplateProps> = ({ inventory }) => {
                 {/* 1. Impulse Rail (Night Shop) */}
                 <ImpulseRail />
 
-                {/* 2. Category Grid (First Fold) */}
+                {/* 2. Recipe Rail (One-Tap Cook) - NEW */}
+                <View style={tw`pl-4 mb-6`}>
+                    <Typography variant="h3" style={tw`mb-3`}>Cook Tonight 👨‍🍳</Typography>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {RecipeService.getSeasonalRecipes().map(recipe => (
+                            <RecipeCard key={recipe.id} recipe={recipe} />
+                        ))}
+                    </ScrollView>
+                </View>
+
+                {/* 3. Category Grid (First Fold) */}
                 <CategoryGrid />
 
                 {/* 3. Hero Banner Placeholder */}

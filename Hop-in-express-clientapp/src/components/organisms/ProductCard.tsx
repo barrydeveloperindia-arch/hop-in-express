@@ -5,6 +5,7 @@ import { Typography } from '../atoms/Typography';
 import { AddToCartButton } from '../molecules/AddToCartButton';
 import { Product } from '../../lib/firestore'; // Using shared type
 import { Clock } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width / 3 - 16; // 3 Column Grid Logic
@@ -22,13 +23,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     onAdd,
     onRemove
 }) => {
+    const router = useRouter();
+
     // Discount Calculation logic (simulated for now if not in DB)
     const discount = product.memberPrice && product.memberPrice < product.price
         ? Math.round(((product.price - product.memberPrice) / product.price) * 100)
         : 0;
 
+    const handlePress = () => {
+        router.push(`/product/${product.id}`);
+    };
+
     return (
-        <View style={[tw`bg-white rounded-xl overflow-hidden border border-gray-100 mb-3`, { width: 108 }]}>
+        <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={handlePress}
+            style={[tw`bg-white rounded-xl overflow-hidden border border-gray-100 mb-3`, { width: 108 }]}
+        >
             {/* Image Area */}
             <View style={tw`h-28 w-full items-center justify-center p-2 relative`}>
                 <Image
@@ -78,6 +89,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     </View>
                 </View>
             </View>
-        </View>
+        </TouchableOpacity>
     );
 };
