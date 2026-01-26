@@ -33,7 +33,7 @@ export const LiveTrackingTemplate = () => {
             <View style={tw`flex-1 bg-blue-50 relative overflow-hidden`}>
                 {/* We use a static image for web simulation of a map */}
                 <Image
-                    source={{ uri: 'https://img.freepik.com/free-vector/city-map-navigation-interface_23-2148293755.jpg' }}
+                    source={{ uri: 'https://images.pexels.com/photos/3183186/pexels-photo-3183186.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Generic Map/Office Abstract
                     style={tw`w-full h-full opacity-50`}
                     resizeMode="cover"
                 />
@@ -67,7 +67,7 @@ export const LiveTrackingTemplate = () => {
                         <Typography variant="h1" style={tw`text-4xl`}>{eta} <Typography variant="h2" color="#9CA3AF">mins</Typography></Typography>
                     </View>
                     <Image
-                        source={{ uri: 'https://cdn-icons-png.flaticon.com/512/2909/2909761.png' }} // Rider Avatar Mock
+                        source={{ uri: 'https://images.pexels.com/photos/1036856/pexels-photo-1036856.jpeg?auto=compress&cs=tinysrgb&w=300' }} // Rider/Helmet
                         style={tw`w-14 h-14 rounded-full border-2 border-gray-100 bg-gray-50`}
                     />
                 </View>

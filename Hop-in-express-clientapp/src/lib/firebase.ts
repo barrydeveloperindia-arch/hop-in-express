@@ -12,7 +12,7 @@ const firebaseConfig = {
     measurementId: "G-SY6450KXL9"
 };
 
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
 // DATABASE ID: 'hopinexpress1' (Critical for your setup)
 export const db = initializeFirestore(app, {

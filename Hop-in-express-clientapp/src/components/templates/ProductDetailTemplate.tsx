@@ -10,6 +10,7 @@ import { COLORS } from '../../lib/theme';
 import { Clock, ShieldCheck, Truck, ChevronLeft, Share2 } from 'lucide-react-native';
 import { PricingService } from '../../services/pricing/PricingService.v1';
 import { useRouter } from 'expo-router';
+import { useCart } from '../../context/CartContext';
 
 const { width } = Dimensions.get('window');
 
@@ -23,14 +24,17 @@ export const ProductDetailTemplate: React.FC<ProductDetailTemplateProps> = ({
     similarProducts
 }) => {
     const router = useRouter();
-    const [qty, setQty] = useState(0);
+    const { getItemQty, addToCart, removeFromCart, totalItems } = useCart();
+
+    const qty = getItemQty(product.id);
+    const effectivePrice = product.memberPrice ?? product.price;
+
     const [deliveryFee, setDeliveryFee] = useState(0);
 
     useEffect(() => {
-        // Calculate dynamic fee based on this single item being in cart (simulation)
-        const fee = PricingService.calculateDeliveryFee(product.price);
+        const fee = PricingService.calculateDeliveryFee(effectivePrice);
         setDeliveryFee(fee);
-    }, [product]);
+    }, [product, effectivePrice]);
 
     return (
         <View style={tw`flex-1 bg-white`}>
@@ -71,10 +75,10 @@ export const ProductDetailTemplate: React.FC<ProductDetailTemplateProps> = ({
                     <View style={tw`flex-row items-center justify-between`}>
                         <View>
                             <View style={tw`flex-row items-end`}>
-                                <Typography variant="h2">£{product.price.toFixed(2)}</Typography>
+                                <Typography variant="h2">£{effectivePrice.toFixed(2)}</Typography>
                                 {product.memberPrice && (
                                     <Typography variant="body" style={tw`ml-2 text-gray-400 line-through bottom-1`}>
-                                        £{(product.price * 1.2).toFixed(2)}
+                                        £{product.price.toFixed(2)}
                                     </Typography>
                                 )}
                             </View>
@@ -84,8 +88,8 @@ export const ProductDetailTemplate: React.FC<ProductDetailTemplateProps> = ({
                         <View style={tw`scale-125 origin-right`}>
                             <AddToCartButton
                                 count={qty}
-                                onIncrement={() => setQty(q => q + 1)}
-                                onDecrement={() => setQty(q => q - 1)}
+                                onIncrement={() => addToCart(product.id)}
+                                onDecrement={() => removeFromCart(product.id)}
                             />
                         </View>
                     </View>
@@ -100,7 +104,7 @@ export const ProductDetailTemplate: React.FC<ProductDetailTemplateProps> = ({
                     <Typography variant="caption" style={tw`text-blue-800`}>
                         {deliveryFee === 0
                             ? "✨ You've unlocked FREE delivery!"
-                            : `Add £${(15 - product.price).toFixed(2)} more for FREE delivery.`}
+                            : `Add £${(15 - effectivePrice).toFixed(2)} more for FREE delivery.`}
                     </Typography>
                 </View>
 
@@ -123,21 +127,24 @@ export const ProductDetailTemplate: React.FC<ProductDetailTemplateProps> = ({
                     <Typography variant="h3" style={tw`mb-3`}>Similar Items</Typography>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         {similarProducts.map(p => (
-                            <View key={p.id} style={tw`mr-3 w-28 bg-gray-50 h-32 rounded-lg items-center justify-center border border-gray-100`}>
+                            <TouchableOpacity
+                                key={p.id}
+                                onPress={() => router.push(`/product/${p.id}` as any)}
+                                style={tw`mr-3 w-28 bg-gray-50 h-32 rounded-lg items-center justify-center border border-gray-100`}
+                            >
                                 <Image source={{ uri: p.image }} style={tw`w-12 h-12 mb-2`} />
                                 <Typography variant="caption" numberOfLines={1}>{p.name}</Typography>
-                            </View>
+                            </TouchableOpacity>
                         ))}
                     </ScrollView>
                 </View>
-
             </ScrollView>
 
-            {/* Sticky Bottom Bar if Qty > 0 */}
-            {qty > 0 && (
+            {/* Sticky Bottom Bar if totalItems > 0 */}
+            {totalItems > 0 && (
                 <View style={tw`absolute bottom-0 w-full bg-white p-4 border-t border-gray-100 shadow-xl`}>
                     <Button
-                        label={`View Cart • £${(qty * product.price).toFixed(2)}`}
+                        label={`View Cart (${totalItems})`}
                         onPress={() => router.push('/cart')}
                     />
                 </View>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { TouchableOpacity, ActivityIndicator, ViewStyle } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, ActivityIndicator, ViewStyle, Platform, Animated } from 'react-native';
 import tw from '../../lib/tw';
 import { Typography } from './Typography';
 import { COLORS } from '../../lib/theme';
@@ -23,8 +23,10 @@ export const Button: React.FC<ButtonProps> = ({
     disabled = false,
     style
 }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
     // Base Container
-    let containerStyle = tw`rounded-xl items-center justify-center flex-row shadow-sm`;
+    let containerStyle: any = tw`rounded-xl items-center justify-center flex-row shadow-sm`;
     let textVariant: 'body' | 'h3' = 'h3';
     let textColor = '#FFF';
 
@@ -58,18 +60,33 @@ export const Button: React.FC<ButtonProps> = ({
         containerStyle = { ...containerStyle, opacity: 0.5 };
     }
 
+    // Hover Effect Logic
+    const hoverStyle = isHovered && !disabled && !loading ? {
+        transform: [{ scale: 1.02 }],
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        shadowOffset: { width: 0, height: 2 },
+        opacity: 0.9
+    } : {};
+
     return (
-        <TouchableOpacity
+        <Pressable
             onPress={onPress}
             disabled={disabled || loading}
-            activeOpacity={0.8}
-            style={[containerStyle, style]}
+            onHoverIn={() => setIsHovered(true)}
+            onHoverOut={() => setIsHovered(false)}
+            style={({ pressed }) => [
+                containerStyle,
+                style,
+                hoverStyle,
+                pressed && { transform: [{ scale: 0.98 }], opacity: 0.8 }
+            ]}
         >
             {loading ? (
                 <ActivityIndicator color={textColor} size="small" />
             ) : (
                 <Typography variant={textVariant} color={textColor} bold>{label}</Typography>
             )}
-        </TouchableOpacity>
+        </Pressable>
     );
 };

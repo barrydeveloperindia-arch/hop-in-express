@@ -4,11 +4,11 @@ import tw from '../../lib/tw';
 import { Typography } from '../atoms/Typography';
 
 const IMPULSE_ITEMS = [
-    { name: 'Vapes', icon: 'https://cdn-icons-png.flaticon.com/512/3050/3050239.png', color: 'bg-purple-50' },
-    { name: 'Pharma', icon: 'https://cdn-icons-png.flaticon.com/512/883/883407.png', color: 'bg-blue-50' },
-    { name: 'Pet Food', icon: 'https://cdn-icons-png.flaticon.com/512/616/616408.png', color: 'bg-orange-50' },
-    { name: 'Muncies', icon: 'https://cdn-icons-png.flaticon.com/512/3081/3081923.png', color: 'bg-yellow-50' },
-    { name: 'Coffee', icon: 'https://cdn-icons-png.flaticon.com/512/751/751663.png', color: 'bg-stone-50' },
+    { name: 'Vapes', icon: 'https://images.pexels.com/photos/10352635/pexels-photo-10352635.jpeg?auto=compress&cs=tinysrgb&w=300', color: 'bg-purple-50' }, // Vape/Smoke
+    { name: 'Pharma', icon: 'https://images.pexels.com/photos/3683074/pexels-photo-3683074.jpeg?auto=compress&cs=tinysrgb&w=300', color: 'bg-blue-50' }, // Medical/Pills
+    { name: 'Pet Food', icon: 'https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=300', color: 'bg-orange-50' },
+    { name: 'Munchies', icon: 'https://images.pexels.com/photos/298217/pexels-photo-298217.jpeg?auto=compress&cs=tinysrgb&w=300', color: 'bg-yellow-50' },
+    { name: 'Coffee', icon: 'https://images.pexels.com/photos/312418/pexels-photo-312418.jpeg?auto=compress&cs=tinysrgb&w=300', color: 'bg-stone-50' },
 ];
 
 export const ImpulseRail = () => {

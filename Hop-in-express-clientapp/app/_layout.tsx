@@ -7,6 +7,8 @@ import { Inter_400Regular } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { View } from 'react-native';
+import { CartProvider } from '../src/context/CartContext';
+import { FloatingCartButton } from '../src/components/molecules/FloatingCartButton';
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -34,18 +36,21 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <ThemeProvider value={DefaultTheme}>
-      <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: '#FFFFFF' }
-          }}
-        >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-        </Stack>
-        <StatusBar style="dark" />
-      </View>
+    <ThemeProvider value={DarkTheme}>
+      <CartProvider>
+        <View style={{ flex: 1, backgroundColor: '#000000' }}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: '#000000' }
+            }}
+          >
+            <Stack.Screen name="index" options={{ headerShown: false }} />
+          </Stack>
+          <FloatingCartButton />
+          <StatusBar style="light" />
+        </View>
+      </CartProvider>
     </ThemeProvider>
   );
 }

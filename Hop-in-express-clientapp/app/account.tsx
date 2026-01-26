@@ -1,14 +1,41 @@
-import React from 'react';
-import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import tw from '../src/lib/tw';
 import { NavigationDock } from '../src/components/organisms/NavigationDock';
 import { Typography } from '../src/components/atoms/Typography';
-import { Settings, CreditCard, MapPin, Heart, Clock, LogOut, ChevronRight } from 'lucide-react-native';
+import { Settings, CreditCard, MapPin, Heart, Clock, LogOut, ChevronRight, User as UserIcon } from 'lucide-react-native';
 import { COLORS } from '../src/lib/theme';
 import { StaffPortalEntry } from '../src/components/staff/StaffPortalEntry';
+import { AuthService } from '../src/services/auth/AuthService';
+import { User } from 'firebase/auth';
+import { useRouter } from 'expo-router';
 
 export default function AccountScreen() {
+    const [user, setUser] = useState<User | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        setUser(AuthService.getCurrentUser());
+    }, []);
+
+    const handleLogin = async () => {
+        try {
+            // For MVP, we use anonymous. Later switch to Phone Auth.
+            const u = await AuthService.loginAnonymously();
+            setUser(u);
+            Alert.alert("Welcome!", "You are now logged in anonymously.");
+        } catch (e) {
+            Alert.alert("Login Failed", "Could not sign in.");
+        }
+    };
+
+    const handleLogout = async () => {
+        await AuthService.logout();
+        setUser(null);
+        router.replace('/');
+    };
+
     return (
         <View style={tw`flex-1 bg-gray-50`}>
             <StatusBar style="dark" />
@@ -17,11 +44,15 @@ export default function AccountScreen() {
             <View style={tw`pt-14 px-4 pb-6 bg-white border-b border-gray-100`}>
                 <View style={tw`flex-row items-center gap-4`}>
                     <View style={tw`w-16 h-16 rounded-full bg-blue-100 items-center justify-center border border-blue-200`}>
-                        <Typography variant="h2" style={tw`text-blue-600`}>S</Typography>
+                        {user ? (
+                            <Typography variant="h2" style={tw`text-blue-600`}>S</Typography>
+                        ) : (
+                            <UserIcon size={24} color={COLORS.primary} />
+                        )}
                     </View>
                     <View>
-                        <Typography variant="h2">Sam Alt</Typography>
-                        <Typography variant="body" color="#666">+44 7700 900000</Typography>
+                        <Typography variant="h2">{user ? 'Sam Alt (Demo)' : 'Guest User'}</Typography>
+                        <Typography variant="body" color="#666">{user ? '+44 7700 900000' : 'Sign in to order'}</Typography>
                     </View>
                 </View>
 
@@ -65,10 +96,17 @@ export default function AccountScreen() {
                     <ChevronRight size={18} color="#CCC" />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={tw`flex-row items-center justify-center mt-6 p-4 bg-red-50 rounded-xl border border-red-100`}>
-                    <LogOut size={20} color="#EF4444" />
-                    <Typography variant="h3" style={tw`ml-2 text-red-600`}>Log Out</Typography>
-                </TouchableOpacity>
+                {user ? (
+                    <TouchableOpacity onPress={handleLogout} style={tw`flex-row items-center justify-center mt-6 p-4 bg-red-50 rounded-xl border border-red-100`}>
+                        <LogOut size={20} color="#EF4444" />
+                        <Typography variant="h3" style={tw`ml-2 text-red-600`}>Log Out</Typography>
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity onPress={handleLogin} style={tw`flex-row items-center justify-center mt-6 p-4 bg-blue-600 rounded-xl shadow-lg shadow-blue-500/30`}>
+                        <UserIcon size={20} color="#FFF" />
+                        <Typography variant="h3" style={tw`ml-2 text-white font-bold`}>Sign In (Anonymous)</Typography>
+                    </TouchableOpacity>
+                )}
 
                 {/* Internal Tool Link */}
                 <StaffPortalEntry />

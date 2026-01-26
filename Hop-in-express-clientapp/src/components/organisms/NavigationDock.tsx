@@ -14,11 +14,11 @@ export const NavigationDock = () => {
 
     const NavItem = ({ icon: Icon, label, path }: { icon: any, label: string, path: string }) => {
         const active = isActive(path);
-        const color = active ? COLORS.primary : COLORS.textSub; // Green if active, Gray if not
+        const color = active ? COLORS.secondary : COLORS.textSub; // Gold if active, Gray if not
 
         return (
             <TouchableOpacity
-                onPress={() => router.push(path)}
+                onPress={() => router.push(path as any)}
                 style={tw`items-center justify-center flex-1 py-2`}
                 activeOpacity={0.8}
             >
@@ -37,13 +37,13 @@ export const NavigationDock = () => {
     };
 
     return (
-        <View style={tw`absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex-row justify-between px-2 pb-5 pt-2 shadow-lg z-50`}>
+        <View style={tw`absolute bottom-0 left-0 right-0 bg-black border-t border-gray-900 flex-row justify-between px-2 pb-5 pt-2 shadow-lg z-50`}>
             <NavItem icon={Home} label="Home" path="/" />
             <NavItem icon={Grid} label="Categories" path="/categories" />
             <NavItem icon={Search} label="Search" path="/search" />
             {/* Bag has a special 'Print' icon feel in Blinkit, usually just Bag */}
             <NavItem icon={ShoppingBag} label="Bag" path="/cart" />
-            <NavItem icon={User} label="Account" path="/account" />
+            <NavItem icon={User} label="Orders" path="/orders" />
         </View>
     );
 };

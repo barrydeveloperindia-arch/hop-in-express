@@ -6,11 +6,12 @@ import { COLORS } from '../../lib/theme';
 
 interface InputProps extends TextInputProps {
     icon?: React.ReactNode;
+    containerStyle?: any;
 }
 
-export const Input: React.FC<InputProps> = ({ style, icon, ...props }) => {
+export const Input: React.FC<InputProps> = ({ style, containerStyle, icon, ...props }) => {
     return (
-        <View style={tw`flex-row items-center bg-gray-100 rounded-xl px-4 h-12 border border-transparent focus:border-green-600`}>
+        <View style={[tw`flex-row items-center bg-gray-100 rounded-xl px-4 h-12 border border-transparent focus:border-green-600`, containerStyle]}>
             {icon && <View style={tw`mr-3`}>{icon}</View>}
             <TextInput
                 placeholderTextColor={COLORS.textMuted}

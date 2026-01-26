@@ -1,20 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { HomeTemplate } from '../src/components/templates/HomeTemplate';
-import { subscribeToLiveInventory, Product } from '../src/lib/firestore';
+import { useInventory } from '../src/hooks/useInventory';
 import tw from '../src/lib/tw';
 
 export default function App() {
-    const [inventory, setInventory] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const unsubscribe = subscribeToLiveInventory((items) => {
-            setInventory(items);
-            setLoading(false);
-        });
-        return () => unsubscribe();
-    }, []);
+    const { inventory, loading } = useInventory();
 
     if (loading) {
         return (

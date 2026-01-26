@@ -10,10 +10,10 @@ import { useRouter } from 'expo-router';
 
 // Mock Items for Order
 const ORDER_ITEMS = [
-    { id: '1', name: 'Organic Nano Banana', qty: 2, bin: 'A-12', image: 'https://cdn-icons-png.flaticon.com/512/2909/2909761.png', picked: false },
-    { id: '2', name: 'Thums Up (300ml)', qty: 6, bin: 'B-04', image: 'https://cdn-icons-png.flaticon.com/512/2405/2405479.png', picked: false },
-    { id: '3', name: 'Tilda Basmati Rice (5kg)', qty: 1, bin: 'C-01', image: 'https://cdn-icons-png.flaticon.com/512/766/766023.png', picked: false },
-    { id: '4', name: 'Frozen Paratha Pack', qty: 1, bin: 'F-09', image: 'https://cdn-icons-png.flaticon.com/512/931/931628.png', picked: false },
+    { id: '1', name: 'Organic Nano Banana', qty: 2, bin: 'A-12', image: 'https://images.pexels.com/photos/1093038/pexels-photo-1093038.jpeg?auto=compress&cs=tinysrgb&w=300', picked: false },
+    { id: '2', name: 'Thums Up (300ml)', qty: 6, bin: 'B-04', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Coca_Cola_can.jpg/640px-Coca_Cola_can.jpg', picked: false }, // Generic Soda
+    { id: '3', name: 'Tilda Basmati Rice (5kg)', qty: 1, bin: 'C-01', image: 'https://images.pexels.com/photos/4110251/pexels-photo-4110251.jpeg?auto=compress&cs=tinysrgb&w=300', picked: false },
+    { id: '4', name: 'Frozen Paratha Pack', qty: 1, bin: 'F-09', image: 'https://images.pexels.com/photos/12737664/pexels-photo-12737664.jpeg?auto=compress&cs=tinysrgb&w=300', picked: false },
 ];
 
 export const PickingSessionTemplate = ({ orderId }: { orderId: string }) => {

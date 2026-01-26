@@ -15,7 +15,7 @@ export const FeatureCarousel = () => {
                 <View style={tw`w-[${CARD_WIDTH}px] h-[380px] mr-4 rounded-[32px] overflow-hidden bg-zinc-900 border border-white/10 relative shadow-2xl shadow-black`}>
                     {/* Background Image / Texture */}
                     <Image
-                        source={{ uri: 'https://images.unsplash.com/photo-1603833665858-e61d17a86224?q=80&w=1887&auto=format&fit=crop' }}
+                        source={{ uri: 'https://images.pexels.com/photos/1093038/pexels-photo-1093038.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }}
                         style={tw`absolute w-full h-full opacity-100`}
                         resizeMode="cover"
                     />
@@ -36,7 +36,7 @@ export const FeatureCarousel = () => {
                 {/* Card 2: Truffle */}
                 <View style={tw`w-[${CARD_WIDTH}px] h-[380px] mr-4 rounded-[32px] overflow-hidden bg-zinc-900 border border-white/10 relative`}>
                     <Image
-                        source={{ uri: 'https://images.unsplash.com/photo-1608649887140-523c9ce05096?q=80&w=2670&auto=format&fit=crop' }}
+                        source={{ uri: 'https://images.pexels.com/photos/350417/pexels-photo-350417.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' }} // Mushrooms closely resembling truffle vibe
                         style={tw`absolute w-full h-full`}
                         resizeMode="cover"
                     />

@@ -31,7 +31,7 @@ export const subscribeToLiveInventory = (callback: (products: Product[]) => void
                 category: data.category || 'Pantry',
                 price: parseFloat(data.price) || 0,
                 memberPrice: parseFloat(data.offerPrice) || (parseFloat(data.price) * 0.9), // Default 10% off if no offer
-                image: data.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1000', // Box placeholder
+                image: data.image || data.imageUrl || 'https://images.pexels.com/photos/1666067/pexels-photo-1666067.jpeg?auto=compress&cs=tinysrgb&w=600', // Box placeholder
                 stock: data.stock || 0,
                 tags: data.tags || [],
                 size: data.unit || '1 unit'

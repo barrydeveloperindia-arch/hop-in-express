@@ -1,23 +1,25 @@
 export const COLORS = {
-    // Brand Identity
-    primary: '#0C831F', // Blinkit Green (Add Buttons, Primary Actions)
-    secondary: '#F8CB46', // Blinkit Yellow (Highlights, Banners)
+    // Brand Identity ("Clean Modern")
+    primary: '#6366F1', // Primary Indigo
+    secondary: '#D4AF37', // Gold
+    midnight: '#FFFFFF', // Actually White now
 
     // Backgrounds
-    background: '#FFFFFF', // High Key White
-    surface: '#F3F4F6', // Light Gray (Cards, Inputs)
-    surfaceDark: '#E5E7EB',
+    background: '#F9FAFB', // Gray-50
+    surface: '#FFFFFF', // White
+    surfaceDark: '#F3F4F6', // Gray-100
+    surfaceLight: '#FFFFFF',
 
     // Typography
-    textMain: '#111827', // Almost Black
+    textMain: '#111827', // Gray-900
     textSub: '#6B7280', // Gray-500
-    textMuted: '#9CA3AF',
-    textInvert: '#FFFFFF',
+    textMuted: '#9CA3AF', // Gray-400
+    textInvert: '#FFFFFF', // White
 
     // Functional
-    success: '#059669',
-    error: '#DC2626',
-    border: '#E5E7EB',
+    success: '#059669', // Emerald
+    error: '#EF4444',
+    border: '#E5E7EB', // Gray-200
 };
 
 export const SPACING = {

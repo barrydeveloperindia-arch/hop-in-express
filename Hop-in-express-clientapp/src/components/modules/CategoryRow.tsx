@@ -3,9 +3,9 @@ import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import tw from '../../lib/tw';
 
 const CATEGORIES = [
-    { name: 'Fruits', image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?q=80&w=2670&auto=format&fit=crop' },
-    { name: 'Vegetables', image: 'https://images.unsplash.com/photo-1597362925123-77861d3fbac7?q=80&w=2670&auto=format&fit=crop' },
-    { name: 'Bakery', image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=2672&auto=format&fit=crop' },
+    { name: 'Fruits', image: 'https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=300' },
+    { name: 'Vegetables', image: 'https://images.pexels.com/photos/144248/potatoes-vegetables-erdfrucht-bio-144248.jpeg?auto=compress&cs=tinysrgb&w=300' },
+    { name: 'Bakery', image: 'https://images.pexels.com/photos/209396/pexels-photo-209396.jpeg?auto=compress&cs=tinysrgb&w=300' },
 ];
 
 export const CategoryRow = () => {
