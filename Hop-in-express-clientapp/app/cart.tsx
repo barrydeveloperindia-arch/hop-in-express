@@ -152,7 +152,7 @@ export default function CartScreen() {
                     <MapPin size={16} color="#000" />
                     <Typography variant="caption" style={tw`ml-2 font-bold`}>Pay using Google Pay</Typography>
                 </View>
-                <Button label="Place Order" onPress={() => { }} size="l" />
+                <Button label="Place Order" onPress={() => router.push('/checkout/success')} size="l" />
             </View>
         </View>
     );

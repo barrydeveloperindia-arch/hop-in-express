@@ -6,6 +6,7 @@ import { NavigationDock } from '../src/components/organisms/NavigationDock';
 import { Typography } from '../src/components/atoms/Typography';
 import { Settings, CreditCard, MapPin, Heart, Clock, LogOut, ChevronRight } from 'lucide-react-native';
 import { COLORS } from '../src/lib/theme';
+import { StaffPortalEntry } from '../src/components/staff/StaffPortalEntry';
 
 export default function AccountScreen() {
     return (
@@ -68,6 +69,9 @@ export default function AccountScreen() {
                     <LogOut size={20} color="#EF4444" />
                     <Typography variant="h3" style={tw`ml-2 text-red-600`}>Log Out</Typography>
                 </TouchableOpacity>
+
+                {/* Internal Tool Link */}
+                <StaffPortalEntry />
             </ScrollView>
 
             <NavigationDock />
