@@ -1,103 +1,159 @@
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { BlurView } from 'expo-blur';
 import tw from '../src/lib/tw';
-import { INVENTORY } from '../src/lib/mockInventory';
-import { ChevronLeft, Trash2, ShieldCheck } from 'lucide-react-native';
+// @ts-ignore
+import { INVENTORY } from '../src/mockInventory';
+import { Typography } from '../src/components/atoms/Typography';
+import { Button } from '../src/components/atoms/Button';
+import { ChevronLeft, MapPin, Clock, FileText, ShieldCheck } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
+import { PricingService } from '../src/services/pricing/PricingService.v1';
+import { COLORS } from '../src/lib/theme';
+
+// Temporary Mock Data fallback if INVENTORY missing
+const MOCK_ITEMS = [
+    {
+        id: '1',
+        name: 'Organic Nano Banana',
+        price: 5.98,
+        memberPrice: 5.98,
+        image: 'https://cdn-icons-png.flaticon.com/512/2909/2909761.png',
+        size: '1 Bunch',
+        qty: 2
+    },
+    {
+        id: '2',
+        name: 'Thums Up',
+        price: 6.00,
+        memberPrice: 6.00,
+        image: 'https://cdn-icons-png.flaticon.com/512/2405/2405479.png',
+        size: '300ml Glass',
+        qty: 6
+    },
+];
 
 export default function CartScreen() {
     const router = useRouter();
+    const [cartItems, setCartItems] = useState(MOCK_ITEMS);
 
-    // Mock Cart Data (Banana x2, Thums Up x6)
-    const cartItems = [
-        { product: INVENTORY.find(p => p.name.includes('Banana'))!, qty: 2 },
-        { product: INVENTORY.find(p => p.name.includes('Thums'))!, qty: 6 },
-        { product: INVENTORY.find(p => p.name.includes('Rice'))!, qty: 1 },
-    ];
-
-    const subtotal = cartItems.reduce((acc, item) => acc + (item.product.memberPrice * item.qty), 0);
-    const standardTotal = cartItems.reduce((acc, item) => acc + (item.product.price * item.qty), 0);
-    const savings = standardTotal - subtotal;
+    // Calculation
+    const itemTotal = cartItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
+    const deliveryFee = PricingService.calculateDeliveryFee(itemTotal);
+    const handlingFee = 0.99; // Standard
+    const grandTotal = itemTotal + deliveryFee + handlingFee;
 
     return (
-        <View style={tw`flex-1 bg-black`}>
-            <StatusBar style="light" />
+        <View style={tw`flex-1 bg-gray-50`}>
+            <StatusBar style="dark" />
 
             {/* Header */}
-            <View style={tw`pt-14 pb-4 px-6 flex-row items-center border-b border-white/10 bg-zinc-900`}>
-                <TouchableOpacity onPress={() => router.back()} style={tw`mr-4`}>
-                    <ChevronLeft size={24} color="#FFF" />
+            <View style={tw`bg-white pt-14 pb-4 px-4 flex-row items-center border-b border-gray-100`}>
+                <TouchableOpacity onPress={() => router.back()} style={tw`mr-3`}>
+                    <ChevronLeft size={24} color="#000" />
                 </TouchableOpacity>
-                <Text style={tw`text-white text-lg font-heading`}>Your Bag</Text>
-                <View style={tw`flex-1 items-end`}>
-                    <Text style={tw`text-zinc-500 text-sm`}>{cartItems.reduce((a, b) => a + b.qty, 0)} items</Text>
+                <View>
+                    <Typography variant="h2">My Cart</Typography>
+                    <Typography variant="body" color="#666">{cartItems.length} items • 12 mins</Typography>
                 </View>
             </View>
 
-            <ScrollView contentContainerStyle={tw`p-6 pb-40`}>
-                {/* Savings Banner */}
-                <LinearGradient
-                    colors={['#4F46E5', '#312E81']}
-                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
-                    style={tw`p-4 rounded-2xl mb-6 flex-row items-center gap-3 border border-indigo-400/30`}
-                >
-                    <View style={tw`w-10 h-10 rounded-full bg-white/20 items-center justify-center`}>
-                        <ShieldCheck size={20} color="#FFF" />
-                    </View>
-                    <View>
-                        <Text style={tw`text-white font-bold text-lg`}>You saved £{savings.toFixed(2)}</Text>
-                        <Text style={tw`text-indigo-200 text-xs`}>with Hop-In Membership</Text>
-                    </View>
-                </LinearGradient>
+            <ScrollView contentContainerStyle={tw`pb-40`}>
 
-                {/* Items */}
-                {cartItems.map((item, i) => (
-                    <View key={i} style={tw`flex-row gap-4 mb-6 bg-zinc-900/50 p-4 rounded-2xl border border-white/5`}>
-                        <Image source={{ uri: item.product.image }} style={tw`w-20 h-20 rounded-xl bg-black`} />
-                        <View style={tw`flex-1 justify-between`}>
-                            <View>
-                                <Text style={tw`text-white font-medium text-base leading-tight`}>{item.product.name}</Text>
-                                <Text style={tw`text-zinc-500 text-xs mt-1`}>{item.product.size}</Text>
-                            </View>
-                            <View style={tw`flex-row justify-between items-end`}>
-                                <Text style={tw`text-indigo-400 font-bold`}>£{(item.product.memberPrice * item.qty).toFixed(2)}</Text>
-
-                                {/* Qty Control Mockup */}
-                                <View style={tw`flex-row items-center bg-black rounded-lg border border-white/10 px-2 py-1 gap-3`}>
-                                    <Text style={tw`text-zinc-400`}>-</Text>
-                                    <Text style={tw`text-white font-bold`}>{item.qty}</Text>
-                                    <Text style={tw`text-white`}>+</Text>
-                                </View>
-                            </View>
+                {/* 1. Delivery Tip / Location */}
+                <View style={tw`bg-white p-4 mb-4`}>
+                    <View style={tw`flex-row items-center mb-3`}>
+                        <View style={tw`bg-gray-100 p-2 rounded-lg mr-3`}>
+                            <MapPin size={20} color={COLORS.primary} />
+                        </View>
+                        <View>
+                            <Typography variant="h3">Delivering to Home</Typography>
+                            <Typography variant="body" color="#666">24 High St, Eastleigh</Typography>
                         </View>
                     </View>
-                ))}
+                    <View style={tw`flex-row items-center bg-green-50 p-3 rounded-xl border border-green-100`}>
+                        <Clock size={16} color={COLORS.success} />
+                        <Typography variant="body" style={tw`ml-2 font-medium text-green-800`}>Delivery in 10-12 minutes</Typography>
+                    </View>
+                </View>
+
+                {/* 2. Items */}
+                <View style={tw`bg-white p-4 mb-4`}>
+                    {cartItems.map((item, i) => (
+                        <View key={i} style={tw`flex-row justify-between items-start mb-6`}>
+                            <View style={tw`flex-row flex-1`}>
+                                <View style={tw`w-16 h-16 border border-gray-100 rounded-xl items-center justify-center mr-3`}>
+                                    <Image source={{ uri: item.image }} style={tw`w-10 h-10`} resizeMode="contain" />
+                                </View>
+                                <View style={tw`flex-1`}>
+                                    <Typography variant="body">{item.name}</Typography>
+                                    <Typography variant="caption" style={tw`mb-1`}>{item.size}</Typography>
+                                    <Typography variant="price">£{item.price.toFixed(2)}</Typography>
+                                </View>
+                            </View>
+
+                            {/* Qty Counter */}
+                            <View style={tw`bg-green-600 rounded-lg flex-row items-center px-2 py-1 h-8`}>
+                                <Typography variant="h3" color="#FFF" style={tw`px-2`}>-</Typography>
+                                <Typography variant="h3" color="#FFF">{item.qty}</Typography>
+                                <Typography variant="h3" color="#FFF" style={tw`px-2`}>+</Typography>
+                            </View>
+                        </View>
+                    ))}
+                </View>
+
+                {/* 3. Bill Details */}
+                <View style={tw`bg-white p-4 mb-4`}>
+                    <Typography variant="h3" style={tw`mb-4`}>Bill Details</Typography>
+
+                    <View style={tw`flex-row justify-between mb-2`}>
+                        <View style={tw`flex-row items-center`}>
+                            <FileText size={14} color="#666" style={tw`mr-2`} />
+                            <Typography variant="body" color="#666">Item Total</Typography>
+                        </View>
+                        <Typography variant="body">£{itemTotal.toFixed(2)}</Typography>
+                    </View>
+
+                    <View style={tw`flex-row justify-between mb-2`}>
+                        <View style={tw`flex-row items-center`}>
+                            <MapPin size={14} color="#666" style={tw`mr-2`} />
+                            <Typography variant="body" color="#666">Delivery Fee</Typography>
+                        </View>
+                        <Typography variant="body">£{deliveryFee.toFixed(2)}</Typography>
+                    </View>
+
+                    <View style={tw`flex-row justify-between mb-2`}>
+                        <View style={tw`flex-row items-center`}>
+                            <ShieldCheck size={14} color="#666" style={tw`mr-2`} />
+                            <Typography variant="body" color="#666">Handling Charge</Typography>
+                        </View>
+                        <Typography variant="body">£{handlingFee.toFixed(2)}</Typography>
+                    </View>
+
+                    <View style={tw`h-[1px] bg-gray-200 my-3`} />
+
+                    <View style={tw`flex-row justify-between`}>
+                        <Typography variant="h2">Grand Total</Typography>
+                        <Typography variant="h2">£{grandTotal.toFixed(2)}</Typography>
+                    </View>
+                </View>
+
+                <View style={tw`p-4 items-center`}>
+                    <Typography variant="caption" style={tw`text-center text-gray-400`}>
+                        Read our cancellation policy
+                    </Typography>
+                </View>
+
             </ScrollView>
 
-            {/* Checkout Dock */}
-            <BlurView intensity={50} tint="dark" style={tw`absolute bottom-0 w-full px-6 pt-6 pb-10 border-t border-white/10 bg-black/60`}>
-                <View style={tw`flex-row justify-between mb-2`}>
-                    <Text style={tw`text-zinc-400`}>Subtotal</Text>
-                    <Text style={tw`text-white font-medium`}>£{subtotal.toFixed(2)}</Text>
+            {/* Footer */}
+            <View style={tw`absolute bottom-0 w-full bg-white p-4 border-t border-gray-100 shadow-xl`}>
+                <View style={tw`mb-3 flex-row items-center bg-gray-50 p-2 rounded`}>
+                    <MapPin size={16} color="#000" />
+                    <Typography variant="caption" style={tw`ml-2 font-bold`}>Pay using Google Pay</Typography>
                 </View>
-                <View style={tw`flex-row justify-between mb-6`}>
-                    <Text style={tw`text-zinc-400`}>Delivery</Text>
-                    <Text style={tw`text-green-400`}>Free</Text>
-                </View>
-
-                <TouchableOpacity
-                    activeOpacity={0.8}
-                    style={tw`w-full h-14 rounded-2xl overflow-hidden relative items-center justify-center shadow-lg shadow-indigo-600/40`}
-                >
-                    <LinearGradient
-                        colors={['#fff', '#e2e8f0']}
-                        style={tw`absolute w-full h-full`}
-                    />
-                    <Text style={tw`text-black font-black uppercase tracking-widest text-sm`}>Checkout</Text>
-                </TouchableOpacity>
-            </BlurView>
+                <Button label="Place Order" onPress={() => { }} size="l" />
+            </View>
         </View>
     );
 }

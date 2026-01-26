@@ -34,17 +34,17 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <ThemeProvider value={DarkTheme}>
-      <View style={{ flex: 1, backgroundColor: '#050505' }}>
+    <ThemeProvider value={DefaultTheme}>
+      <View style={{ flex: 1, backgroundColor: '#FFFFFF' }}>
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: '#050505' }
+            contentStyle: { backgroundColor: '#FFFFFF' }
           }}
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />
         </Stack>
-        <StatusBar style="light" />
+        <StatusBar style="dark" />
       </View>
     </ThemeProvider>
   );

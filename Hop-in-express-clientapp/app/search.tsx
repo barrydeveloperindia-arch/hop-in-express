@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, TextInput, TouchableOpacity, ScrollView, Image, Text } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { BlurView } from 'expo-blur';
-import tw from '../src/lib/tw'; // Adjust import if needed, assuming direct export
-import { INVENTORY } from '../src/lib/mockInventory';
+import tw from '../src/lib/tw';
+// @ts-ignore
+import { INVENTORY } from '../src/mockInventory';
 import { Search as SearchIcon, X, ArrowRight } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { Typography } from '../src/components/atoms/Typography';
+import { Input } from '../src/components/atoms/Input';
+import { COLORS } from '../src/lib/theme';
 
 // Vernacular Mapping Mock
 const SYNONYMS: Record<string, string> = {
@@ -32,42 +35,42 @@ export default function SearchScreen() {
     );
 
     return (
-        <View style={tw`flex-1 bg-black`}>
-            <StatusBar style="light" />
+        <View style={tw`flex-1 bg-white`}>
+            <StatusBar style="dark" />
 
             {/* Search Header */}
-            <View style={tw`pt-14 pb-4 px-6 flex-row gap-3 items-center bg-zinc-900 border-b border-white/10`}>
-                <View style={tw`flex-1 h-12 bg-black rounded-2xl flex-row items-center px-4 border border-white/10`}>
-                    <SearchIcon size={20} color="#6B7280" />
+            <View style={tw`pt-14 pb-4 px-4 flex-row gap-3 items-center bg-white border-b border-gray-100`}>
+                <View style={tw`flex-1 h-12 bg-gray-100 rounded-xl flex-row items-center px-4 border border-transparent`}>
+                    <SearchIcon size={20} color={COLORS.textMuted} />
                     <TextInput
                         placeholder="Search for 'Bhindi', 'Atta'..."
-                        placeholderTextColor="#6B7280"
-                        style={tw`flex-1 ml-3 text-white text-base`}
+                        placeholderTextColor={COLORS.textMuted}
+                        style={tw`flex-1 ml-3 text-black text-base`}
                         value={query}
                         onChangeText={setQuery}
                         autoFocus
                     />
                     {query.length > 0 && (
                         <TouchableOpacity onPress={() => setQuery('')}>
-                            <X size={18} color="#9CA3AF" />
+                            <X size={18} color={COLORS.textMuted} />
                         </TouchableOpacity>
                     )}
                 </View>
                 <TouchableOpacity onPress={() => router.back()}>
-                    <Text style={tw`text-white text-sm font-medium`}>Cancel</Text>
+                    <Typography variant="body" style={tw`font-medium text-black`}>Cancel</Typography>
                 </TouchableOpacity>
             </View>
 
             {/* Content */}
-            <ScrollView contentContainerStyle={tw`p-6`}>
+            <ScrollView contentContainerStyle={tw`p-4`}>
                 {query.length === 0 ? (
                     // Empty State / Suggestions
                     <View>
-                        <Text style={tw`text-zinc-500 uppercase tracking-widest text-xs font-bold mb-4`}>Quick Actions</Text>
+                        <Typography variant="tiny" style={tw`text-gray-500 mb-4`}>Quick Actions</Typography>
                         <View style={tw`flex-row flex-wrap gap-2`}>
                             {['Bhindi', 'Thums Up', 'Atta', 'Haldirams'].map(tag => (
-                                <TouchableOpacity key={tag} onPress={() => setQuery(tag)} style={tw`bg-zinc-800 px-4 py-2 rounded-full border border-white/5`}>
-                                    <Text style={tw`text-zinc-300 text-sm`}>{tag}</Text>
+                                <TouchableOpacity key={tag} onPress={() => setQuery(tag)} style={tw`bg-gray-50 px-4 py-2 rounded-full border border-gray-200`}>
+                                    <Typography variant="body" color={COLORS.textMain}>{tag}</Typography>
                                 </TouchableOpacity>
                             ))}
                         </View>
@@ -75,27 +78,29 @@ export default function SearchScreen() {
                 ) : (
                     // Results
                     <View>
-                        <Text style={tw`text-white mb-4`}>
+                        <Typography variant="body" style={tw`mb-4 text-gray-800`}>
                             Found {results.length} results
-                            {SYNONYMS[normalizedQuery] && <Text style={tw`text-indigo-400 italic`}> (mapped from "{query}")</Text>}
-                        </Text>
+                            {SYNONYMS[normalizedQuery] && <Typography variant="caption" style={tw`text-indigo-600 italic`}> (mapped from "{query}")</Typography>}
+                        </Typography>
 
                         {results.map(product => (
                             <TouchableOpacity
                                 key={product.id}
                                 onPress={() => router.push(`/product/${product.id}`)}
-                                style={tw`flex-row items-center bg-zinc-900 p-3 rounded-2xl mb-3 border border-white/5`}
+                                style={tw`flex-row items-center bg-white p-2 rounded-xl mb-3 border border-gray-100 shadow-sm`}
                             >
-                                <Image source={{ uri: product.image }} style={tw`w-16 h-16 rounded-xl bg-black`} />
+                                <View style={tw`w-16 h-16 rounded-lg bg-gray-50 items-center justify-center border border-gray-100`}>
+                                    <Image source={{ uri: product.image }} style={tw`w-12 h-12`} resizeMode="contain" />
+                                </View>
                                 <View style={tw`flex-1 ml-4`}>
-                                    <Text style={tw`text-white font-medium`}>{product.name}</Text>
+                                    <Typography variant="h3">{product.name}</Typography>
                                     <View style={tw`flex-row items-center gap-2 mt-1`}>
-                                        <Text style={tw`text-indigo-400 font-bold`}>£{product.memberPrice.toFixed(2)}</Text>
-                                        <Text style={tw`text-zinc-600 line-through text-xs`}>£{product.price.toFixed(2)}</Text>
+                                        <Typography variant="price">£{product.memberPrice.toFixed(2)}</Typography>
+                                        <Typography variant="tiny" style={tw`text-gray-400 line-through`}>£{product.price.toFixed(2)}</Typography>
                                     </View>
                                 </View>
-                                <View style={tw`w-8 h-8 rounded-full bg-indigo-600/20 items-center justify-center`}>
-                                    <ArrowRight size={16} color="#6366F1" />
+                                <View style={tw`w-8 h-8 rounded-full bg-gray-50 items-center justify-center`}>
+                                    <ArrowRight size={16} color={COLORS.primary} />
                                 </View>
                             </TouchableOpacity>
                         ))}
