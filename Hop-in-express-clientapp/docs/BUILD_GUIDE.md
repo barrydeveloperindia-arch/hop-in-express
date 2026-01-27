@@ -7,8 +7,15 @@
 1.  **Android Studio**: Ensure it's installed and the `ANDROID_HOME` environment variable is set.
 2.  **SDK Tools**: Install "Android SDK Command-line Tools" via Android Studio SDK Manager.
 3.  **Google Maps API Key**:
-    *   Get an API Key from Google Cloud Console with **Maps SDK for Android** enabled.
-    *   Open `app.json` and replace `TODO_REPLACE_WITH_YOUR_KEY` with your actual key.
+    *   **Step 1**: Go to the [Google Cloud Console](https://console.cloud.google.com/).
+    *   **Step 2**: Create a new project (e.g., "Hop-In Express Maps").
+    *   **Step 3**: In the search bar at the top, type "Maps SDK for Android" and select it. Click **Enable**.
+    *   **Step 4**: Go to the **Credentials** page (Menu > APIs & Services > Credentials).
+    *   **Step 5**: Click **Create Credentials** > **API Key**.
+    *   **Step 6**: Copy the generated key string.
+    *   **Step 7**: Open `app.json` in your project and replace `TODO_REPLACE_WITH_YOUR_KEY` with this copied key.
+    
+    *(Optional but Recommended)*: Click on the credential name to edit it. Under "API restrictions", select "Restrict key" and choose "Maps SDK for Android". Under "Application restrictions", choose "Android apps" and add your package name: `com.barry_developer.hopinexpress`.
 
 ## Step 1: Generate Native Project
 
