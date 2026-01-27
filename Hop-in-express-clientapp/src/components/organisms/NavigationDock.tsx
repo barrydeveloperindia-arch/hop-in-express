@@ -43,7 +43,7 @@ export const NavigationDock = () => {
             <NavItem icon={Search} label="Search" path="/search" />
             {/* Bag has a special 'Print' icon feel in Blinkit, usually just Bag */}
             <NavItem icon={ShoppingBag} label="Bag" path="/cart" />
-            <NavItem icon={User} label="Orders" path="/orders" />
+            <NavItem icon={User} label="Account" path="/account" />
         </View>
     );
 };

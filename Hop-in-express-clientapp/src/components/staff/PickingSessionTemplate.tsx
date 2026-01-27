@@ -8,7 +8,7 @@ import { Check, ArrowLeft, Bike, AlertCircle } from 'lucide-react-native';
 import { COLORS } from '../../lib/theme';
 import { useRouter } from 'expo-router';
 
-// Mock Items for Order
+// Mock Items for Order (Ideally fetch from backend)
 const ORDER_ITEMS = [
     { id: '1', name: 'Organic Nano Banana', qty: 2, bin: 'A-12', image: 'https://images.pexels.com/photos/1093038/pexels-photo-1093038.jpeg?auto=compress&cs=tinysrgb&w=300', picked: false },
     { id: '2', name: 'Thums Up (300ml)', qty: 6, bin: 'B-04', image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Coca_Cola_can.jpg/640px-Coca_Cola_can.jpg', picked: false }, // Generic Soda
@@ -36,26 +36,28 @@ export const PickingSessionTemplate = ({ orderId }: { orderId: string }) => {
     };
 
     return (
-        <View style={tw`flex-1 bg-white`}>
-            <StatusBar style="dark" />
+        <View style={tw`flex-1 bg-zinc-950`}>
+            <StatusBar style="light" />
 
             {/* Header */}
-            <View style={tw`pt-14 pb-4 px-4 bg-white border-b border-gray-100 flex-row justify-between items-center`}>
-                <TouchableOpacity onPress={() => router.back()} style={tw`bg-gray-100 p-2 rounded-full`}>
-                    <ArrowLeft size={20} color="#000" />
+            <View style={tw`pt-14 pb-4 px-4 bg-zinc-900 border-b border-zinc-800 flex-row justify-between items-center`}>
+                <TouchableOpacity onPress={() => router.back()} style={tw`bg-zinc-800 p-2 rounded-full border border-zinc-700`}>
+                    <ArrowLeft size={20} color="#FFF" />
                 </TouchableOpacity>
                 <View style={tw`items-end`}>
-                    <Typography variant="h3">Order #{orderId?.split('_')[1] || '000'}</Typography>
-                    <Typography variant="caption" color="red" style={tw`font-bold`}>DUE IN 8 MINS</Typography>
+                    <Typography variant="h3" color="#FFF">Order #{orderId?.split('_')[1] || '000'}</Typography>
+                    <View style={tw`bg-red-500/20 px-2 py-0.5 rounded mt-1 border border-red-500/30`}>
+                        <Typography variant="caption" color="#F87171" style={tw`font-bold text-[10px]`}>DUE IN 8 MINS</Typography>
+                    </View>
                 </View>
             </View>
 
-            {/* Progress Bar */}
-            <View style={tw`h-1 bg-gray-100 w-full`}>
-                <View style={[tw`h-full bg-green-500`, { width: `${progress * 100}%` }]} />
+            {/* Progress Bar (Glow) */}
+            <View style={tw`h-1.5 bg-zinc-800 w-full`}>
+                <View style={[tw`h-full bg-green-500 shadow-lg shadow-green-500`, { width: `${progress * 100}%` }]} />
             </View>
-            <View style={tw`bg-green-50 p-2 items-center`}>
-                <Typography variant="tiny" style={tw`text-green-800 font-bold`}>{pickedItems} of {totalItems} items picked</Typography>
+            <View style={tw`bg-green-500/10 p-2 items-center border-b border-green-500/20`}>
+                <Typography variant="tiny" style={tw`text-green-400 font-bold uppercase tracking-widest`}>{pickedItems} of {totalItems} items picked</Typography>
             </View>
 
             {/* Picking List */}
@@ -65,28 +67,30 @@ export const PickingSessionTemplate = ({ orderId }: { orderId: string }) => {
                         key={item.id}
                         onPress={() => togglePick(item.id)}
                         activeOpacity={0.8}
-                        style={tw`flex-row items-center p-4 rounded-xl mb-3 border ${item.picked ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200 shadow-sm'}`}
+                        style={tw`flex-row items-center p-4 rounded-xl mb-3 border ${item.picked ? 'bg-green-900/20 border-green-500/30' : 'bg-zinc-900 border-zinc-800'}`}
                     >
                         {/* Checkbox Visual */}
-                        <View style={tw`w-8 h-8 rounded-full border-2 items-center justify-center mr-4 ${item.picked ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
+                        <View style={tw`w-8 h-8 rounded-full border-2 items-center justify-center mr-4 ${item.picked ? 'bg-green-500 border-green-500' : 'border-zinc-700 bg-zinc-950'}`}>
                             {item.picked && <Check size={16} color="#FFF" />}
                         </View>
 
-                        <Image source={{ uri: item.image }} style={tw`w-12 h-12 mr-4 ${item.picked ? 'opacity-50' : ''}`} resizeMode="contain" />
+                        <View style={tw`w-12 h-12 mr-4 bg-zinc-800 rounded-lg overflow-hidden border border-zinc-700`}>
+                            <Image source={{ uri: item.image }} style={tw`w-full h-full ${item.picked ? 'opacity-50' : ''}`} resizeMode="cover" />
+                        </View>
 
                         <View style={tw`flex-1`}>
-                            <View style={tw`flex-row justify-between`}>
-                                <Typography variant="h3" style={item.picked ? tw`text-gray-400 line-through` : tw`text-black`}>{item.name}</Typography>
-                                <Typography variant="h3" style={tw`font-bold`}>x{item.qty}</Typography>
+                            <View style={tw`flex-row justify-between mb-1`}>
+                                <Typography variant="h3" color={item.picked ? '#4B5563' : '#FFF'} style={item.picked ? tw`line-through` : {}}>{item.name}</Typography>
+                                <Typography variant="h3" color={item.picked ? '#4B5563' : '#FFF'} style={tw`font-bold`}>x{item.qty}</Typography>
                             </View>
-                            <Typography variant="caption" style={tw`font-bold text-blue-600 mt-1`}>BIN: {item.bin}</Typography>
+                            <Typography variant="caption" style={tw`font-bold text-blue-400`}>BIN: {item.bin}</Typography>
                         </View>
                     </TouchableOpacity>
                 ))}
             </ScrollView>
 
             {/* Dispatch Footer */}
-            <View style={tw`absolute bottom-0 w-full bg-white p-4 border-t border-gray-100 shadow-xl`}>
+            <View style={tw`absolute bottom-0 w-full bg-zinc-900 p-4 border-t border-zinc-800`}>
                 {progress === 1 ? (
                     <TouchableOpacity
                         onPress={handleDispatch}
@@ -96,9 +100,9 @@ export const PickingSessionTemplate = ({ orderId }: { orderId: string }) => {
                         <Typography variant="h3" color="#FFF">DISPATCH RIDER</Typography>
                     </TouchableOpacity>
                 ) : (
-                    <View style={tw`flex-row items-center justify-center h-14 bg-gray-100 rounded-xl`}>
-                        <AlertCircle size={20} color="#9CA3AF" style={tw`mr-2`} />
-                        <Typography variant="body" color="#9CA3AF">Scan/Pick all items to dispatch</Typography>
+                    <View style={tw`flex-row items-center justify-center h-14 bg-zinc-800 rounded-xl border border-zinc-700`}>
+                        <AlertCircle size={20} color="#71717A" style={tw`mr-2`} />
+                        <Typography variant="body" color="#71717A">Scan/Pick all items to dispatch</Typography>
                     </View>
                 )}
             </View>

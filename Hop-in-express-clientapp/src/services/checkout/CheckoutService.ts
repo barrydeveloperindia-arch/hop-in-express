@@ -16,6 +16,8 @@ export type Order = {
     deliveryFee: number;
     total: number;
     status: OrderStatus;
+    paymentMethod: string;
+    notes?: string;
     customer: {
         name: string;
         phone: string;
@@ -34,7 +36,9 @@ export class CheckoutService {
     static async placeOrder(
         items: OrderItem[],
         totals: { subtotal: number; deliveryFee: number; total: number },
-        customer: { name: string; phone: string; address: string }
+        customer: { name: string; phone: string; address: string },
+        paymentMethod: string,
+        notes?: string
     ): Promise<string> {
         try {
             const orderData: Order = {
@@ -42,6 +46,8 @@ export class CheckoutService {
                 ...totals,
                 customer,
                 status: 'pending',
+                paymentMethod,
+                notes,
                 createdAt: serverTimestamp(),
                 shopId: SHOP_ID
             };

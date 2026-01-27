@@ -37,7 +37,7 @@ export default function CartScreen() {
     const handlingFee = 0.99;
     const grandTotal = itemTotal + deliveryFee + handlingFee;
 
-    const handleConfirmOrder = async (details: { name: string; phone: string; address: string; notes: string }) => {
+    const handleConfirmOrder = async (details: { name: string; phone: string; address: string; notes: string; paymentMethod: string }) => {
         setOrdering(true);
         setShowCheckout(false);
 
@@ -52,7 +52,9 @@ export default function CartScreen() {
                     name: details.name,
                     phone: details.phone,
                     address: details.address
-                }
+                },
+                details.paymentMethod,
+                details.notes
             );
 
             clearCart();
@@ -175,6 +177,8 @@ export default function CartScreen() {
                 visible={showCheckout}
                 onClose={() => setShowCheckout(false)}
                 onSubmit={handleConfirmOrder}
+                total={grandTotal}
+                count={cartItems.reduce((acc, item) => acc + item.qty, 0)}
             />
         </View>
     );

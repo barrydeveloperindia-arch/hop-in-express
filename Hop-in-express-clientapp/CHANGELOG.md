@@ -19,3 +19,15 @@ All notable changes to the "Hopin Express" project will be documented in this fi
 
 ### Deprecated
 - **Midnight Vanta Theme**: Removed dark mode components (legacy `v1`).
+
+## [v2.1.0] - 2026-01-27
+### Added
+- **Manager Cockpit**: Specialized dashboard for store managers (`StaffDashboardTemplate`).
+- **Dark Operations Theme**: High-contrast dark mode for warehouse/picking environments (Phase 3).
+- **Gamified KPI Dials**: `CircularProgress` for inventory health monitoring.
+- **Rider Fleet Map**: Live visualization of rider locations (`RiderMap`).
+- **One-Tap Restock**: `RestockSwiper` for rapid inventory management.
+- **Live Event Ticker**: Real-time alerts implementation (`Ticker`). 
+
+### Changed
+- **Picking Session**: Refactored `PickingSessionTemplate` to use "Dark Operations" theme for better visibility in dim conditions.
