@@ -50,14 +50,17 @@ export default function AccountScreen() {
     };
 
     const handleLogin = async () => {
+        console.log("Attempting anonymous login...");
         try {
             const u = await AuthService.loginAnonymously();
+            console.log("Login success! User:", u.uid);
             setUser(u);
             // Initialize basic profile if needed
             await UserProfileService.updateProfile(u.uid, { uid: u.uid, displayName: 'Guest User', role: 'customer' });
             await fetchProfile(u);
             Alert.alert("Welcome!", "You are now logged in anonymously.");
         } catch (e) {
+            console.error("Login failed:", e);
             Alert.alert("Login Failed", "Could not sign in.");
         }
     };

@@ -61,3 +61,19 @@ This will compile the app and install it directly on your connected device or em
 -   **Customer App**: The default view.
 -   **Manager App**: Login or navigate to `/staff`.
 -   **Rider App**: Navigate to Rider Mode (future impl).
+
+## Troubleshooting
+
+### Java Version / Gradle Errors
+If you see errors like:
+- `incompatible Daemon`
+- `Unsupported class file major version`
+- `Could not find tools.jar`
+
+This is likely because your system is using **Java 8**. React Native (0.76+) requires **Java 17** or newer.
+
+**Solution**:
+Use the JDK bundled with Android Studio. We have created a helper skill for this:
+1.  Open `skills/android_build_fix/SKILL.md`
+2.  Run the PowerShell script provided there to set your `JAVA_HOME` correctly.
+

@@ -19,31 +19,27 @@ export const Header = () => {
     }, []);
 
     return (
-        <View style={tw`bg-white pt-14 pb-3 px-4 shadow-sm z-10 border-b border-gray-100`}>
+        <View style={tw`bg-white pt-14 pb-2 px-4 shadow-sm z-10 border-b border-gray-100`}>
             {/* Top Row: Location & Profile */}
-            <View style={tw`flex-row justify-between items-start mb-4`}>
+            <View style={tw`flex-row justify-between items-center mb-3`}>
                 <View>
                     <View style={tw`flex-row items-center`}>
-                        <Typography variant="h2" style={tw`text-xl font-black mr-1`}>Eastleigh</Typography>
-                        <ChevronDown size={16} color="#000" />
+                        <MapPin size={18} color={COLORS.primary} style={tw`mr-1`} />
+                        <Typography variant="h2" style={tw`text-lg font-black mr-1`}>Eastleigh</Typography>
+                        <ChevronDown size={18} color="#000" />
                     </View>
-                    <View style={tw`flex-row items-center mt-1`}>
-                        <Typography variant="body" style={tw`text-xs text-gray-800 font-bold bg-gray-100 px-2 py-0.5 rounded-md overflow-hidden mr-1`}>
-                            ⏱ 10 MINS
-                        </Typography>
-                        <Typography variant="body" style={tw`text-xs text-gray-500`}>to Home</Typography>
-                    </View>
+                    <Typography variant="body" style={tw`text-[11px] text-gray-500 font-medium ml-6`}>10 Minutes to Home</Typography>
                 </View>
 
                 <TouchableOpacity
                     onPress={() => router.push('/account')}
-                    style={tw`bg-gray-100 p-2 rounded-full`}
+                    style={tw`bg-gray-50 p-2.5 rounded-full border border-gray-100`}
                 >
-                    <User size={20} color="#000" />
+                    <User size={20} color="#1F2937" />
                 </TouchableOpacity>
             </View>
 
-            {/* Search Bar */}
+            {/* Search Bar - Squircle & Soft */}
             <TouchableOpacity
                 activeOpacity={0.9}
                 onPress={() => router.push('/search')}
@@ -52,9 +48,10 @@ export const Header = () => {
                 <View style={tw`pointer-events-none`}>
                     <Input
                         placeholder='Search "milk", "bread"...'
-                        icon={<Search size={20} color={COLORS.textMuted} />}
-                        style={tw`bg-gray-50 border border-gray-200`}
-                        editable={false} // Important: prevent keyboard, just navigate
+                        icon={<Search size={18} color={COLORS.textMuted} />}
+                        containerStyle={tw`bg-gray-50 border-0 rounded-xl h-11 pr-4`} // Use containerStyle for the box
+                        style={tw`font-medium text-[15px]`} // Use style for the text input
+                        editable={false}
                     />
                 </View>
             </TouchableOpacity>
